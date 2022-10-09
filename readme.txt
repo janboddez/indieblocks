@@ -1,0 +1,25 @@
+=== IndieBlocks ===
+Contributors: janboddez
+Tags: blocks, gutenberg, indieweb, notes, likes, micropub, fse
+Tested up to: 6.1
+License: GNU General Public License v3.0
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+
+Use blocks, and, optionally, "short-form" post types to easily "IndieWebify" your WordPress site.
+
+== Description ==
+IndieBlocks currently registers a single block, "Context," which takes a URL and "type," and outputs correctly microformatted HTML.
+More blocks are on the way.
+In combination with a microformats-compatible theme, these help ensure Microformats clients are able to determine a post's type.
+It also comes with "short-form" (Note and Like) custom post types, and a (somewhat experimental) option to add microformats to (all!) *block-based* themes.
+
+== Installation ==
+Upload this plugin's ZIP file via the Plugins > Add New > "Upload Plugin" button.
+
+After activation, head over to *Settings > IndieBlocks*, and enable or disable its different features.
+
+More detailed instructions can be found on https://jan.boddez.net/wordpress/indieblocks.
+
+== Changelog ==
+= 0.1.0 =
+Very first version.

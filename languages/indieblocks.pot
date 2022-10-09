@@ -1,0 +1,255 @@
+# Copyright (C) 2022 Jan Boddez
+# This file is distributed under the GNU General Public License v3.
+msgid ""
+msgstr ""
+"Project-Id-Version: IndieBlocks 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2022-10-09T18:54:45+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.6.0\n"
+"X-Domain: indieblocks\n"
+
+#. Plugin Name of the plugin
+#: includes/class-options-handler.php:55
+#: includes/class-options-handler.php:56
+#: includes/class-options-handler.php:136
+msgid "IndieBlocks"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://jan.boddez.net/wordpress/indieblocks"
+msgstr ""
+
+#. Description of the plugin
+msgid "Leverage blocks and custom post types to easily \"IndieWebify\" your WordPress site."
+msgstr ""
+
+#. Author of the plugin
+msgid "Jan Boddez"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://jan.boddez.net/"
+msgstr ""
+
+#: includes/class-options-handler.php:144
+msgid "Blocks"
+msgstr ""
+
+#: includes/class-options-handler.php:145
+msgid "Enable blocks?"
+msgstr ""
+
+#: includes/class-options-handler.php:146
+msgid "Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!"
+msgstr ""
+
+#: includes/class-options-handler.php:149
+msgid "Post Types"
+msgstr ""
+
+#: includes/class-options-handler.php:150
+msgid "Enable short-form post types?"
+msgstr ""
+
+#: includes/class-options-handler.php:151
+msgid "Enable note and like post types. If the &ldquo;Blocks&rdquo; option is enabled, too, this will register a starter block template for notes and likes."
+msgstr ""
+
+#: includes/class-options-handler.php:154
+msgid "Taxonomies"
+msgstr ""
+
+#: includes/class-options-handler.php:155
+msgid "Enable Note categories and tags?"
+msgstr ""
+
+#: includes/class-options-handler.php:156
+msgid "(Requires &ldquo;Post Types.&rdquo;) Enable note categories and tags."
+msgstr ""
+
+#: includes/class-options-handler.php:159
+msgid "Custom Menu Order"
+msgstr ""
+
+#: includes/class-options-handler.php:160
+msgid "Custom menu order?"
+msgstr ""
+
+#: includes/class-options-handler.php:161
+msgid "(Requires &ldquo;Post Types.&rdquo;) Group (regular) posts, notes, and likes at the top of WordPress&rsquo; admin menu."
+msgstr ""
+
+#: includes/class-options-handler.php:164
+msgid "Autogenerate Titles"
+msgstr ""
+
+#: includes/class-options-handler.php:165
+msgid "Automatically generate titles?"
+msgstr ""
+
+#: includes/class-options-handler.php:166
+msgid "(Requires &ldquo;Post Types.&rdquo;) Autogenerate note and like titles. (Your theme should probably hide these, still.)"
+msgstr ""
+
+#: includes/class-options-handler.php:169
+msgid "Random Slugs"
+msgstr ""
+
+#: includes/class-options-handler.php:170
+msgid "Generate random slugs?"
+msgstr ""
+
+#: includes/class-options-handler.php:171
+msgid "(Requires &ldquo;Post Types.&rdquo;) Autogenerate note and like slugs. Disable for WordPress&rsquo; default behavior."
+msgstr ""
+
+#: includes/class-options-handler.php:175
+msgid "Include in Search"
+msgstr ""
+
+#: includes/class-options-handler.php:176
+msgid "Include Notes in search?"
+msgstr ""
+
+#: includes/class-options-handler.php:177
+msgid "(Requires &ldquo;Post Types.&rdquo;) Include notes (and pages, but not likes) in search results."
+msgstr ""
+
+#: includes/class-options-handler.php:181
+msgid "Microformats"
+msgstr ""
+
+#: includes/class-options-handler.php:182
+msgid "Enable microformats2?"
+msgstr ""
+
+#: includes/class-options-handler.php:183
+msgid "(Experimental) Adds microformats2 to this site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor."
+msgstr ""
+
+#: includes/class-post-types.php:80
+msgid "Notes"
+msgstr ""
+
+#: includes/class-post-types.php:81
+msgid "Note"
+msgstr ""
+
+#: includes/class-post-types.php:82
+msgid "New Note"
+msgstr ""
+
+#: includes/class-post-types.php:83
+msgid "Add New Note"
+msgstr ""
+
+#: includes/class-post-types.php:84
+msgid "Edit Note"
+msgstr ""
+
+#: includes/class-post-types.php:85
+msgid "View Note"
+msgstr ""
+
+#: includes/class-post-types.php:86
+msgid "View Notes"
+msgstr ""
+
+#: includes/class-post-types.php:87
+msgid "Search Notes"
+msgstr ""
+
+#: includes/class-post-types.php:88
+msgid "No notes found."
+msgstr ""
+
+#: includes/class-post-types.php:89
+msgid "No notes found in trash."
+msgstr ""
+
+#: includes/class-post-types.php:95
+msgid "notes"
+msgstr ""
+
+#: includes/class-post-types.php:117
+msgid "Likes"
+msgstr ""
+
+#: includes/class-post-types.php:118
+msgid "Like"
+msgstr ""
+
+#: includes/class-post-types.php:119
+msgid "New Like"
+msgstr ""
+
+#: includes/class-post-types.php:120
+msgid "Add New Like"
+msgstr ""
+
+#: includes/class-post-types.php:121
+msgid "Edit Like"
+msgstr ""
+
+#: includes/class-post-types.php:122
+msgid "View Like"
+msgstr ""
+
+#: includes/class-post-types.php:123
+msgid "View Likes"
+msgstr ""
+
+#: includes/class-post-types.php:124
+msgid "Search Likes"
+msgstr ""
+
+#: includes/class-post-types.php:125
+msgid "No likes found."
+msgstr ""
+
+#: includes/class-post-types.php:126
+msgid "No likes found in trash."
+msgstr ""
+
+#: includes/class-post-types.php:132
+msgid "likes"
+msgstr ""
+
+#. translators: %s: URL of the bookmarked page.
+#: blocks/context/block.js:17
+msgid "Bookmarked %s."
+msgstr ""
+
+#. translators: %s: URL of the "liked" page.
+#: blocks/context/block.js:19
+msgid "Liked %s."
+msgstr ""
+
+#. translators: %s: URL of the page being replied to.
+#: blocks/context/block.js:21
+msgid "In reply to %s."
+msgstr ""
+
+#. translators: %s: URL of the "page" being reposted.
+#: blocks/context/block.js:23
+msgid "Reposted %s."
+msgstr ""
+
+#: blocks/context/block.js:30
+msgid "Context"
+msgstr ""
+
+#: blocks/context/block.js:31
+msgid "Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph."
+msgstr ""
+
+#: blocks/context/block.json
+msgctxt "block title"
+msgid "Context"
+msgstr ""

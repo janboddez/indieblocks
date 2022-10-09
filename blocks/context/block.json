@@ -1,0 +1,30 @@
+{
+	"apiVersion": 2,
+	"title": "Context",
+	"name": "indieblocks/context",
+	"category": "text",
+	"icon": "format-status",
+	"editorScript": "file:./block.js",
+	"attributes": {
+		"url": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "href",
+			"default": "https://example.org/"
+		},
+		"kind": {
+			"type": "string",
+			"selector": "a",
+			"attribute": "class",
+			"default": "u-bookmark-of"
+		}
+	},
+	"example": {
+		"attributes": {
+			"url": "https://example.org/",
+			"kind": "u-bookmark-of"
+		}
+	},
+	"textdomain": "indieblocks"
+}

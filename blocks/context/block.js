@@ -46,7 +46,7 @@
 			return el( 'div', useBlockProps(),
 				[
 					el( BlockControls ),
-					props.isSelected
+					( props.isSelected || undefined === url )
 						? el( Placeholder, blockProps,
 							[
 								el( TextControl, {

@@ -53,11 +53,22 @@ class IndieBlocks {
 		$this->options_handler = new Options_Handler();
 		$this->options_handler->register();
 
+		// Load "modules." We hook these up to `plugins_loaded` rather than
+		// directly call the `register()` methods. This allows other plugins to
+		// more easily unhook them.
 		$options = $this->options_handler->get_options();
 
 		// Gutenberg blocks.
 		if ( ! empty( $options['enable_blocks'] ) ) {
 			add_action( 'plugins_loaded', array( Blocks::class, 'register' ) );
+		}
+
+		// `Feeds::register()` runs its own option check.
+		add_action( 'plugins_loaded', array( Feeds::class, 'register' ) );
+
+		// Location and weather functions.
+		if ( ! empty( $options['location_functions'] ) ) {
+			add_action( 'plugins_loaded', array( Location::class, 'register' ) );
 		}
 
 		// Custom Post Types.

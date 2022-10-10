@@ -110,21 +110,24 @@ class Options_Handler {
 	 * @param mixed $new_value New value.
 	 */
 	public function flush_permalinks( $old_value, $new_value ) {
-		if ( ! empty( $new_value['post_types'] ) ) {
-			// Post types are currently active.
-			if ( ! empty( $old_value['post_types'] ) ) {
-				// But they already were.
-				return;
-			}
+		$flush = false;
 
-			Post_Types::register_post_types();
-		} elseif ( empty( $old_value['post_types'] ) ) {
-			// They were inactive before and still are.
-			return;
+		if ( empty( $old_value['post_types'] ) && ! empty( $new_value['post_types'] ) ) {
+			$flush = true;
+		}
+		if ( empty( $new_value['post_types'] ) && ! empty( $old_value['post_types'] ) ) {
+			$flush = true;
+		}
+		if ( empty( $old_value['modified_feeds'] ) && ! empty( $new_value['modified_feeds'] ) ) {
+			$flush = true;
+		}
+		if ( empty( $new_value['modified_feeds'] ) && ! empty( $old_value['modified_feeds'] ) ) {
+			$flush = true;
 		}
 
-		// Something changed.
-		flush_rewrite_rules();
+		if ( $flush ) {
+			flush_rewrite_rules();
+		}
 	}
 
 	/**
@@ -169,6 +172,16 @@ class Options_Handler {
 						<th scope="row"><?php esc_html_e( 'Random Slugs', 'indieblocks' ); ?></label></th>
 						<td><label><input type="checkbox" name="indieblocks_settings[random_slugs]" value="1" <?php checked( ! empty( $this->options['random_slugs'] ) ); ?>/> <?php esc_html_e( 'Generate random slugs?', 'indieblocks' ); ?></label>
 						<p class="description"><?php esc_html_e( '(Requires &ldquo;Post Types.&rdquo;) Autogenerate note and like slugs. Disable for WordPress&rsquo; default behavior.', 'indieblocks' ); ?></p></td>
+					</tr>
+					<tr valign="top">
+						<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></label></th>
+						<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Modify feeds?', 'indieblocks' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Disables all but RSS feeds, and, depending on you permalinks settings, will include notes in your main feed and set up a separate post-only feed.', 'indieblocks' ); ?></p></td>
+					</tr>
+					<tr valign="top">
+						<th scope="row"><?php esc_html_e( 'Location and Weather', 'indieblocks' ); ?></label></th>
+						<td><label><input type="checkbox" name="indieblocks_settings[location_functions]" value="1" <?php checked( ! empty( $this->options['location_functions'] ) ); ?>/> <?php esc_html_e( 'Enable location functions?', 'indieblocks' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Add basic location and weather data to posts.', 'indieblocks' ); ?></p></td>
 					</tr>
 					<!--
 					<tr valign="top">

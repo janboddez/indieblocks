@@ -75,14 +75,14 @@ class Feeds {
 	 * Hides note titles from RSS feeds.
 	 */
 	public static function load_custom_rss2_template() {
-		require_once dirname( dirname( __FILE__ ) ) . '/templates/feed-rss2.php';
+		require_once dirname( __DIR__ ) . '/templates/feed-rss2.php';
 	}
 
 	/**
 	 * Hides note titles from Atom feeds.
 	 */
 	public static function load_custom_atom_template() {
-		require_once dirname( dirname( __FILE__ ) ) . '/templates/feed-atom.php';
+		require_once dirname( __DIR__ ) . '/templates/feed-atom.php';
 	}
 
 	/**

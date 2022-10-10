@@ -95,6 +95,10 @@ class IndieBlocks {
 			Post_Types::register_post_types();
 		}
 
+		if ( ! empty( $options['modified_feeds'] ) ) {
+			Feeds::create_post_feed();
+		}
+
 		flush_rewrite_rules();
 	}
 

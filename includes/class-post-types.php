@@ -24,15 +24,16 @@ class Post_Types {
 
 			// Set the post type for Micropub posts.
 			add_filter( 'micropub_post_type', array( __CLASS__, 'set_post_type' ), 10, 2 );
+			add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
 
 			if ( ! empty( $options['default_taxonomies'] ) ) {
 				// Include Notes in category and tag archives.
-				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ) );
+				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
 			}
 
 			if ( ! empty( $options['include_in_search'] ) ) {
 				// Include short-form entries in search results.
-				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ) );
+				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ), 99 );
 			}
 
 			if ( ! empty( $options['automatic_titles'] ) ) {
@@ -167,6 +168,98 @@ class Post_Types {
 	}
 
 	/**
+	 * Overrides default Micropub post content.
+	 *
+	 * @todo: Clean up.
+	 *
+	 * @param  string $post_content Post content.
+	 * @param  array  $input        Input properties.
+	 * @return string               Modified content.
+	 */
+	public static function set_post_content( $post_content, $input ) {
+		$plugin  = IndieBlocks::get_instance();
+		$options = $plugin->get_options_handler()->get_options();
+
+		if ( empty( $options['enable_blocks'] ) ) {
+			return $post_content;
+		}
+
+		// Replace the default content with an `indieblocks/context` block.
+		if ( ! empty( $input['properties']['like-of'][0] ) ) {
+			// Replace the default content with an `indieblocks/context` block.
+			$url = $input['properties']['like-of'][0];
+
+			/*
+			// Sanitize URL.
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				$url = $matches[0]; // Just the URL, please.
+			}
+			*/
+			$post_content = '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->
+			<div class="wp-block-indieblocks-context"><i>Liked <a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
+			<!-- /wp:indieblocks/context -->';
+
+			if ( ! empty( $input['properties']['content'][0] ) ) {
+				// A comment or quote, etc.
+				$post_content .= static::render_content( $input['properties']['content'][0] );
+			}
+		} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
+			$url = $input['properties']['bookmark-of'][0];
+
+			/*
+			// Sanitize URL.
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				$url = $matches[0]; // Just the URL, please.
+			}
+			*/
+			$post_content = '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->
+			<div class="wp-block-indieblocks-context"><i>Bookmarked <a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
+			<!-- /wp:indieblocks/context -->';
+
+			if ( ! empty( $input['properties']['content'][0] ) ) {
+				$post_content .= static::render_content( $input['properties']['content'][0] );
+			}
+		} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
+			// To do: add richer content for known sources (Twitter, Nitter).
+			$url = $input['properties']['repost-of'][0];
+
+			/*
+			// Sanitize URL.
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				$url = $matches[0]; // Just the URL, please.
+			}
+			*/
+			$post_content = '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->
+			<div class="wp-block-indieblocks-context"><i>Reposted <a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
+			<!-- /wp:indieblocks/context -->';
+
+			if ( ! empty( $input['properties']['content'][0] ) ) {
+				$post_content .= '<!-- wp:quote -->
+				<blockquote class="wp-block-quote" id="e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
+				<!-- /wp:quote -->';
+			}
+		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
+			$url = $input['properties']['in-reply-to'][0];
+
+			/*
+			// Sanitize URL.
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				$url = $matches[0]; // Just the URL, please.
+			}
+			*/
+			$post_content = '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->
+			<div class="wp-block-indieblocks-context"><i>Bookmarked <a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
+			<!-- /wp:indieblocks/context -->';
+
+			if ( ! empty( $input['properties']['content'][0] ) ) {
+				$post_content .= static::render_content( $input['properties']['content'][0] );
+			}
+		}
+
+		return $post_content;
+	}
+
+	/**
 	 * Sets a random slug for short-form content.
 	 *
 	 * @param  array $data    Filtered data.
@@ -298,7 +391,17 @@ class Post_Types {
 			return $query;
 		}
 
-		$query->set( 'post_type', array( 'post', 'indieblocks_note' ) );
+		$post_types = $query->get( 'post_type' );
+
+		if ( is_string( $post_types ) ) {
+			$post_types = array_filter( explode( ',', $post_types ) );
+		}
+
+		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
+		$post_types   = (array) $post_types;
+		$post_types[] = 'indieblocks_note';
+
+		$query->set( 'post_type', array_unique( $post_types ) );
 
 		return $query;
 	}
@@ -326,8 +429,33 @@ class Post_Types {
 			return $query;
 		}
 
-		$query->set( 'post_type', array( 'post', 'page', 'indieblocks_note' ) );
+		$post_types = $query->get( 'post_type' );
+
+		if ( is_string( $post_types ) ) {
+			$post_types = array_filter( explode( ',', $post_types ) );
+		}
+
+		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
+		$post_types   = (array) $post_types;
+		$post_types[] = 'indieblocks_note';
+		$post_types[] = 'page';
+
+		$query->set( 'post_type', array_unique( $post_types ) );
 
 		return $query;
+	}
+
+	/**
+	 * Render `e-content` for certain post types.
+	 *
+	 * @param  string $content Original post content.
+	 * @return string          Modified content.
+	 */
+	public static function render_content( $content ) {
+		return '<!-- wp:group {"className":"e-content"} -->
+		<div class="wp-block-group e-content"><!-- wp:paragraph -->
+		<p>' . wp_kses_post( $content ) . '</p>
+		<!-- /wp:paragraph --></div>
+		<!-- /wp:group -->';
 	}
 }

@@ -34,5 +34,6 @@ Thumbs.db
 *.tar
 *.zip
 
+svn/*
 vendor/*
 *.cache

@@ -66,6 +66,10 @@ class Options_Handler {
 	 * Registers the actual options.
 	 */
 	public function add_settings() {
+		// Pre-initialize settings. `add_option()` will _not_ override existing
+		// options, so it's safe to use here.
+		add_option( 'indieblocks_settings', $this->options );
+
 		register_setting(
 			'indieblocks-settings-group',
 			'indieblocks_settings',

@@ -405,46 +405,46 @@ class Post_Types {
 					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->' . PHP_EOL;
 					/* translators: %s: URL of the "liked" page. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->';
+						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'bookmark':
 					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->' . PHP_EOL;
 					/* translators: %s: URL of the bookmarked page. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->';
+						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'reply':
 					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->' . PHP_EOL;
 					/* translators: %s: URL of the page being replied to. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->';
+						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'repost':
 					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->' . PHP_EOL;
 					/* translators: %s: URL of the "page" being reposted. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->';
+						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 			}
 		}
 
 		if ( ! empty( $input['properties']['content'][0] ) ) {
-			if ( 'repost' !== $post_type ) {
+			if ( 'repost' === $post_type ) {
+				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
+					<blockquote class="wp-block-quote e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
+					<!-- /wp:quote -->';
+			} else {
 				$post_content .= '<!-- wp:group {"className":"e-content"} -->
 					<div class="wp-block-group e-content"><!-- wp:paragraph -->
 					<p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:group -->';
-			} else {
-				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
-					<!-- /wp:quote -->';
 			}
 		}
 
-		return $post_content;
+		return trim( $post_content );
 	}
 }

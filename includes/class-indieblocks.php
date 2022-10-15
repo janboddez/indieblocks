@@ -80,6 +80,9 @@ class IndieBlocks {
 		if ( ! empty( $options['add_mf2'] ) && $this->theme_supports_blocks() ) {
 			add_action( 'plugins_loaded', array( Theme_Mf2::class, 'register' ) );
 		}
+
+		// Micropub hook callbacks.
+		add_action( 'plugins_loaded', array( Micropub_Compat::class, 'register' ) );
 	}
 
 	/**

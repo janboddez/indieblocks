@@ -28,7 +28,7 @@ class Options_Handler {
 		'add_featured_images' => false,
 		'location_functions'  => false,
 		'add_mf2'             => false,
-		'micropub'            => false,
+		'micropub'            => true,
 		'webmention'          => false,
 	);
 
@@ -198,6 +198,11 @@ class Options_Handler {
 						<th scope="row"><?php esc_html_e( 'Microformats', 'indieblocks' ); ?></label></th>
 						<td><label><input type="checkbox" name="indieblocks_settings[add_mf2]" value="1" <?php checked( ! empty( $this->options['add_mf2'] ) ); ?>/> <?php esc_html_e( 'Enable microformats2?', 'indieblocks' ); ?></label>
 						<p class="description"><?php esc_html_e( '(Experimental) Adds microformats2 to this site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor.', 'indieblocks' ); ?></p></td>
+					</tr>
+					<tr valign="top">
+						<th scope="row"><?php esc_html_e( 'Micropub', 'indieblocks' ); ?></label></th>
+						<td><label><input type="checkbox" name="indieblocks_settings[micropub]" value="1" <?php checked( ! empty( $this->options['micropub'] ) ); ?>/> <?php esc_html_e( 'Deeper Micropub integration?', 'indieblocks' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Adds post type and taxonomy data to responses to Micropub &ldquo;config&rdquo; queries.', 'indieblocks' ); ?></p></td>
 					</tr>
 				</table>
 				<p class="submit"><?php submit_button( __( 'Save Changes' ), 'primary', 'submit', false ); ?></p>

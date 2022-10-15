@@ -18,39 +18,33 @@ class Post_Types {
 		$plugin  = IndieBlocks::get_instance();
 		$options = $plugin->get_options_handler()->get_options();
 
-		if ( ! empty( $options['post_types'] ) ) {
-			// Register short-form post types.
-			add_action( 'init', array( __CLASS__, 'register_post_types' ) );
+		// Register short-form post types.
+		add_action( 'init', array( __CLASS__, 'register_post_types' ) );
 
-			// Set the post type for Micropub posts.
-			add_filter( 'micropub_post_type', array( __CLASS__, 'set_post_type' ), 10, 2 );
-			add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
+		if ( ! empty( $options['default_taxonomies'] ) ) {
+			// Include Notes in category and tag archives.
+			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
+		}
 
-			if ( ! empty( $options['default_taxonomies'] ) ) {
-				// Include Notes in category and tag archives.
-				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
-			}
+		if ( ! empty( $options['include_in_search'] ) ) {
+			// Include short-form entries in search results.
+			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ), 99 );
+		}
 
-			if ( ! empty( $options['include_in_search'] ) ) {
-				// Include short-form entries in search results.
-				add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ), 99 );
-			}
+		if ( ! empty( $options['automatic_titles'] ) ) {
+			// Automatically generate a "post title" for short-form posts.
+			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_title' ), 10, 2 );
+		}
 
-			if ( ! empty( $options['automatic_titles'] ) ) {
-				// Automatically generate a "post title" for short-form posts.
-				add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_title' ), 10, 2 );
-			}
+		if ( ! empty( $options['random_slugs'] ) ) {
+			// Generate a random slug for short-form posts.
+			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
+		}
 
-			if ( ! empty( $options['random_slugs'] ) ) {
-				// Generate a random slug for short-form posts.
-				add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
-			}
-
-			if ( ! empty( $options['custom_menu_order'] ) ) {
-				// Have Notes and Likes appear right under Posts in WP's main menu.
-				add_filter( 'custom_menu_order', '__return_true' );
-				add_filter( 'menu_order', array( __CLASS__, 'menu_order' ) );
-			}
+		if ( ! empty( $options['custom_menu_order'] ) ) {
+			// Have Notes and Likes appear right under Posts in WP's main menu.
+			add_filter( 'custom_menu_order', '__return_true' );
+			add_filter( 'menu_order', array( __CLASS__, 'menu_order' ) );
 		}
 	}
 
@@ -98,6 +92,8 @@ class Post_Types {
 			),
 			'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'comments', 'wpcom-markdown' ),
 			'menu_icon'         => 'dashicons-format-status',
+			'capability_type'   => 'page',
+			'map_meta_cap'      => true,
 		);
 
 		if ( ! empty( $options['enable_blocks'] ) ) {
@@ -135,6 +131,8 @@ class Post_Types {
 			),
 			'supports'          => array( 'author', 'title', 'editor', 'custom-fields', 'wpcom-markdown' ),
 			'menu_icon'         => 'dashicons-heart',
+			'capability_type'   => 'page',
+			'map_meta_cap'      => true,
 		);
 
 		if ( ! empty( $options['enable_blocks'] ) ) {
@@ -142,60 +140,6 @@ class Post_Types {
 		}
 
 		register_post_type( 'indieblocks_like', $args );
-	}
-
-	/**
-	 * Maps Micropub entries to a custom post type.
-	 *
-	 * @param  string $post_type Post type.
-	 * @param  array  $input     Input data.
-	 * @return string            Post type slug.
-	 */
-	public static function set_post_type( $post_type, $input ) {
-		if ( ! empty( $input['properties']['like-of'][0] ) ) {
-			$post_type = 'indieblocks_like';
-		} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['content'][0] ) && empty( $input['post_title'] ) ) {
-			$post_type = 'indieblocks_note';
-		}
-
-		return $post_type;
-	}
-
-	/**
-	 * Overrides default Micropub post content.
-	 *
-	 * @todo: Clean up.
-	 *
-	 * @param  string $post_content Post content.
-	 * @param  array  $input        Input properties.
-	 * @return string               Modified content.
-	 */
-	public static function set_post_content( $post_content, $input ) {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
-
-		if ( empty( $options['enable_blocks'] ) ) {
-			return $post_content;
-		}
-
-		// Replace default content with block-based content.
-		if ( ! empty( $input['properties']['like-of'][0] ) ) {
-			$post_content = static::render( 'like', $input['properties']['like-of'][0], $input );
-		} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
-			$post_content = static::render( 'bookmark', $input['properties']['bookmark-of'][0], $input );
-		} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
-			$post_content = static::render( 'repost', $input['properties']['repost-of'][0], $input );
-		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
-			$post_content = static::render( 'reply', $input['properties']['in-reply-to'][0], $input );
-		}
-
-		return $post_content;
 	}
 
 	/**
@@ -382,69 +326,5 @@ class Post_Types {
 		$query->set( 'post_type', array_unique( $post_types ) );
 
 		return $query;
-	}
-
-	/**
-	 * Render `e-content` for certain post types.
-	 *
-	 * @param  string $post_type (IndieWeb) post type.
-	 * @param  array  $url       The URL being interacted with, if applicable.
-	 * @param  array  $input     Micropub input arguments.
-	 * @return string            Rendered content.
-	 */
-	public static function render( $post_type, $url = '', $input = array() ) {
-		if ( ! empty( $url ) ) {
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				$url = $matches[0]; // Just the URL, please.
-			}
-
-			$post_content = '';
-
-			switch ( $post_type ) {
-				case 'like':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->' . PHP_EOL;
-					/* translators: %s: URL of the "liked" page. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'bookmark':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->' . PHP_EOL;
-					/* translators: %s: URL of the bookmarked page. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'reply':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->' . PHP_EOL;
-					/* translators: %s: URL of the page being replied to. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'repost':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->' . PHP_EOL;
-					/* translators: %s: URL of the "page" being reposted. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-			}
-		}
-
-		if ( ! empty( $input['properties']['content'][0] ) ) {
-			if ( 'repost' === $post_type ) {
-				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
-					<!-- /wp:quote -->';
-			} else {
-				$post_content .= '<!-- wp:group {"className":"e-content"} -->
-					<div class="wp-block-group e-content"><!-- wp:paragraph -->
-					<p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p>
-					<!-- /wp:paragraph --></div>
-					<!-- /wp:group -->';
-			}
-		}
-
-		return trim( $post_content );
 	}
 }

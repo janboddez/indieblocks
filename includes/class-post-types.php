@@ -184,76 +184,15 @@ class Post_Types {
 			return $post_content;
 		}
 
-		// Replace the default content with an `indieblocks/context` block.
+		// Replace default content with block-based content.
 		if ( ! empty( $input['properties']['like-of'][0] ) ) {
-			// Replace the default content with an `indieblocks/context` block.
-			$url = $input['properties']['like-of'][0];
-
-			/*
-			// Sanitize URL.
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				$url = $matches[0]; // Just the URL, please.
-			}
-			*/
-			$post_content = '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->
-			<div class="wp-block-indieblocks-context"><i>Liked <a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
-			<!-- /wp:indieblocks/context -->';
-
-			if ( ! empty( $input['properties']['content'][0] ) ) {
-				// A comment or quote, etc.
-				$post_content .= static::render_content( $input['properties']['content'][0] );
-			}
+			$post_content = static::render( 'like', $input['properties']['like-of'][0], $input );
 		} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
-			$url = $input['properties']['bookmark-of'][0];
-
-			/*
-			// Sanitize URL.
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				$url = $matches[0]; // Just the URL, please.
-			}
-			*/
-			$post_content = '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->
-			<div class="wp-block-indieblocks-context"><i>Bookmarked <a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
-			<!-- /wp:indieblocks/context -->';
-
-			if ( ! empty( $input['properties']['content'][0] ) ) {
-				$post_content .= static::render_content( $input['properties']['content'][0] );
-			}
+			$post_content = static::render( 'bookmark', $input['properties']['bookmark-of'][0], $input );
 		} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
-			// To do: add richer content for known sources (Twitter, Nitter).
-			$url = $input['properties']['repost-of'][0];
-
-			/*
-			// Sanitize URL.
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				$url = $matches[0]; // Just the URL, please.
-			}
-			*/
-			$post_content = '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->
-			<div class="wp-block-indieblocks-context"><i>Reposted <a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
-			<!-- /wp:indieblocks/context -->';
-
-			if ( ! empty( $input['properties']['content'][0] ) ) {
-				$post_content .= '<!-- wp:quote -->
-				<blockquote class="wp-block-quote" id="e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
-				<!-- /wp:quote -->';
-			}
+			$post_content = static::render( 'repost', $input['properties']['repost-of'][0], $input );
 		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
-			$url = $input['properties']['in-reply-to'][0];
-
-			/*
-			// Sanitize URL.
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				$url = $matches[0]; // Just the URL, please.
-			}
-			*/
-			$post_content = '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->
-			<div class="wp-block-indieblocks-context"><i>Bookmarked <a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>.</i></div>
-			<!-- /wp:indieblocks/context -->';
-
-			if ( ! empty( $input['properties']['content'][0] ) ) {
-				$post_content .= static::render_content( $input['properties']['content'][0] );
-			}
+			$post_content = static::render( 'reply', $input['properties']['in-reply-to'][0], $input );
 		}
 
 		return $post_content;
@@ -394,11 +333,11 @@ class Post_Types {
 		$post_types = $query->get( 'post_type' );
 
 		if ( is_string( $post_types ) ) {
-			$post_types = array_filter( explode( ',', $post_types ) );
+			$post_types = explode( ',', $post_types );
 		}
 
 		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
-		$post_types   = (array) $post_types;
+		$post_types   = array_filter( (array) $post_types );
 		$post_types[] = 'indieblocks_note';
 
 		$query->set( 'post_type', array_unique( $post_types ) );
@@ -432,11 +371,11 @@ class Post_Types {
 		$post_types = $query->get( 'post_type' );
 
 		if ( is_string( $post_types ) ) {
-			$post_types = array_filter( explode( ',', $post_types ) );
+			$post_types = explode( ',', $post_types );
 		}
 
 		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
-		$post_types   = (array) $post_types;
+		$post_types   = array_filter( (array) $post_types );
 		$post_types[] = 'indieblocks_note';
 		$post_types[] = 'page';
 
@@ -448,14 +387,64 @@ class Post_Types {
 	/**
 	 * Render `e-content` for certain post types.
 	 *
-	 * @param  string $content Original post content.
-	 * @return string          Modified content.
+	 * @param  string $post_type (IndieWeb) post type.
+	 * @param  array  $url       The URL being interacted with, if applicable.
+	 * @param  array  $input     Micropub input arguments.
+	 * @return string            Rendered content.
 	 */
-	public static function render_content( $content ) {
-		return '<!-- wp:group {"className":"e-content"} -->
-		<div class="wp-block-group e-content"><!-- wp:paragraph -->
-		<p>' . wp_kses_post( $content ) . '</p>
-		<!-- /wp:paragraph --></div>
-		<!-- /wp:group -->';
+	public static function render( $post_type, $url = '', $input = array() ) {
+		if ( ! empty( $url ) ) {
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				$url = $matches[0]; // Just the URL, please.
+			}
+
+			$post_content = '';
+
+			switch ( $post_type ) {
+				case 'like':
+					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->' . PHP_EOL;
+					/* translators: %s: URL of the "liked" page. */
+					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+						<!-- /wp:indieblocks/context -->';
+					break;
+
+				case 'bookmark':
+					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->' . PHP_EOL;
+					/* translators: %s: URL of the bookmarked page. */
+					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+						<!-- /wp:indieblocks/context -->';
+					break;
+
+				case 'reply':
+					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->' . PHP_EOL;
+					/* translators: %s: URL of the page being replied to. */
+					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+						<!-- /wp:indieblocks/context -->';
+					break;
+
+				case 'repost':
+					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->' . PHP_EOL;
+					/* translators: %s: URL of the "page" being reposted. */
+					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+						<!-- /wp:indieblocks/context -->';
+					break;
+			}
+		}
+
+		if ( ! empty( $input['properties']['content'][0] ) ) {
+			if ( 'repost' !== $post_type ) {
+				$post_content .= '<!-- wp:group {"className":"e-content"} -->
+					<div class="wp-block-group e-content"><!-- wp:paragraph -->
+					<p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p>
+					<!-- /wp:paragraph --></div>
+					<!-- /wp:group -->';
+			} else {
+				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
+					<blockquote class="wp-block-quote e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
+					<!-- /wp:quote -->';
+			}
+		}
+
+		return $post_content;
 	}
 }

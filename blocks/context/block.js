@@ -16,7 +16,7 @@
 		/* translators: %s: URL of the bookmarked page. */
 		'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
 		/* translators: %s: URL of the "liked" page. */
-		'u-like-of':     __( 'Liked %s.', 'indieblocks' ),
+		'u-like-of':     __( 'Likes %s.', 'indieblocks' ),
 		/* translators: %s: URL of the page being replied to. */
 		'u-in-reply-to': __( 'In reply to %s.', 'indieblocks' ),
 		/* translators: %s: URL of the "page" being reposted. */

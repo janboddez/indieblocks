@@ -165,10 +165,12 @@ class Theme_Mf2 {
 			return '';
 		}
 
-		// @todo: Add `u-photo` to avatar.
 		$avatar = ! empty( $attributes['avatarSize'] ) ? get_avatar(
 			$author_id,
-			$attributes['avatarSize']
+			$attributes['avatarSize'],
+			'',
+			'',
+			array( 'class' => 'u-photo' )
 		) : null;
 
 		$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;

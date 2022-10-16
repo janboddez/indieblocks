@@ -81,7 +81,7 @@ class Location {
 			'indieblocks-location',
 			__( 'Location', 'indieblocks' ),
 			array( __CLASS__, 'render_meta_box' ),
-			array( 'post', 'indieblocks_note' ),
+			apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ),
 			'side',
 			'default'
 		);

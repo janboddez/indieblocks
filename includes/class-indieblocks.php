@@ -90,9 +90,7 @@ class IndieBlocks {
 	 * changed, and each time the plugin is (de)activated.
 	 */
 	public function activate() {
-		Post_Types::register_post_types();
-		Feeds::create_post_feed();
-		flush_rewrite_rules();
+		$this->options_handler->flush_permalinks();
 	}
 
 	/**

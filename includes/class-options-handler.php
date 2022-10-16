@@ -24,6 +24,7 @@ class Options_Handler {
 		'automatic_titles'    => false,
 		'hide_titles'         => false,
 		'random_slugs'        => false,
+		'date_archives'       => false,
 		'notes_in_feed'       => true,
 		'likes_in_feed'       => false,
 		'notes_in_home'       => false,
@@ -48,13 +49,26 @@ class Options_Handler {
 	 */
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'create_menu' ) );
-		add_action( 'update_option_indieblocks_settings', array( IndieBlocks::get_instance(), 'activate' ) );
+	}
+
+	/**
+	 * Flushes permalinks upon activation and whenever settings are saved.
+	 */
+	public function flush_permalinks() {
+		Post_Types::register_post_types();
+		Post_Types::create_date_archives();
+		Feeds::create_post_feed();
+		flush_rewrite_rules();
 	}
 
 	/**
 	 * Registers the plugin settings page.
 	 */
 	public function create_menu() {
+		if ( delete_transient( 'indieblocks_flush_permalinks' ) ) {
+			$this->flush_permalinks();
+		}
+
 		add_options_page(
 			__( 'IndieBlocks', 'indieblocks' ),
 			__( 'IndieBlocks', 'indieblocks' ),
@@ -101,6 +115,7 @@ class Options_Handler {
 			'automatic_titles'    => isset( $settings['automatic_titles'] ) ? true : false,
 			'hide_titles'         => isset( $settings['hide_titles'] ) ? true : false,
 			'random_slugs'        => isset( $settings['random_slugs'] ) ? true : false,
+			'date_archives'       => isset( $settings['date_archives'] ) ? true : false,
 			'modified_feeds'      => isset( $settings['modified_feeds'] ) ? true : false,
 			'add_featured_images' => isset( $settings['add_featured_images'] ) ? true : false,
 			'location_functions'  => isset( $settings['location_functions'] ) ? true : false,
@@ -108,6 +123,9 @@ class Options_Handler {
 			'micropub'            => isset( $settings['micropub'] ) ? true : false,
 			'webmention'          => isset( $settings['webmention'] ) ? true : false,
 		);
+
+		// Instruct IndieBlocks to flush permalinks during the next request.
+		set_transient( 'indieblocks_flush_permalinks', true );
 
 		// Updated settings.
 		return $this->options;
@@ -136,7 +154,7 @@ class Options_Handler {
 						<td><label><input type="checkbox" name="indieblocks_settings[enable_notes]" value="1" <?php checked( ! empty( $this->options['post_types'] ) || ! empty( $this->options['enable_notes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Notes&rdquo;', 'indieblocks' ); ?></label>
 						<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[notes_in_feed]" value="1" <?php checked( ! empty( $this->options['notes_in_feed'] ) ); ?>/> <?php esc_html_e( 'Include in main feed', 'indieblocks' ); ?></label>
 						<br /><label><input type="checkbox" name="indieblocks_settings[notes_in_home]" value="1" <?php checked( ! empty( $this->options['notes_in_home'] ) ); ?>/> <?php esc_html_e( 'Show on blog page', 'indieblocks' ); ?></label>
-						<br /><label><input type="checkbox" name="indieblocks_settings[default_taxonomies]" value="1" <?php checked( ! empty( $this->options['default_taxonomies'] ) ); ?>/> <?php esc_html_e( 'Enable categories and tags?', 'indieblocks' ); ?></label></p></td>
+						<br /><label><input type="checkbox" name="indieblocks_settings[default_taxonomies]" value="1" <?php checked( ! empty( $this->options['default_taxonomies'] ) ); ?>/> <?php esc_html_e( 'Enable categories and tags', 'indieblocks' ); ?></label></p></td>
 					</tr>
 					<tr valign="top">
 						<td><label><input type="checkbox" name="indieblocks_settings[enable_likes]" value="1" <?php checked( ! empty( $this->options['post_types'] ) || ! empty( $this->options['enable_likes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Likes&rdquo;', 'indieblocks' ); ?></label>
@@ -149,14 +167,19 @@ class Options_Handler {
 						<p class="description"><?php esc_html_e( 'Group (regular) posts, notes, and likes at the top of WordPress&rsquo; admin menu.', 'indieblocks' ); ?></p></td>
 					</tr>
 					<tr valign="top">
+						<th scope="row"><?php esc_html_e( 'Autogenerate Titles', 'indieblocks' ); ?></th>
+						<td><label><input type="checkbox" name="indieblocks_settings[automatic_titles]" value="1" <?php checked( ! empty( $this->options['automatic_titles'] ) ); ?>/> <?php esc_html_e( 'Automatically generate titles', 'indieblocks' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Autogenerate note and like titles. (Your theme should probably hide these, still.)', 'indieblocks' ); ?></p></td>
+					</tr>
+					<tr valign="top">
 						<th scope="row"><?php esc_html_e( 'Random Slugs', 'indieblocks' ); ?></th>
 						<td><label><input type="checkbox" name="indieblocks_settings[random_slugs]" value="1" <?php checked( ! empty( $this->options['random_slugs'] ) ); ?>/> <?php esc_html_e( 'Generate random slugs', 'indieblocks' ); ?></label>
 						<p class="description"><?php esc_html_e( 'Autogenerate note and like slugs. Disable for WordPress&rsquo; default behavior.', 'indieblocks' ); ?></p></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php esc_html_e( 'Autogenerate Titles', 'indieblocks' ); ?></th>
-						<td><label><input type="checkbox" name="indieblocks_settings[automatic_titles]" value="1" <?php checked( ! empty( $this->options['automatic_titles'] ) ); ?>/> <?php esc_html_e( 'Automatically generate titles', 'indieblocks' ); ?></label>
-						<p class="description"><?php esc_html_e( 'Autogenerate note and like titles. (Your theme should probably hide these, still.)', 'indieblocks' ); ?></p></td>
+						<th scope="row"><?php esc_html_e( 'Date-Based Archives', 'indieblocks' ); ?></th>
+						<td><label><input type="checkbox" name="indieblocks_settings[date_archives]" value="1" <?php checked( ! empty( $this->options['date_archives'] ) ); ?>/> <?php esc_html_e( 'Enable date-based archives', 'indieblocks' ); ?></label>
+						<p class="description"><?php esc_html_e( '(Experimental) Enable year, month, and day archives for notes and likes.', 'indieblocks' ); ?></p></td>
 					</tr>
 					<tr valign="top">
 						<th scope="row"><?php esc_html_e( 'Microformats', 'indieblocks' ); ?></th>

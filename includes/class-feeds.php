@@ -94,6 +94,11 @@ class Feeds {
 	 * posts).
 	 */
 	public static function create_post_feed() {
+		if ( get_transient( 'indieblocks_flush_permalinks' ) ) {
+			// Hold off a bit.
+			return;
+		}
+
 		$front = static::get_front();
 
 		if ( empty( $front ) ) {
@@ -101,7 +106,7 @@ class Feeds {
 			return;
 		}
 
-		add_rewrite_rule( $front . '/feed/?$', 'index.php?post_type=post&feed=rss2', 'top' );
+		add_rewrite_rule( '^' . $front . '/feed/?$', 'index.php?post_type=post&feed=rss2', 'top' );
 
 		// Set the new feed's title.
 		add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );

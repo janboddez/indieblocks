@@ -16,8 +16,9 @@ class Micropub_Compat {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
 
 		if ( ! empty( $options['enable_blocks'] ) ) {
 			// Assuming anyone who has our block(s) enabled would want to use
@@ -25,7 +26,7 @@ class Micropub_Compat {
 			add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
 		}
 
-		if ( ! empty( $options['post_types'] ) ) {
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) || ! empty( $options['enable_likes'] ) ) {
 			// Assuming anyone who has our post types enabled would also want
 			// their Micropub posts to use them.
 			add_filter( 'micropub_post_type', array( __CLASS__, 'set_post_type' ), 10, 2 );
@@ -35,7 +36,7 @@ class Micropub_Compat {
 			// Behind an extra option so folks that want to support more post
 			// types or somehow not hook into config queries can more easily
 			// disable these.
-			if ( ! empty( $options['post_types'] ) ) {
+			if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) || ! empty( $options['enable_likes'] ) ) {
 				// Micropub users can often choose to limit possible post types
 				// to those supported by their CMS. Filterable.
 				add_filter( 'micropub_query', array( __CLASS__, 'query_post_types' ), 20, 2 );
@@ -166,8 +167,9 @@ class Micropub_Compat {
 	 * @return string               Modified content.
 	 */
 	public static function set_post_content( $post_content, $input ) {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
 
 		if ( empty( $options['enable_blocks'] ) ) {
 			return $post_content;

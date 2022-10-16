@@ -15,28 +15,19 @@ class Feeds {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
+		// Include microblog entries in the site's main feed (but only if the
+		// settings is enabled for either CPT.
+		add_filter( 'request', array( __CLASS__, 'include_in_main_feed' ), 9 );
+
+		// Create a new, post-only feed (but only if a "permalink front" is
+		// in use).
+		add_filter( 'init', array( __CLASS__, 'create_post_feed' ) );
 
 		if ( ! empty( $options['modified_feeds'] ) ) {
-			// Include microblog entries in the site's main feed (but only if we use
-			// a "permalink front").
-			add_filter( 'request', array( __CLASS__, 'include_in_main_feed' ), 9 );
-
-			// Create a new, post-only feed (but only if we use a "permalink
-			// front").
-			add_filter( 'init', array( __CLASS__, 'create_post_feed' ) );
-
-			// And adapt that feed's title.
-			add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );
-
-			// @todo: Move these behind a different setting. Users might not want to drop Atom, or JSON Feed, support.
-
-			// Disable all but RSS feeds. This way, we only have to worry about
-			// one format anymore.
-			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
-			// add_action( 'template_redirect', array( __CLASS__, 'disable_non_rss_feeds' ) );
-
 			// Using custom RSS and Atom templates, prevent _note_ titles from
 			// being displayed in these feeds. Will cause conflicts with
 			// existing custom feed templates.
@@ -50,24 +41,6 @@ class Feeds {
 			// Prepend Featured Images to feed items.
 			add_filter( 'the_excerpt_rss', array( __CLASS__, 'feed_thumbnails' ) );
 			add_filter( 'the_content_feed', array( __CLASS__, 'feed_thumbnails' ) );
-		}
-	}
-
-	/**
-	 * Disables feeds, except RSS2, for which we're using a modified template.
-	 */
-	public static function disable_non_rss_feeds() {
-		if ( is_feed() && ! is_feed( 'rss2' ) ) {
-			global $wp_query;
-
-			$wp_query->set_404();
-			status_header( 404 );
-
-			// Note: the above isn't enough if we want to display a (HTML) 404
-			// page, too.
-			header( 'Content-Type: text/html' );
-			locate_template( '404.php', true, true ); // @todo: This may not work for block themes!
-			exit;
 		}
 	}
 
@@ -91,14 +64,26 @@ class Feeds {
 	 * @param array $query_vars The array of requested query variables.
 	 */
 	public static function include_in_main_feed( $query_vars ) {
-		if ( '' === static::get_front() ) {
-			// @todo: Replace this by an actual setting.
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
+		if ( empty( $options['notes_in_feed'] ) && empty( $options['likes_in_feed'] ) ) {
+			// Do nothing.
 			return $query_vars;
 		}
 
 		// Target only the main feed.
 		if ( isset( $query_vars['feed'] ) && ! isset( $query_vars['post_type'] ) ) {
-			$query_vars['post_type'] = array( 'post', 'indieblocks_note' );
+			$query_vars['post_type'] = array( 'post' );
+
+			if ( ! empty( $options['notes_in_feed'] ) ) {
+				$query_vars['post_type'][] = 'indieblocks_note';
+			}
+
+			if ( ! empty( $options['likes_in_feed'] ) ) {
+				$query_vars['post_type'][] = 'indieblocks_like';
+			}
 		}
 
 		return $query_vars;
@@ -117,6 +102,9 @@ class Feeds {
 		}
 
 		add_rewrite_rule( $front . '/feed/?$', 'index.php?post_type=post&feed=rss2', 'top' );
+
+		// Set the new feed's title.
+		add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );
 	}
 
 	/**
@@ -153,7 +141,7 @@ class Feeds {
 	public static function feed_thumbnails( $content ) {
 		global $post;
 
-		if ( has_post_thumbnail( $post->ID ) ) {
+		if ( ! empty( $post->ID ) && has_post_thumbnail( $post->ID ) ) {
 			$content = '<p>' . get_the_post_thumbnail( $post->ID ) . '</p>' . PHP_EOL . $content;
 		}
 

@@ -93,12 +93,12 @@ do_action( 'rss_tag_pre', 'rss2' );
 		?>
 	<item>
 		<?php
-		if ( 'indieblocks_note' !== get_post_type( get_the_ID() ) ) :
+		if ( 'indieblocks_note' !== get_post_type() ) :
 			// Show titles for post types _other than_ notes.
 			?>
 			<title><?php the_title_rss(); ?></title>
 			<?php
-		elseif ( '' !== get_post_meta( get_the_ID(), 'mf2_bookmark-of', true ) && apply_filters( 'indieblocks_ignore_bookmark_titles', true ) ) :
+		elseif ( '' !== get_post_meta( get_the_ID(), 'mf2_bookmark-of', true ) && apply_filters( 'indieblocks_ignore_bookmark_titles', false ) ) :
 			// Some of these "notes," however, may really be bookmarks, for
 			// which we allow an exception.
 			?>

@@ -377,9 +377,16 @@ class Theme_Mf2 {
 			$classes[] = "has-text-align-{$attributes['textAlign']}";
 		}
 
-		// Note and Like titles do not get the `p-name` class. Leaving it up to
-		// site authors to visually hide or altogether remove those.
-		$classes[] = ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ? 'p-name' : '';
+		// Note and Like titles, by default, do not get the `p-name` class.
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
+		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+			$classes[] = 'p-name';
+		} elseif ( ! empty( $options['hide_titles'] ) ) {
+			$classes[] = 'screen-reader-text';
+		}
 
 		if ( isset( $attributes['level'] ) ) {
 			$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];

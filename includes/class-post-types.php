@@ -7,6 +7,8 @@
 
 namespace IndieBlocks;
 
+use Error;
+
 /**
  * Introduces a number of short-form custom post types, and more.
  */
@@ -15,8 +17,9 @@ class Post_Types {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
 
 		// Register short-form post types.
 		add_action( 'init', array( __CLASS__, 'register_post_types' ) );
@@ -30,6 +33,9 @@ class Post_Types {
 			// Include short-form entries in search results.
 			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ), 99 );
 		}
+
+		// Optionally, display short-form entries on the homepage (or main blog page).
+		add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_home' ), 99 );
 
 		if ( ! empty( $options['automatic_titles'] ) ) {
 			// Automatically generate a "post title" for short-form posts.
@@ -66,80 +72,85 @@ class Post_Types {
 	 * Registers custom post types.
 	 */
 	public static function register_post_types() {
-		$plugin  = IndieBlocks::get_instance();
-		$options = $plugin->get_options_handler()->get_options();
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
 
-		// Notes.
-		$args = array(
-			'labels'            => array(
-				'name'               => __( 'Notes', 'indieblocks' ),
-				'singular_name'      => __( 'Note', 'indieblocks' ),
-				'add_new'            => __( 'New Note', 'indieblocks' ),
-				'add_new_item'       => __( 'Add New Note', 'indieblocks' ),
-				'edit_item'          => __( 'Edit Note', 'indieblocks' ),
-				'view_item'          => __( 'View Note', 'indieblocks' ),
-				'view_items'         => __( 'View Notes', 'indieblocks' ),
-				'search_items'       => __( 'Search Notes', 'indieblocks' ),
-				'not_found'          => __( 'No notes found.', 'indieblocks' ),
-				'not_found_in_trash' => __( 'No notes found in trash.', 'indieblocks' ),
-			),
-			'public'            => true,
-			'has_archive'       => true,
-			'show_in_nav_menus' => true,
-			'rewrite'           => array(
-				'slug'       => __( 'notes', 'indieblocks' ),
-				'with_front' => false,
-			),
-			'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'comments', 'wpcom-markdown' ),
-			'menu_icon'         => 'dashicons-format-status',
-			'capability_type'   => 'page',
-			'map_meta_cap'      => true,
-		);
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
+			// Notes.
+			$args = array(
+				'labels'            => array(
+					'name'               => __( 'Notes', 'indieblocks' ),
+					'singular_name'      => __( 'Note', 'indieblocks' ),
+					'add_new'            => __( 'New Note', 'indieblocks' ),
+					'add_new_item'       => __( 'Add New Note', 'indieblocks' ),
+					'edit_item'          => __( 'Edit Note', 'indieblocks' ),
+					'view_item'          => __( 'View Note', 'indieblocks' ),
+					'view_items'         => __( 'View Notes', 'indieblocks' ),
+					'search_items'       => __( 'Search Notes', 'indieblocks' ),
+					'not_found'          => __( 'No notes found.', 'indieblocks' ),
+					'not_found_in_trash' => __( 'No notes found in trash.', 'indieblocks' ),
+				),
+				'public'            => true,
+				'has_archive'       => true,
+				'show_in_nav_menus' => true,
+				'rewrite'           => array(
+					'slug'       => __( 'notes', 'indieblocks' ),
+					'with_front' => false,
+				),
+				'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'comments', 'wpcom-markdown' ),
+				'menu_icon'         => 'dashicons-format-status',
+				'capability_type'   => 'page',
+				'map_meta_cap'      => true,
+			);
 
-		if ( ! empty( $options['enable_blocks'] ) ) {
-			// Enable the block editor.
-			$args['show_in_rest'] = true;
+			if ( ! empty( $options['enable_blocks'] ) ) {
+				// Enable the block editor.
+				$args['show_in_rest'] = true;
+			}
+
+			if ( ! empty( $options['default_taxonomies'] ) ) {
+				// Enable WordPress' default categories and tags.
+				$args['taxonomies'] = array( 'category', 'post_tag' );
+			}
+
+			register_post_type( 'indieblocks_note', $args );
 		}
 
-		if ( ! empty( $options['default_taxonomies'] ) ) {
-			// Enable WordPress' default categories and tags.
-			$args['taxonomies'] = array( 'category', 'post_tag' );
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_likes'] ) ) {
+			// Likes.
+			$args = array(
+				'labels'            => array(
+					'name'               => __( 'Likes', 'indieblocks' ),
+					'singular_name'      => __( 'Like', 'indieblocks' ),
+					'add_new'            => __( 'New Like', 'indieblocks' ),
+					'add_new_item'       => __( 'Add New Like', 'indieblocks' ),
+					'edit_item'          => __( 'Edit Like', 'indieblocks' ),
+					'view_item'          => __( 'View Like', 'indieblocks' ),
+					'view_items'         => __( 'View Likes', 'indieblocks' ),
+					'search_items'       => __( 'Search Likes', 'indieblocks' ),
+					'not_found'          => __( 'No likes found.', 'indieblocks' ),
+					'not_found_in_trash' => __( 'No likes found in trash.', 'indieblocks' ),
+				),
+				'public'            => true,
+				'has_archive'       => true,
+				'show_in_nav_menus' => true,
+				'rewrite'           => array(
+					'slug'       => __( 'likes', 'indieblocks' ),
+					'with_front' => false,
+				),
+				'supports'          => array( 'author', 'title', 'editor', 'custom-fields', 'wpcom-markdown' ),
+				'menu_icon'         => 'dashicons-heart',
+				'capability_type'   => 'page',
+				'map_meta_cap'      => true,
+			);
+
+			if ( ! empty( $options['enable_blocks'] ) ) {
+				$args['show_in_rest'] = true;
+			}
+
+			register_post_type( 'indieblocks_like', $args );
 		}
-
-		register_post_type( 'indieblocks_note', $args );
-
-		// Likes.
-		$args = array(
-			'labels'            => array(
-				'name'               => __( 'Likes', 'indieblocks' ),
-				'singular_name'      => __( 'Like', 'indieblocks' ),
-				'add_new'            => __( 'New Like', 'indieblocks' ),
-				'add_new_item'       => __( 'Add New Like', 'indieblocks' ),
-				'edit_item'          => __( 'Edit Like', 'indieblocks' ),
-				'view_item'          => __( 'View Like', 'indieblocks' ),
-				'view_items'         => __( 'View Likes', 'indieblocks' ),
-				'search_items'       => __( 'Search Likes', 'indieblocks' ),
-				'not_found'          => __( 'No likes found.', 'indieblocks' ),
-				'not_found_in_trash' => __( 'No likes found in trash.', 'indieblocks' ),
-			),
-			'public'            => true,
-			'has_archive'       => true,
-			'show_in_nav_menus' => true,
-			'rewrite'           => array(
-				'slug'       => __( 'likes', 'indieblocks' ),
-				'with_front' => false,
-			),
-			'supports'          => array( 'author', 'title', 'editor', 'custom-fields', 'wpcom-markdown' ),
-			'menu_icon'         => 'dashicons-heart',
-			'capability_type'   => 'page',
-			'map_meta_cap'      => true,
-		);
-
-		if ( ! empty( $options['enable_blocks'] ) ) {
-			$args['show_in_rest'] = true;
-		}
-
-		register_post_type( 'indieblocks_like', $args );
 	}
 
 	/**
@@ -275,12 +286,12 @@ class Post_Types {
 		}
 
 		$post_types = $query->get( 'post_type' );
+		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
 
 		if ( is_string( $post_types ) ) {
 			$post_types = explode( ',', $post_types );
 		}
 
-		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
 		$post_types   = array_filter( (array) $post_types );
 		$post_types[] = 'indieblocks_note';
 
@@ -313,15 +324,69 @@ class Post_Types {
 		}
 
 		$post_types = $query->get( 'post_type' );
+		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
 
 		if ( is_string( $post_types ) ) {
 			$post_types = explode( ',', $post_types );
 		}
 
-		$post_types   = ! empty( $post_types ) ? $post_types : array( 'post' );
 		$post_types   = array_filter( (array) $post_types );
 		$post_types[] = 'indieblocks_note';
 		$post_types[] = 'page';
+
+		$query->set( 'post_type', array_unique( $post_types ) );
+
+		return $query;
+	}
+
+	/**
+	 * Show notes on the main blog page.
+	 *
+	 * @param  WP_Query $query The WP_Query object.
+	 * @return WP_Query        Modified query object.
+	 */
+	public static function include_in_home( $query ) {
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
+		if ( empty( $options['notes_in_home'] ) && empty( $options['likes_in_home'] ) ) {
+			// Do nothing.
+			return $query;
+		}
+
+		if ( is_admin() ) {
+			return $query;
+		}
+
+		if ( ! $query->is_main_query() ) {
+			return $query;
+		}
+
+		if ( ! empty( $query->query_vars['suppress_filters'] ) ) {
+			return $query;
+		}
+
+		if ( ! $query->is_home() ) {
+			return $query;
+		}
+
+		$post_types = $query->get( 'post_type' );
+		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
+
+		if ( is_string( $post_types ) ) {
+			$post_types = explode( ',', $post_types );
+		}
+
+		$post_types = array_filter( (array) $post_types );
+
+		if ( ! empty( $options['notes_in_home'] ) ) {
+			$post_types[] = 'indieblocks_note';
+		}
+
+		if ( ! empty( $options['likes_in_home'] ) ) {
+			$post_types[] = 'indieblocks_like';
+		}
 
 		$query->set( 'post_type', array_unique( $post_types ) );
 

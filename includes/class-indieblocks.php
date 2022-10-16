@@ -72,9 +72,7 @@ class IndieBlocks {
 		}
 
 		// Custom Post Types.
-		if ( ! empty( $options['post_types'] ) ) {
-			add_action( 'plugins_loaded', array( Post_Types::class, 'register' ) );
-		}
+		add_action( 'plugins_loaded', array( Post_Types::class, 'register' ) );
 
 		// Everything Site Editor/theme microformats.
 		if ( ! empty( $options['add_mf2'] ) && $this->theme_supports_blocks() ) {
@@ -92,16 +90,8 @@ class IndieBlocks {
 	 * changed, and each time the plugin is (de)activated.
 	 */
 	public function activate() {
-		$options = $this->options_handler->get_options();
-
-		if ( ! empty( $options['post_types'] ) ) {
-			Post_Types::register_post_types();
-		}
-
-		if ( ! empty( $options['modified_feeds'] ) ) {
-			Feeds::create_post_feed();
-		}
-
+		Post_Types::register_post_types();
+		Feeds::create_post_feed();
 		flush_rewrite_rules();
 	}
 

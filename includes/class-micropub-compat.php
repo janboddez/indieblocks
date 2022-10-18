@@ -74,6 +74,10 @@ class Micropub_Compat {
 			),
 		);
 
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
 			// Add all (explicitly supported) short-form post types.
 			$post_types = array_merge(

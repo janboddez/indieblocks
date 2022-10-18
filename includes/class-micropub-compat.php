@@ -169,13 +169,13 @@ class Micropub_Compat {
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
 			if ( ! empty( $input['properties']['like-of'][0] ) ) {
 				$post_type = 'indieblocks_note';
-			} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) && ! empty( $options['enable_notes'] ) ) {
+			} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
 				$post_type = 'indieblocks_note';
-			} elseif ( ! empty( $input['properties']['repost-of'][0] ) && ! empty( $options['enable_notes'] ) ) {
+			} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
 				$post_type = 'indieblocks_note';
-			} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) && ! empty( $options['enable_notes'] ) ) {
+			} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
 				$post_type = 'indieblocks_note';
-			} elseif ( ! empty( $input['properties']['content'][0] ) && empty( $input['post_title'] ) && ! empty( $options['enable_notes'] ) ) {
+			} elseif ( ! empty( $input['properties']['content'][0] ) && empty( $input['post_title'] ) ) {
 				$post_type = 'indieblocks_note';
 			}
 		}

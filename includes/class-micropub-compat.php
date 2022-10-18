@@ -72,28 +72,44 @@ class Micropub_Compat {
 				'type' => 'article',
 				'name' => 'Article',
 			),
-			array(
-				'type' => 'bookmark',
-				'name' => 'Bookmark',
-			),
-			array(
-				'type' => 'like',
-				'name' => 'Like',
-			),
-			array(
-				'type' => 'note',
-				'name' => 'Note',
-			),
-			array(
-				'type' => 'reply',
-				'name' => 'Reply',
-			),
-			array(
-				'type' => 'repost',
-				'name' => 'Repost',
-			),
 		);
 
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
+			// Add all (explicitly supported) short-form post types.
+			$post_types = array_merge(
+				$post_types,
+				array(
+					array(
+						'type' => 'bookmark',
+						'name' => 'Bookmark',
+					),
+					array(
+						'type' => 'like',
+						'name' => 'Like',
+					),
+					array(
+						'type' => 'note',
+						'name' => 'Note',
+					),
+					array(
+						'type' => 'reply',
+						'name' => 'Reply',
+					),
+					array(
+						'type' => 'repost',
+						'name' => 'Repost',
+					),
+				)
+			);
+		} elseif ( ! empty( $options['enable_notes'] ) ) {
+			// Add _only_ likes.
+			$post_types[] = array(
+				'type' => 'like',
+				'name' => 'Like',
+			);
+		}
+
+		// Allow developers to override these settings.
 		$post_types = apply_filters( 'indieblocks_micropub_post_types', $post_types );
 
 		if ( ! empty( $post_types ) ) {
@@ -142,16 +158,28 @@ class Micropub_Compat {
 	 * @return string            Post type slug.
 	 */
 	public static function set_post_type( $post_type, $input ) {
-		if ( ! empty( $input['properties']['like-of'][0] ) ) {
-			$post_type = 'indieblocks_like';
-		} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['repost-of'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
-			$post_type = 'indieblocks_note';
-		} elseif ( ! empty( $input['properties']['content'][0] ) && empty( $input['post_title'] ) ) {
-			$post_type = 'indieblocks_note';
+		$options = IndieBlocks::get_instance()
+			->get_options_handler()
+			->get_options();
+
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
+			if ( ! empty( $input['properties']['like-of'][0] ) ) {
+				$post_type = 'indieblocks_note';
+			} elseif ( ! empty( $input['properties']['bookmark-of'][0] ) && ! empty( $options['enable_notes'] ) ) {
+				$post_type = 'indieblocks_note';
+			} elseif ( ! empty( $input['properties']['repost-of'][0] ) && ! empty( $options['enable_notes'] ) ) {
+				$post_type = 'indieblocks_note';
+			} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) && ! empty( $options['enable_notes'] ) ) {
+				$post_type = 'indieblocks_note';
+			} elseif ( ! empty( $input['properties']['content'][0] ) && empty( $input['post_title'] ) && ! empty( $options['enable_notes'] ) ) {
+				$post_type = 'indieblocks_note';
+			}
+		}
+
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_likes'] ) ) {
+			if ( ! empty( $input['properties']['like-of'][0] ) ) {
+				$post_type = 'indieblocks_like';
+			}
 		}
 
 		return $post_type;
@@ -159,8 +187,6 @@ class Micropub_Compat {
 
 	/**
 	 * Overrides default Micropub post content.
-	 *
-	 * @todo: Clean up.
 	 *
 	 * @param  string $post_content Post content.
 	 * @param  array  $input        Input properties.

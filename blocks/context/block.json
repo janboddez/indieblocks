@@ -10,7 +10,8 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "href"
+			"attribute": "href",
+			"default": ""
 		},
 		"kind": {
 			"type": "string",

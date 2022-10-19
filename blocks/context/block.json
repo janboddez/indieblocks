@@ -5,6 +5,7 @@
 	"category": "text",
 	"icon": "format-status",
 	"editorScript": "file:./block.js",
+    "editorStyle": "file:./editor.css",
 	"attributes": {
 		"url": {
 			"type": "string",

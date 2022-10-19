@@ -12,11 +12,11 @@ namespace IndieBlocks;
  */
 class IndieBlocks {
 	/**
-	 * This class's single instance.
+	 * Plugin version.
 	 *
-	 * @var IndieBlocks $instance Plugin instance.
+	 * @var string $version Plugin version.
 	 */
-	private static $instance;
+	public static $version = '0.2.0';
 
 	/**
 	 * Options handler.
@@ -24,6 +24,13 @@ class IndieBlocks {
 	 * @var Options_Handler $options_handler Options handler.
 	 */
 	private $options_handler;
+
+	/**
+	 * This class's single instance.
+	 *
+	 * @var IndieBlocks $instance Plugin instance.
+	 */
+	private static $instance;
 
 	/**
 	 * Returns the single instance of this class.

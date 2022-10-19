@@ -1,7 +1,7 @@
 <?php
 
 return array(
-	'version'      => '0.1.0',
+	'version'      => \IndieBlocks\IndieBlocks::$version,
 	'dependencies' => array(
 		'wp-blocks',
 		'wp-element',

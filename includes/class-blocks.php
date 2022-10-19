@@ -20,6 +20,9 @@ class Blocks {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 	}
 
+	/**
+	 * Registers (block-related) REST API endpoints.
+	 */
 	public static function register_api_endpoints() {
 		register_rest_route(
 			'indieblocks/v1',
@@ -32,15 +35,30 @@ class Blocks {
 		);
 	}
 
+	/**
+	 * The one, for now, REST API permission callback.
+	 *
+	 * @return bool If the request's authorized or not.
+	 */
 	public static function permission_callback() {
 		return current_user_can( 'edit_posts' );
 	}
 
+	/**
+	 * Returns the contents of a web page's `title` element.
+	 *
+	 * @param  \WP_REST_Request $request   WP REST API request.
+	 * @return \WP_REST_Response|\WP_Error Response.
+	 */
 	public static function get_title( $request ) {
 		$url = $request->get_param( 'url' );
 
 		if ( empty( $url ) ) {
-			return '';
+			return rest_ensure_response( '' );
+		}
+
+		if ( ! wp_http_validate_url( $url ) ) {
+			return rest_ensure_response( '' );
 		}
 
 		$parser = new Parser( $url );
@@ -49,7 +67,7 @@ class Blocks {
 		$title = $parser->get_title();
 
 		if ( empty( $title ) ) {
-			$title = $url;
+			return rest_ensure_response( '' );
 		}
 
 		return rest_ensure_response( $title );

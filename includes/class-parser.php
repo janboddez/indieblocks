@@ -42,10 +42,6 @@ class Parser {
 	 * Fetches the page, then loads its DOM.
 	 */
 	public function parse() {
-		if ( ! wp_http_validate_url( $this->url ) ) {
-			return;
-		}
-
 		error_log( 'Trying to fetch from cache.' );
 		$content = get_transient( mb_substr( 'indieblocks:' . esc_url_raw( $this->url ), 0, 150 ) );
 

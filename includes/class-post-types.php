@@ -49,11 +49,13 @@ class Post_Types {
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
 		}
 
-		if ( ! empty( $options['custom_menu_order'] ) ) {
+		// @codingStandardsIgnoreStart
+		// if ( ! empty( $options['custom_menu_order'] ) ) {
 			// Have Notes and Likes appear right under Posts in WP's main menu.
-			add_filter( 'custom_menu_order', '__return_true' );
-			add_filter( 'menu_order', array( __CLASS__, 'menu_order' ) );
-		}
+		// 	add_filter( 'custom_menu_order', '__return_true' );
+		// 	add_filter( 'menu_order', array( __CLASS__, 'menu_order' ) );
+		// }
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**
@@ -74,11 +76,6 @@ class Post_Types {
 	 * Registers custom post types.
 	 */
 	public static function register_post_types() {
-		if ( get_transient( 'indieblocks_flush_permalinks' ) ) {
-			// Hold off a bit.
-			return;
-		}
-
 		$options = IndieBlocks::get_instance()
 			->get_options_handler()
 			->get_options();
@@ -107,8 +104,9 @@ class Post_Types {
 				),
 				'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'comments', 'wpcom-markdown' ),
 				'menu_icon'         => 'dashicons-format-status',
-				'capability_type'   => 'page',
+				'capability_type'   => 'post',
 				'map_meta_cap'      => true,
+				'menu_position'     => 5,
 			);
 
 			if ( ! empty( $options['enable_blocks'] ) ) {
@@ -148,8 +146,9 @@ class Post_Types {
 				),
 				'supports'          => array( 'author', 'title', 'editor', 'custom-fields', 'wpcom-markdown' ),
 				'menu_icon'         => 'dashicons-heart',
-				'capability_type'   => 'page',
+				'capability_type'   => 'post',
 				'map_meta_cap'      => true,
+				'menu_position'     => 5,
 			);
 
 			if ( ! empty( $options['enable_blocks'] ) ) {
@@ -404,11 +403,6 @@ class Post_Types {
 	 * Enable date-based archives.
 	 */
 	public static function create_date_archives() {
-		if ( get_transient( 'indieblocks_flush_permalinks' ) ) {
-			// Hold off a bit.
-			return;
-		}
-
 		$options = IndieBlocks::get_instance()
 			->get_options_handler()
 			->get_options();

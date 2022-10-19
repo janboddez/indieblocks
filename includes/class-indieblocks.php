@@ -16,7 +16,7 @@ class IndieBlocks {
 	 *
 	 * @var string $version Plugin version.
 	 */
-	public static $version = '0.2.0';
+	public static $version = '0.2.1';
 
 	/**
 	 * Options handler.

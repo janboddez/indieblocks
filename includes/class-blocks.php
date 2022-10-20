@@ -57,6 +57,8 @@ class Blocks {
 			return rest_ensure_response( '' );
 		}
 
+		$url = rawurldecode( $url );
+
 		if ( ! wp_http_validate_url( $url ) ) {
 			return rest_ensure_response( '' );
 		}

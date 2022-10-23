@@ -197,11 +197,11 @@ class Micropub_Compat {
 	 * @return string               Modified content.
 	 */
 	public static function set_post_content( $post_content, $input ) {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		// Figure out the post type once more.
+		$post_type = static::set_post_type( 'post', $input );
 
-		if ( empty( $options['enable_blocks'] ) ) {
+		if ( ! use_block_editor_for_post_type( $post_type ) ) {
+			// Do nothing.
 			return $post_content;
 		}
 
@@ -273,13 +273,13 @@ class Micropub_Compat {
 		if ( ! empty( $input['properties']['content'][0] ) ) {
 			if ( 'repost' === $post_type ) {
 				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content"><p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p></blockquote>
+					<blockquote class="wp-block-quote e-content">' . wpautop( wp_kses_post( $input['properties']['content'][0] ) ) . '</blockquote>
 					<!-- /wp:quote -->';
 			} else {
 				$post_content .= '<!-- wp:group {"className":"e-content"} -->
-					<div class="wp-block-group e-content"><!-- wp:paragraph -->
-					<p>' . wp_kses_post( $input['properties']['content'][0] ) . '</p>
-					<!-- /wp:paragraph --></div>
+					<div class="wp-block-group e-content"><!-- wp:freeform -->
+					' . wpautop( wp_kses_post( $input['properties']['content'][0] ) ) . '
+					<!-- /wp:freeform --></div>
 					<!-- /wp:group -->';
 			}
 		}

@@ -19,6 +19,7 @@ class Theme_Mf2 {
 		add_filter( 'term_links-post_tag', array( __CLASS__, 'add_term_link_class' ) );
 		add_filter( 'body_class', array( __CLASS__, 'add_body_class' ), 99 );
 		add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 99 );
+		add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 99 );
 
 		add_action( 'init', array( __CLASS__, 'deregister_core_blocks' ), 1 );
 		add_action( 'init', array( __CLASS__, 'reregister_core_blocks' ) );
@@ -85,6 +86,23 @@ class Theme_Mf2 {
 	}
 
 	/**
+	 * Adds `h-cite` and `u-comment` classes to comments.
+	 *
+	 * @param  array $classes Array of class names.
+	 * @return array          The filtered array.
+	 */
+	public static function add_comment_class( $classes ) {
+		if ( is_admin() ) {
+			return $classes;
+		}
+
+		$classes[] = 'u-comment';
+		$classes[] = 'h-cite';
+
+		return array_unique( $classes );
+	}
+
+	/**
 	 * Deregisters some of WordPress's default post blocks.
 	 */
 	public static function deregister_core_blocks() {
@@ -93,6 +111,9 @@ class Theme_Mf2 {
 		remove_action( 'init', 'register_block_core_post_date' );
 		remove_action( 'init', 'register_block_core_post_excerpt' );
 		remove_action( 'init', 'register_block_core_post_title' );
+		remove_action( 'init', 'register_block_core_comment_author_name' );
+		remove_action( 'init', 'register_block_core_comment_content' );
+		remove_action( 'init', 'register_block_core_comment_date' );
 	}
 
 	/**
@@ -134,6 +155,27 @@ class Theme_Mf2 {
 				'render_callback' => array( __CLASS__, 'render_block_core_post_title' ),
 			)
 		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-author-name',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_author_name' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-content',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_content' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-date',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_date' ),
+			)
+		);
 	}
 
 	/**
@@ -145,6 +187,9 @@ class Theme_Mf2 {
 		remove_action( 'init', 'gutenberg_register_block_core_post_date', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_post_excerpt', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_post_title', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_author_name', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_content', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_date', 20 );
 	}
 
 	/**
@@ -387,6 +432,7 @@ class Theme_Mf2 {
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			$classes[] = 'p-name';
 		} elseif ( ! empty( $options['hide_titles'] ) ) {
+			// Hide titles. Counting on core/the theme to provide the CSS.
 			$classes[] = 'screen-reader-text';
 		}
 
@@ -405,6 +451,148 @@ class Theme_Mf2 {
 			$tag_name,
 			$wrapper_attributes,
 			$title
+		);
+	}
+
+	/**
+	 * Adds `p-author` and `h-card` classes to the `core/comment-author-name`
+	 * block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Return the post comment's author.
+	 */
+	public static function render_block_core_comment_author_name( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['commentId'] ) ) {
+			return '';
+		}
+
+		$comment            = get_comment( $block->context['commentId'] );
+		$commenter          = wp_get_current_commenter();
+		$show_pending_links = isset( $commenter['comment_author'] ) && $commenter['comment_author'];
+		if ( empty( $comment ) ) {
+			return '';
+		}
+
+		$classes = array( 'p-author', 'h-card' );
+		if ( isset( $attributes['textAlign'] ) ) {
+			$classes[] = 'has-text-align-' . $attributes['textAlign'];
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+		$comment_author     = get_comment_author( $comment );
+		$link               = get_comment_author_url( $comment );
+
+		if ( ! empty( $link ) && ! empty( $attributes['isLink'] ) && ! empty( $attributes['linkTarget'] ) ) {
+			$comment_author = sprintf( '<a rel="external nofollow ugc" href="%1s" target="%2s" class="u-url">%3s</a>', esc_url( $link ), esc_attr( $attributes['linkTarget'] ), $comment_author );
+		}
+		if ( '0' === $comment->comment_approved && ! $show_pending_links ) {
+			$comment_author = wp_kses( $comment_author, array() );
+		}
+
+		return sprintf(
+			'<div %1$s>%2$s</div>',
+			$wrapper_attributes,
+			$comment_author
+		);
+	}
+
+	/**
+	 * Adds the `p-content` and `p-name` classes to the `core/comment-content`
+	 * block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Return the post comment's content.
+	 */
+	public static function render_block_core_comment_content( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['commentId'] ) ) {
+			return '';
+		}
+
+		$comment            = get_comment( $block->context['commentId'] );
+		$commenter          = wp_get_current_commenter();
+		$show_pending_links = isset( $commenter['comment_author'] ) && $commenter['comment_author'];
+		if ( empty( $comment ) ) {
+			return '';
+		}
+
+		$args         = array();
+		$comment_text = get_comment_text( $comment, $args );
+		if ( ! $comment_text ) {
+			return '';
+		}
+
+		/** This filter is documented in wp-includes/comment-template.php */
+		$comment_text = apply_filters( 'comment_text', $comment_text, $comment, $args );
+
+		$moderation_note = '';
+		if ( '0' === $comment->comment_approved ) {
+			$commenter = wp_get_current_commenter();
+
+			if ( $commenter['comment_author_email'] ) {
+				$moderation_note = __( 'Your comment is awaiting moderation.' );
+			} else {
+				$moderation_note = __( 'Your comment is awaiting moderation. This is a preview; your comment will be visible after it has been approved.' );
+			}
+			$moderation_note = '<p><em class="comment-awaiting-moderation">' . $moderation_note . '</em></p>';
+			if ( ! $show_pending_links ) {
+				$comment_text = wp_kses( $comment_text, array() );
+			}
+		}
+
+		$classes = array( 'p-content', 'p-name' );
+		if ( isset( $attributes['textAlign'] ) ) {
+			$classes[] = 'has-text-align-' . $attributes['textAlign'];
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+		return sprintf(
+			'<div %1$s>%2$s%3$s</div>',
+			$wrapper_attributes,
+			$moderation_note,
+			$comment_text
+		);
+	}
+
+	/**
+	 * Adds `dt-published` to the `core/comment-date` block, and `u-url` to the
+	 * comment's permalink.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Return the post comment's date.
+	 */
+	public static function render_block_core_comment_date( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['commentId'] ) ) {
+			return '';
+		}
+
+		$comment = get_comment( $block->context['commentId'] );
+		if ( empty( $comment ) ) {
+			return '';
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => '' ) );
+		$formatted_date     = get_comment_date(
+			isset( $attributes['format'] ) ? $attributes['format'] : '',
+			$comment
+		);
+		$link               = get_comment_link( $comment );
+
+		if ( ! empty( $attributes['isLink'] ) ) {
+			$formatted_date = sprintf( '<a href="%1s" class="u-url">%2s</a>', esc_url( $link ), $formatted_date );
+		}
+
+		return sprintf(
+			'<div %1$s><time datetime="%2$s" class="dt-published">%3$s</time></div>',
+			$wrapper_attributes,
+			esc_attr( get_comment_date( 'c', $comment ) ),
+			$formatted_date
 		);
 	}
 }

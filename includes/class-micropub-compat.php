@@ -241,28 +241,28 @@ class Micropub_Compat {
 
 			switch ( $post_type ) {
 				case 'like':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-like-of"} -->' . PHP_EOL;
+					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
 					/* translators: %s: URL of the "liked" page. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
 						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'bookmark':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-bookmark-of"} -->' . PHP_EOL;
+					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
 					/* translators: %s: URL of the bookmarked page. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
 						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'reply':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-in-reply-to"} -->' . PHP_EOL;
+					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
 					/* translators: %s: URL of the page being replied to. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
 						<!-- /wp:indieblocks/context -->' . PHP_EOL;
 					break;
 
 				case 'repost':
-					$post_content .= '<!-- wp:indieblocks/context {"kind":"u-repost-of"} -->' . PHP_EOL;
+					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
 					/* translators: %s: URL of the "page" being reposted. */
 					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
 						<!-- /wp:indieblocks/context -->' . PHP_EOL;

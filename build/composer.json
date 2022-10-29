@@ -1,0 +1,12 @@
+{
+    "require": {
+        "mf2\/mf2": "^0.5",
+        "masterminds\/html5": "^2.7",
+        "michelf\/php-markdown": "^2.0"
+    },
+    "autoload": {
+        "classmap": [
+            "..\/includes\/"
+        ]
+    }
+}

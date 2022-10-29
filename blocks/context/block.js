@@ -28,7 +28,7 @@
 		edit: function ( props ) {
 			var url         = props.attributes.url;
 			var customTitle = props.attributes.customTitle;
-			var title       = props.attributes.title || url;
+			var title       = props.attributes.title || '';
 			var kind        = props.attributes.kind;
 
 			function onChangeUrl( value ) {
@@ -61,7 +61,12 @@
 					path: '/indieblocks/v1/title?url=' + encodeURIComponent( url ),
 					signal: controller.signal
 				} ).then( function( value ) {
+					if ( ! value || '' === value ) {
+						value = url;
+					}
+
 					props.setAttributes( { title: value } );
+
 					clearTimeout(timeoutId);
 				} ).catch( function( error ) {
 					// The request timed out or otherwise failed.
@@ -124,7 +129,7 @@
 							el( 'i', {},
 								element.createInterpolateElement(
 									// Add a period only if the "title" doesn't already end in one of these punctuation marks.
-									sprintf( messages[ kind ] + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + title + '</a>' ),
+									sprintf( messages[ kind ] + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( '' !== title ? title : url ) + '</a>' ),
 									{ a: el( 'a', { className: kind, href: url } ) }
 								)
 							)

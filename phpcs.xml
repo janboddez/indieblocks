@@ -12,4 +12,5 @@
 
 	<exclude-pattern>tests/*</exclude-pattern>
 	<exclude-pattern>bootstrap\.php$</exclude-pattern>
+	<exclude-pattern>scoper\.inc\.php$</exclude-pattern>
 </ruleset>

@@ -23,9 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Load dependencies.
-foreach ( glob( __DIR__ . '/includes/*.php' ) as $file ) {
-	require_once $file;
-}
+require_once __DIR__ . '/build/vendor/scoper-autoload.php';
+// foreach ( glob( __DIR__ . '/includes/*.php' ) as $file ) {
+//	require_once $file;
+// }
 
 $indieblocks = IndieBlocks::get_instance();
 $indieblocks->register();

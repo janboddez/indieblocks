@@ -25,6 +25,7 @@ class Post_Types {
 		// Date-based archives.
 		add_action( 'init', array( __CLASS__, 'create_date_archives' ) );
 		add_action( 'wp', array( __CLASS__, 'set_404_if_empty' ) );
+		// add_filter( 'post_type_link', array( __CLASS__, 'post_type_link' ), 10, 2 );
 
 		if ( ! empty( $options['default_taxonomies'] ) ) {
 			// Include Notes in category and tag archives.
@@ -408,7 +409,6 @@ class Post_Types {
 			->get_options();
 
 		if ( empty( $options['date_archives'] ) ) {
-			// Nothing to do. This doesn't always work. Or rather it does, but ...
 			return;
 		}
 
@@ -428,6 +428,26 @@ class Post_Types {
 			if ( empty( $post_type->rewrite['slug'] ) ) {
 				return;
 			}
+
+			// Date-based permalinks.
+			// if ( ! empty( $options['permalink_format'] ) && '/%year%/%monthnum%/%day%/%postname%/' === $options['permalink_format'] ) {
+			// 	// And so on.
+			// }
+			// Year, month, day and name.
+			// add_permastruct(
+			// 	$post_type->name,
+			// 	// @todo: Make this configurable, and replace the slash with WP's install path.
+			// 	'/' . $post_type->rewrite['slug'] . '/%year%/%monthnum%/%day%/%' . $post_type->name . '%/',
+			// 	array( 'with_front' => false )
+			// );
+			// Year, month, and name.
+			// add_permastruct(
+			// 	$post_type->name,
+			// 	// @todo: Make this configurable, and replace the slash with WP's install path.
+			// 	'/' . $post_type->rewrite['slug'] . '/%year%/%monthnum%/%' . $post_type->name . '%/',
+			// 	array( 'with_front' => false )
+			// );
+			// @todo: Use `add_rewrite_tag()`?
 
 			// Day.
 			add_rewrite_rule(
@@ -470,6 +490,31 @@ class Post_Types {
 				'top'
 			);
 		}
+	}
+
+	/**
+	 * Returns a proper permalink for IndieBlocks posts.
+	 *
+	 * @param  string  $permalink Post permalink.
+	 * @param  WP_Post $post     Post object.
+	 * @return string            Filtered permalink.
+	 */
+	public static function post_type_link( $permalink, $post ) {
+		if ( ! in_array( get_post_type( $post ), array( 'indieblocks_note', 'indieblocks_like' ), true ) ) {
+			return $permalink;
+		}
+
+		return str_replace(
+			array(
+				'%year%',
+				'%monthnum%',
+			),
+			array(
+				get_the_date( 'Y', $post->ID ),
+				get_the_date( 'm', $post->ID ),
+			),
+			$permalink
+		);
 	}
 
 	/**

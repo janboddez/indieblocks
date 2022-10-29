@@ -14,6 +14,16 @@
 			"attribute": "href",
 			"default": ""
 		},
+		"customTitle": {
+			"type": "boolean",
+			"default": false
+		},
+		"title": {
+			"type": "string",
+			"source": "text",
+			"selector": "a",
+			"default": ""
+		},
 		"kind": {
 			"type": "string",
 			"source": "attribute",

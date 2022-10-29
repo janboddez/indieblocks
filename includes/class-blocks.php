@@ -68,10 +68,6 @@ class Blocks {
 
 		$title = $parser->get_title();
 
-		if ( empty( $title ) ) {
-			return rest_ensure_response( '' );
-		}
-
 		return rest_ensure_response( $title );
 	}
 
@@ -82,11 +78,6 @@ class Blocks {
 		register_block_type( dirname( __DIR__ ) . '/blocks/context' );
 
 		// This oughta happen automatically, but whatevs.
-		$script_handle = generate_block_asset_handle( 'indieblocks/context', 'editorScript' );
-		wp_set_script_translations( $script_handle, 'indieblocks', dirname( __DIR__ ) . '/languages' );
-
-		register_block_type( dirname( __DIR__ ) . '/blocks/reply' );
-
 		$script_handle = generate_block_asset_handle( 'indieblocks/context', 'editorScript' );
 		wp_set_script_translations( $script_handle, 'indieblocks', dirname( __DIR__ ) . '/languages' );
 	}

@@ -36,4 +36,5 @@ Thumbs.db
 
 svn/*
 vendor/*
+*.bak.*
 *.cache

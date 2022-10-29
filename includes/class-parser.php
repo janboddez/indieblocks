@@ -42,13 +42,19 @@ class Parser {
 	 * Fetches the page, then loads its DOM.
 	 */
 	public function parse() {
-		error_log( 'Trying to fetch from cache.' );
-		$content = get_transient( mb_substr( 'indieblocks:' . esc_url_raw( $this->url ), 0, 150 ) );
+		$content = get_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ) );
 
 		if ( empty( $content ) ) {
-			$args = array(
-				'timeout'  => 11,
-				'redirect' => 5,
+			$wp_version = get_bloginfo( 'version' );
+			$user_agent = 'WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' ) . '; IndieBlocks';
+
+			$args = apply_filters(
+				'indieblocks_fetch_args',
+				array(
+					'user-agent' => $user_agent,
+					'timeout'    => 11,
+				),
+				$this->url
 			);
 
 			$response = wp_remote_get(
@@ -56,10 +62,9 @@ class Parser {
 				$args
 			);
 
-			error_log( 'Downloading content.' );
 			$content = wp_remote_retrieve_body( $response );
 
-			set_transient( mb_substr( 'indieblocks:' . esc_url_raw( $this->url ), 0, 150 ), $content, 3600 );
+			set_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
 		}
 
 		if ( empty( $content ) ) {
@@ -80,7 +85,7 @@ class Parser {
 		$title = $this->dom->getElementsByTagName( 'title' );
 
 		if ( isset( $title->length ) && $title->length > 0 ) {
-			return $title->item( 0 )->textContent;
+			return trim( $title->item( 0 )->textContent );
 		}
 
 		return '';

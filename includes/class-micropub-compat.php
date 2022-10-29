@@ -271,14 +271,19 @@ class Micropub_Compat {
 		}
 
 		if ( ! empty( $input['properties']['content'][0] ) ) {
+			// Allow developers to run (sanitized) content through a filter, to,
+			// e.g., parse Markdown.
+			$content = apply_filters( 'indieblocks_inner_content', wp_kses_post( $input['properties']['content'][0] ), $input );
+			$content = wpautop( $content );
+
 			if ( 'repost' === $post_type ) {
 				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content">' . wpautop( wp_kses_post( $input['properties']['content'][0] ) ) . '</blockquote>
+					<blockquote class="wp-block-quote e-content">' . $content . '</blockquote>
 					<!-- /wp:quote -->';
 			} else {
 				$post_content .= '<!-- wp:group {"className":"e-content"} -->
 					<div class="wp-block-group e-content"><!-- wp:freeform -->
-					' . wpautop( wp_kses_post( $input['properties']['content'][0] ) ) . '
+					' . $content . '
 					<!-- /wp:freeform --></div>
 					<!-- /wp:group -->';
 			}

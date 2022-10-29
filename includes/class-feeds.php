@@ -150,7 +150,7 @@ class Feeds {
 			$content = '<p>' . get_the_post_thumbnail( $post->ID ) . '</p>' . PHP_EOL . $content;
 		}
 
-		return wpautop( $content );
+		return $content;
 	}
 
 	/**

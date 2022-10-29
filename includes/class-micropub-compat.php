@@ -271,9 +271,18 @@ class Micropub_Compat {
 		}
 
 		if ( ! empty( $input['properties']['content'][0] ) ) {
-			// Allow developers to run (sanitized) content through a filter, to,
-			// e.g., parse Markdown.
-			$content = apply_filters( 'indieblocks_inner_content', wp_kses_post( $input['properties']['content'][0] ), $input );
+			$content = wp_kses_post( $input['properties']['content'][0] );
+
+			$options = IndieBlocks::get_instance()
+				->get_options_handler()
+				->get_options();
+
+			if ( ! empty( $options['parse_markdown'] ) ) {
+				// @todo: Filter all notes and likes, not just those posted via Micropub, and store Markdown in `post_content_filtered`, kind of like Jetpack does it.
+				$content = Michelf\MarkdownExtra::defaultTransform( $content );
+			}
+
+			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
 			$content = wpautop( $content );
 
 			if ( 'repost' === $post_type ) {

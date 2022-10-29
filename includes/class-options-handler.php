@@ -35,6 +35,7 @@ class Options_Handler {
 		'add_mf2'             => false,
 		'micropub'            => false,
 		'webmention'          => false,
+		'parse_markdown'      => false,
 	);
 
 	/**
@@ -165,6 +166,7 @@ class Options_Handler {
 			'add_featured_images' => isset( $settings['add_featured_images'] ) ? true : false,
 			'location_functions'  => isset( $settings['location_functions'] ) ? true : false,
 			'micropub'            => isset( $settings['micropub'] ) ? true : false,
+			'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
 			'webmention'          => isset( $settings['webmention'] ) ? true : false,
 		);
 
@@ -277,6 +279,11 @@ class Options_Handler {
 							<th scope="row"><?php esc_html_e( 'Micropub', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[micropub]" value="1" <?php checked( ! empty( $this->options['micropub'] ) ); ?>/> <?php esc_html_e( 'Deeper Micropub integration', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Add post type and category data to responses to Micropub &ldquo;config&rdquo; queries.', 'indieblocks' ); ?></p></td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Parse Markdown', 'indieblocks' ); ?></th>
+							<td><label><input type="checkbox" name="indieblocks_settings[parse_markdown]" value="1" <?php checked( ! empty( $this->options['parse_markdown'] ) ); ?>/> <?php esc_html_e( 'Parse Markdown', 'indieblocks' ); ?></label>
+							<p class="description"><?php esc_html_e( '(Experimental) Parse Markdown inside &ldquo;Micropub&rdquo; notes or likes.', 'indieblocks' ); ?></p></td>
 						</tr>
 					</table>
 				<?php endif; ?>

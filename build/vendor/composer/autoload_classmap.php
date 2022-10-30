@@ -39,4 +39,8 @@ return array(
     'IndieBlocks\\Parser' => $baseDir . '/../includes/class-parser.php',
     'IndieBlocks\\Post_Types' => $baseDir . '/../includes/class-post-types.php',
     'IndieBlocks\\Theme_Mf2' => $baseDir . '/../includes/class-theme-mf2.php',
+    'IndieBlocks\\Webmention' => $baseDir . '/../includes/class-webmention.php',
+    'IndieBlocks\\Webmention_Parser' => $baseDir . '/../includes/class-webmention-parser.php',
+    'IndieBlocks\\Webmention_Receiver' => $baseDir . '/../includes/class-webmention-receiver.php',
+    'IndieBlocks\\Webmention_Sender' => $baseDir . '/../includes/class-webmention-sender.php',
 );

@@ -17,26 +17,27 @@ class Options_Handler {
 	 * @var array $options Plugin options.
 	 */
 	private $options = array(
-		'enable_blocks'       => true,
-		'post_types'          => false,
-		'default_taxonomies'  => false,
-		'custom_menu_order'   => false,
-		'random_slugs'        => false,
-		'automatic_titles'    => false,
-		'hide_titles'         => false,
-		'date_archives'       => false,
-		'permalink_format'    => '/%postname%/',
-		'notes_in_feed'       => true,
-		'likes_in_feed'       => false,
-		'notes_in_home'       => false,
-		'likes_in_home'       => false,
-		'modified_feeds'      => false,
-		'add_featured_images' => false,
-		'location_functions'  => false,
-		'add_mf2'             => false,
-		'micropub'            => false,
-		'webmention'          => false,
-		'parse_markdown'      => false,
+		'enable_blocks'         => true,
+		'post_types'            => false,
+		'default_taxonomies'    => false,
+		'custom_menu_order'     => false,
+		'random_slugs'          => false,
+		'automatic_titles'      => false,
+		'hide_titles'           => false,
+		'date_archives'         => false,
+		'notes_in_feed'         => true,
+		'likes_in_feed'         => false,
+		'notes_in_home'         => false,
+		'likes_in_home'         => false,
+		'permalink_format'      => '/%postname%/',
+		'modified_feeds'        => false,
+		'webmention'            => false,
+		'webmention_post_types' => array(),
+		'add_featured_images'   => false,
+		'location_functions'    => false,
+		'add_mf2'               => false,
+		'micropub'              => false,
+		'parse_markdown'        => false,
 	);
 
 	/**
@@ -110,10 +111,10 @@ class Options_Handler {
 	}
 
 	/**
-	 * Handles submitted options.
+	 * Handles submitted "Blocks" options.
 	 *
 	 * @param  array $settings Settings as submitted through WP Admin.
-	 * @return array Options to be stored.
+	 * @return array           Options to be stored.
 	 */
 	public function sanitize_blocks_settings( $settings ) {
 		$options = array(
@@ -131,10 +132,10 @@ class Options_Handler {
 	}
 
 	/**
-	 * Handles submitted options.
+	 * Handles submitted "Post Types" options.
 	 *
 	 * @param  array $settings Settings as submitted through WP Admin.
-	 * @return array Options to be stored.
+	 * @return array           Options to be stored.
 	 */
 	public function sanitize_post_types_settings( $settings ) {
 		$options = array(
@@ -145,7 +146,6 @@ class Options_Handler {
 			'enable_likes'       => isset( $settings['enable_likes'] ) ? true : false,
 			'likes_in_feed'      => isset( $settings['likes_in_feed'] ) ? true : false,
 			'likes_in_home'      => isset( $settings['likes_in_home'] ) ? true : false,
-			'custom_menu_order'  => isset( $settings['custom_menu_order'] ) ? true : false,
 			'random_slugs'       => isset( $settings['random_slugs'] ) ? true : false,
 			'automatic_titles'   => isset( $settings['automatic_titles'] ) ? true : false,
 			'hide_titles'        => isset( $settings['hide_titles'] ) ? true : false,
@@ -174,10 +174,42 @@ class Options_Handler {
 	}
 
 	/**
-	 * Handles submitted options.
+	 * Handles submitted "Webmention" options.
 	 *
 	 * @param  array $settings Settings as submitted through WP Admin.
-	 * @return array Options to be stored.
+	 * @return array           Options to be stored.
+	 */
+	public function sanitize_webmention_settings( $settings ) {
+		$options = array(
+			'webmention' => isset( $settings['webmention'] ) ? true : false,
+		);
+
+		$webmention_post_types = array();
+
+		if ( isset( $settings['webmention_post_types'] ) && is_array( $settings['webmention_post_types'] ) ) {
+			foreach ( $settings['webmention_post_types'] as $post_type ) {
+				if ( in_array( $post_type, array_keys( $this->get_post_types() ), true ) ) {
+					$webmention_post_types[] = $post_type;
+				}
+			}
+		}
+
+		$options['webmention_post_types'] = $webmention_post_types;
+
+		$this->options = array_merge(
+			$this->options,
+			$options
+		);
+
+		// Updated settings.
+		return $this->options;
+	}
+
+	/**
+	 * Handles submitted "Miscallaneous" options.
+	 *
+	 * @param  array $settings Settings as submitted through WP Admin.
+	 * @return array           Options to be stored.
 	 */
 	public function sanitize_misc_settings( $settings ) {
 		$options = array(
@@ -214,6 +246,7 @@ class Options_Handler {
 				<h2 class="nav-tab-wrapper">
 					<a href="<?php echo esc_url( $this->get_options_url( 'blocks' ) ); ?>" class="nav-tab <?php echo esc_attr( 'blocks' === $active_tab ? 'nav-tab-active' : '' ); ?>"><?php esc_html_e( 'Microformats and Blocks', 'indieblocks' ); ?></a>
 					<a href="<?php echo esc_url( $this->get_options_url( 'post_types' ) ); ?>" class="nav-tab <?php echo esc_attr( 'post_types' === $active_tab ? 'nav-tab-active' : '' ); ?>"><?php esc_html_e( 'Post Types', 'indieblocks' ); ?></a>
+					<a href="<?php echo esc_url( $this->get_options_url( 'webmention' ) ); ?>" class="nav-tab <?php echo esc_attr( 'webmention' === $active_tab ? 'nav-tab-active' : '' ); ?>"><?php esc_html_e( 'Webmention', 'indieblocks' ); ?></a>
 					<a href="<?php echo esc_url( $this->get_options_url( 'misc' ) ); ?>" class="nav-tab <?php echo esc_attr( 'misc' === $active_tab ? 'nav-tab-active' : '' ); ?>"><?php esc_html_e( 'Miscellaneous', 'indieblocks' ); ?></a>
 				</h2>
 
@@ -261,24 +294,45 @@ class Options_Handler {
 							<td><label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Attempts to hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor.', 'indieblocks' ); ?></p></td>
 						</tr>
+						<?php if ( get_option( 'permalink_structure' ) ) : ?>
+							<tr valign="top">
+								<th scope="row"><?php esc_html_e( 'Date-Based Archives', 'indieblocks' ); ?></th>
+								<td><label><input type="checkbox" name="indieblocks_settings[date_archives]" value="1" <?php checked( ! empty( $this->options['date_archives'] ) ); ?>/> <?php esc_html_e( 'Enable date-based archives', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Enable year, month, and day archives for notes and likes.', 'indieblocks' ); ?></p></td>
+							</tr>
+							<tr valign="top">
+								<th scope="row"><?php esc_html_e( 'Permalink format', 'indieblocks' ); ?></th>
+								<td>
+									<?php foreach ( self::PERMALINK_FORMATS as $i => $format ) : ?>
+										<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="radio" name="indieblocks_settings[permalink_format]" value="<?php echo esc_attr( $format ); ?>" <?php checked( isset( $this->options['permalink_format'] ) ? $this->options['permalink_format'] : '/%postname%/', $format ); ?> /> <code><?php echo esc_html( $this->get_example_permalink( $format ) ); ?></code></label>
+									<?php endforeach; ?>
+									<p class="description"><?php esc_html_e( '(Experimental) Set a custom note and like permalink format.', 'indieblocks' ); ?></p>
+								</td>
+							</tr>
+							<tr valign="top">
+								<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></th>
+								<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Modify feeds', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Remove note and like titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates.', 'indieblocks' ); ?></p></td>
+							</tr>
+						<?php endif; ?>
+					</table>
+				<?php endif; ?>
+
+				<?php if ( 'webmention' === $active_tab ) : ?>
+					<table class="form-table">
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Date-Based Archives', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[date_archives]" value="1" <?php checked( ! empty( $this->options['date_archives'] ) ); ?>/> <?php esc_html_e( 'Enable date-based archives', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Enable year, month, and day archives for notes and likes.', 'indieblocks' ); ?></p></td>
+							<th scope="row"><?php esc_html_e( 'Webmention', 'indieblocks' ); ?></th>
+							<td><label><input type="checkbox" name="indieblocks_settings[webmention]" value="1" <?php checked( ! empty( $this->options['webmention'] ) ); ?>/> <?php esc_html_e( 'Enable Webmention', 'indieblocks' ); ?></label>
+							<p class="description"><?php esc_html_e( '(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Permalink format', 'indieblocks' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Post Types', 'indieblocks' ); ?></th>
 							<td>
-								<?php foreach ( self::PERMALINK_FORMATS as $i => $format ) : ?>
-									<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="radio" name="indieblocks_settings[permalink_format]" value="<?php echo esc_attr( $format ); ?>" <?php checked( isset( $this->options['permalink_format'] ) ? $this->options['permalink_format'] : '/%postname%/', $format ); ?> /> <code><?php echo esc_html( $this->get_example_permalink( $format ) ); ?></code></label>
+								<?php foreach ( $this->get_post_types() as $i => $post_type ) : ?>
+									<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="checkbox" name="indieblocks_settings[webmention_post_types][]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( isset( $this->options['webmention_post_types'] ) && in_array( $post_type->name, (array) $this->options['webmention_post_types'], true ) ); ?> /> <?php echo esc_html( isset( $post_type->labels->singular_name ) ? $post_type->labels->singular_name : $post_type->name ); ?></code></label>
 								<?php endforeach; ?>
-								<p class="description"><?php esc_html_e( '(Experimental) Set a custom note and like permalink format.', 'indieblocks' ); ?></p>
+								<p class="description"><?php esc_html_e( '(Experimental) The post types for which webmentions (outgoing and incoming) should be enabled.', 'indieblocks' ); ?></p>
 							</td>
-						</tr>
-						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Modify feeds', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Remove note and like titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates.', 'indieblocks' ); ?></p></td>
 						</tr>
 					</table>
 				<?php endif; ?>
@@ -323,29 +377,22 @@ class Options_Handler {
 		if ( ! empty( $_POST['submit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$query_string = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
 
-			if ( ! empty( $query_string ) ) {
-				parse_str( $query_string, $query_vars );
+			if ( empty( $query_string ) ) {
+				return 'blocks';
+			}
 
-				if ( isset( $query_vars['tab'] ) && 'post_types' === $query_vars['tab'] ) {
-					return 'post_types';
-				}
+			parse_str( $query_string, $query_vars );
 
-				if ( isset( $query_vars['tab'] ) && 'misc' === $query_vars['tab'] ) {
-					return 'misc';
-				}
+			if ( isset( $query_vars['tab'] ) && in_array( $query_vars['tab'], array( 'post_types', 'webmention', 'misc' ), true ) ) {
+				return $query_vars['tab'];
 			}
 
 			return 'blocks';
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['tab'] ) && 'post_types' === $_GET['tab'] ) {
-			return 'post_types';
-		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['tab'] ) && 'misc' === $_GET['tab'] ) {
-			return 'misc';
+		if ( isset( $_GET['tab'] ) && in_array( $_GET['tab'], array( 'post_types', 'webmention', 'misc' ), true ) ) {
+			return $_GET['tab']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 
 		return 'blocks';
@@ -404,5 +451,15 @@ class Options_Handler {
 			array( date( 'Y' ), date( 'm' ), date( 'd' ), __( 'sample-post', 'indieblocks' ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			$format
 		);
+	}
+
+	/**
+	 * Returns post types we may want to enable Webmention for.
+	 */
+	private function get_post_types() {
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+		unset( $post_types['attachment'] );
+
+		return $post_types;
 	}
 }

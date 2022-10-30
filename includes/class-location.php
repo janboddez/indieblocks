@@ -200,9 +200,8 @@ class Location {
 					'headers'             => array(
 						'Accept' => 'application/json',
 					),
-					'timeout'             => 15,
+					'timeout'             => 11,
 					'limit_response_size' => 1048576,
-					'redirection'         => 1,
 					'user-agent'          => 'IndieBlocks for WordPress',
 				)
 			);
@@ -259,9 +258,8 @@ class Location {
 					'headers'             => array(
 						'Accept' => 'application/json',
 					),
-					'timeout'             => 15,
+					'timeout'             => 11,
 					'limit_response_size' => 1048576,
-					'redirection'         => 1,
 				)
 			);
 

@@ -60,20 +60,6 @@ class Post_Types {
 	}
 
 	/**
-	 * Modifies WP's main menu.
-	 */
-	public static function menu_order() {
-		return array(
-			'index.php', // Dashboard.
-			'separator1',
-			'edit.php', // Posts.
-			'edit.php?post_type=indieblocks_note', // Notes.
-			'edit.php?post_type=indieblocks_like', // Likes.
-			// Let WordPress take it from here. This works, somehow.
-		);
-	}
-
-	/**
 	 * Registers custom post types.
 	 */
 	public static function register_post_types() {
@@ -589,7 +575,8 @@ class Post_Types {
 			return $slug;
 		}
 
-		if ( ! preg_match( '~\d+~', $slug ) ) {
+		if ( ! preg_match( '~^\d+$~', $slug ) ) {
+			// We're insterested only in slugs that are 100% digits.
 			return $slug;
 		}
 
@@ -598,13 +585,15 @@ class Post_Types {
 			->get_options();
 
 		if ( empty( $options['date_archives'] ) ) {
+			// No date archives means no clashes.
 			return $slug;
 		}
 
 		if ( empty( $options['permalink_format'] ) ) {
-			$options['permalink_format'] = '/%postname/%'; // Corresponds with the default.
+			$options['permalink_format'] = '/%postname%/';
 		}
 
+		// The following lines are lifted almost verbatim from core.
 		$permastructs   = array_values( array_filter( explode( '/', $options['permalink_format'] ) ) );
 		$postname_index = array_search( '%postname%', $permastructs, true );
 
@@ -617,7 +606,7 @@ class Post_Types {
 			global $wpdb;
 
 			$check_sql = "SELECT post_name FROM $wpdb->posts WHERE post_name = %s AND post_type = %s AND ID != %d LIMIT 1";
-			$suffix    = 2;
+			$suffix    = 2; // There's no way `$slug` ends in a suffix already; we previously confirmed it is _numbers only_.
 
 			do {
 				// Ensure the "suffixed" slug is _also unique_.

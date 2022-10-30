@@ -13,10 +13,8 @@ namespace IndieBlocks;
 class IndieBlocks {
 	/**
 	 * Plugin version.
-	 *
-	 * @var string $version Plugin version.
 	 */
-	public static $version = '0.2.1';
+	const VERSION = '0.3.0';
 
 	/**
 	 * Options handler.
@@ -64,6 +62,10 @@ class IndieBlocks {
 		// directly call the `register()` methods. This allows other plugins to
 		// more easily unhook them.
 		$options = $this->options_handler->get_options();
+
+		if ( ! empty( $options['webmention'] ) ) {
+			add_action( 'plugins_loaded', array( Webmention::class, 'register' ) );
+		}
 
 		// Gutenberg blocks.
 		if ( ! empty( $options['enable_blocks'] ) ) {

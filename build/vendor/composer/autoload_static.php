@@ -63,6 +63,10 @@ class ComposerStaticInitb65820b9b0628aefe1b59aa82b13d9f8
         'IndieBlocks\\Parser' => __DIR__ . '/../..' . '/../includes/class-parser.php',
         'IndieBlocks\\Post_Types' => __DIR__ . '/../..' . '/../includes/class-post-types.php',
         'IndieBlocks\\Theme_Mf2' => __DIR__ . '/../..' . '/../includes/class-theme-mf2.php',
+        'IndieBlocks\\Webmention' => __DIR__ . '/../..' . '/../includes/class-webmention.php',
+        'IndieBlocks\\Webmention_Parser' => __DIR__ . '/../..' . '/../includes/class-webmention-parser.php',
+        'IndieBlocks\\Webmention_Receiver' => __DIR__ . '/../..' . '/../includes/class-webmention-receiver.php',
+        'IndieBlocks\\Webmention_Sender' => __DIR__ . '/../..' . '/../includes/class-webmention-sender.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

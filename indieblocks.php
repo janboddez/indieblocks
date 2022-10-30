@@ -8,7 +8,7 @@
  * License:     GNU General Public License v3
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: indieblocks
- * Version:     0.2.1
+ * Version:     0.3.0
  *
  * @author  Jan Boddez <jan@janboddez.be>
  * @license http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
@@ -24,9 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Load dependencies.
 require_once __DIR__ . '/build/vendor/scoper-autoload.php';
-// foreach ( glob( __DIR__ . '/includes/*.php' ) as $file ) {
-//	require_once $file;
-// }
 
 $indieblocks = IndieBlocks::get_instance();
 $indieblocks->register();

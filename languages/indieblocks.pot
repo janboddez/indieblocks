@@ -2,22 +2,22 @@
 # This file is distributed under the GNU General Public License v3.
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.2.1\n"
+"Project-Id-Version: IndieBlocks 0.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-10-29T08:58:12+00:00\n"
+"POT-Creation-Date: 2022-10-30T22:44:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
 
 #. Plugin Name of the plugin
-#: includes/class-options-handler.php:74
-#: includes/class-options-handler.php:75
-#: includes/class-options-handler.php:186
+#: includes/class-options-handler.php:86
+#: includes/class-options-handler.php:87
+#: includes/class-options-handler.php:238
 #: svn/tags/0.1.0/includes/class-options-handler.php:55
 #: svn/tags/0.1.0/includes/class-options-handler.php:56
 #: svn/tags/0.1.0/includes/class-options-handler.php:136
@@ -96,7 +96,7 @@ msgstr ""
 #: includes/class-micropub-compat.php:253
 #: svn/tags/0.2.0/includes/class-micropub-compat.php:253
 #: svn/trunk/includes/class-micropub-compat.php:253
-#: blocks/context/block.js:162
+#: blocks/context/block.js:167
 #: svn/tags/0.1.0/blocks/context/block.js:17
 #: svn/tags/0.2.0/blocks/context/block.js:17
 #: svn/trunk/blocks/context/block.js:17
@@ -107,7 +107,7 @@ msgstr ""
 #: includes/class-micropub-compat.php:260
 #: svn/tags/0.2.0/includes/class-micropub-compat.php:260
 #: svn/trunk/includes/class-micropub-compat.php:260
-#: blocks/context/block.js:166
+#: blocks/context/block.js:171
 #: svn/tags/0.1.0/blocks/context/block.js:21
 #: svn/tags/0.2.0/blocks/context/block.js:21
 #: svn/trunk/blocks/context/block.js:21
@@ -118,86 +118,92 @@ msgstr ""
 #: includes/class-micropub-compat.php:267
 #: svn/tags/0.2.0/includes/class-micropub-compat.php:267
 #: svn/trunk/includes/class-micropub-compat.php:267
-#: blocks/context/block.js:168
+#: blocks/context/block.js:173
 #: svn/tags/0.1.0/blocks/context/block.js:23
 #: svn/tags/0.2.0/blocks/context/block.js:23
 #: svn/trunk/blocks/context/block.js:23
 msgid "Reposted %s."
 msgstr ""
 
-#: includes/class-options-handler.php:195
+#: includes/class-options-handler.php:247
 #: svn/tags/0.2.0/includes/class-options-handler.php:195
 #: svn/trunk/includes/class-options-handler.php:195
 msgid "Microformats and Blocks"
 msgstr ""
 
-#: includes/class-options-handler.php:196
+#: includes/class-options-handler.php:248
+#: includes/class-options-handler.php:329
 #: svn/tags/0.1.0/includes/class-options-handler.php:149
 #: svn/tags/0.2.0/includes/class-options-handler.php:196
 #: svn/trunk/includes/class-options-handler.php:196
 msgid "Post Types"
 msgstr ""
 
-#: includes/class-options-handler.php:197
+#: includes/class-options-handler.php:249
+#: includes/class-options-handler.php:324
+msgid "Webmention"
+msgstr ""
+
+#: includes/class-options-handler.php:250
 #: svn/tags/0.2.0/includes/class-options-handler.php:197
 #: svn/trunk/includes/class-options-handler.php:197
 msgid "Miscellaneous"
 msgstr ""
 
-#: includes/class-options-handler.php:203
+#: includes/class-options-handler.php:256
 #: svn/tags/0.1.0/includes/class-options-handler.php:144
 #: svn/tags/0.2.0/includes/class-options-handler.php:203
 #: svn/trunk/includes/class-options-handler.php:203
 msgid "Blocks"
 msgstr ""
 
-#: includes/class-options-handler.php:204
+#: includes/class-options-handler.php:257
 #: svn/tags/0.1.0/includes/class-options-handler.php:145
 #: svn/tags/0.2.0/includes/class-options-handler.php:204
 #: svn/trunk/includes/class-options-handler.php:204
 msgid "Enable blocks?"
 msgstr ""
 
-#: includes/class-options-handler.php:205
+#: includes/class-options-handler.php:258
 #: svn/tags/0.1.0/includes/class-options-handler.php:146
 #: svn/tags/0.2.0/includes/class-options-handler.php:205
 #: svn/trunk/includes/class-options-handler.php:205
 msgid "Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!"
 msgstr ""
 
-#: includes/class-options-handler.php:208
+#: includes/class-options-handler.php:261
 #: svn/tags/0.1.0/includes/class-options-handler.php:181
 #: svn/tags/0.2.0/includes/class-options-handler.php:208
 #: svn/trunk/includes/class-options-handler.php:208
 msgid "Microformats"
 msgstr ""
 
-#: includes/class-options-handler.php:209
+#: includes/class-options-handler.php:262
 #: svn/tags/0.2.0/includes/class-options-handler.php:209
 #: svn/trunk/includes/class-options-handler.php:209
 msgid "Enable microformats"
 msgstr ""
 
-#: includes/class-options-handler.php:210
+#: includes/class-options-handler.php:263
 #: svn/tags/0.2.0/includes/class-options-handler.php:210
 #: svn/trunk/includes/class-options-handler.php:210
 msgid "(Experimental) Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor."
 msgstr ""
 
-#: includes/class-options-handler.php:218
+#: includes/class-options-handler.php:271
 #: svn/tags/0.2.0/includes/class-options-handler.php:218
 #: svn/trunk/includes/class-options-handler.php:218
 msgid "Custom Post Types"
 msgstr ""
 
-#: includes/class-options-handler.php:219
+#: includes/class-options-handler.php:272
 #: svn/tags/0.2.0/includes/class-options-handler.php:219
 #: svn/trunk/includes/class-options-handler.php:219
 msgid "Enable &ldquo;Notes&rdquo;"
 msgstr ""
 
-#: includes/class-options-handler.php:220
-#: includes/class-options-handler.php:226
+#: includes/class-options-handler.php:273
+#: includes/class-options-handler.php:279
 #: svn/tags/0.2.0/includes/class-options-handler.php:220
 #: svn/tags/0.2.0/includes/class-options-handler.php:226
 #: svn/trunk/includes/class-options-handler.php:220
@@ -205,8 +211,8 @@ msgstr ""
 msgid "Include in main feed"
 msgstr ""
 
-#: includes/class-options-handler.php:221
-#: includes/class-options-handler.php:227
+#: includes/class-options-handler.php:274
+#: includes/class-options-handler.php:280
 #: svn/tags/0.2.0/includes/class-options-handler.php:221
 #: svn/tags/0.2.0/includes/class-options-handler.php:227
 #: svn/trunk/includes/class-options-handler.php:221
@@ -214,332 +220,347 @@ msgstr ""
 msgid "Show on blog page"
 msgstr ""
 
-#: includes/class-options-handler.php:222
+#: includes/class-options-handler.php:275
 #: svn/tags/0.2.0/includes/class-options-handler.php:222
 #: svn/trunk/includes/class-options-handler.php:222
 msgid "Enable categories and tags"
 msgstr ""
 
-#: includes/class-options-handler.php:225
+#: includes/class-options-handler.php:278
 #: svn/tags/0.2.0/includes/class-options-handler.php:225
 #: svn/trunk/includes/class-options-handler.php:225
 msgid "Enable &ldquo;Likes&rdquo;"
 msgstr ""
 
-#: includes/class-options-handler.php:231
-#: svn/tags/0.1.0/includes/class-options-handler.php:159
-#: svn/tags/0.2.0/includes/class-options-handler.php:231
-#: svn/trunk/includes/class-options-handler.php:231
-msgid "Custom Menu Order"
-msgstr ""
-
-#: includes/class-options-handler.php:232
-#: svn/tags/0.2.0/includes/class-options-handler.php:232
-#: svn/trunk/includes/class-options-handler.php:232
-msgid "Group posts, notes, and likes."
-msgstr ""
-
-#: includes/class-options-handler.php:233
-#: svn/tags/0.2.0/includes/class-options-handler.php:233
-#: svn/trunk/includes/class-options-handler.php:233
-msgid "Group (regular) posts, notes, and likes at the top of WordPress&rsquo; admin menu."
-msgstr ""
-
-#: includes/class-options-handler.php:237
+#: includes/class-options-handler.php:283
 #: svn/tags/0.1.0/includes/class-options-handler.php:169
 #: svn/tags/0.2.0/includes/class-options-handler.php:237
 #: svn/trunk/includes/class-options-handler.php:237
 msgid "Random Slugs"
 msgstr ""
 
-#: includes/class-options-handler.php:238
+#: includes/class-options-handler.php:284
 #: svn/tags/0.2.0/includes/class-options-handler.php:238
 #: svn/trunk/includes/class-options-handler.php:238
 msgid "Generate random slugs"
 msgstr ""
 
-#: includes/class-options-handler.php:239
+#: includes/class-options-handler.php:285
 #: svn/tags/0.2.0/includes/class-options-handler.php:239
 #: svn/trunk/includes/class-options-handler.php:239
 msgid "Autogenerate unique note and like slugs. Disable for WordPress&rsquo; default behavior."
 msgstr ""
 
-#: includes/class-options-handler.php:242
+#: includes/class-options-handler.php:288
 #: svn/tags/0.1.0/includes/class-options-handler.php:164
 #: svn/tags/0.2.0/includes/class-options-handler.php:242
 #: svn/trunk/includes/class-options-handler.php:242
 msgid "Autogenerate Titles"
 msgstr ""
 
-#: includes/class-options-handler.php:243
+#: includes/class-options-handler.php:289
 #: svn/tags/0.2.0/includes/class-options-handler.php:243
 #: svn/trunk/includes/class-options-handler.php:243
 msgid "Automatically generate titles"
 msgstr ""
 
-#: includes/class-options-handler.php:244
+#: includes/class-options-handler.php:290
 #: svn/tags/0.2.0/includes/class-options-handler.php:244
 #: svn/trunk/includes/class-options-handler.php:244
 msgid "Autogenerate note and like titles. (Your theme should probably hide these, still.)"
 msgstr ""
 
-#: includes/class-options-handler.php:247
+#: includes/class-options-handler.php:293
 #: svn/tags/0.2.0/includes/class-options-handler.php:247
 #: svn/trunk/includes/class-options-handler.php:247
 msgid "Hide Titles"
 msgstr ""
 
-#: includes/class-options-handler.php:248
+#: includes/class-options-handler.php:294
 #: svn/tags/0.2.0/includes/class-options-handler.php:248
 #: svn/trunk/includes/class-options-handler.php:248
 msgid "Hide note and like titles"
 msgstr ""
 
-#: includes/class-options-handler.php:249
+#: includes/class-options-handler.php:295
 #: svn/tags/0.2.0/includes/class-options-handler.php:249
 #: svn/trunk/includes/class-options-handler.php:249
 msgid "(Experimental) Attempts to hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor."
 msgstr ""
 
-#: includes/class-options-handler.php:252
+#: includes/class-options-handler.php:299
 #: svn/tags/0.2.0/includes/class-options-handler.php:252
 #: svn/trunk/includes/class-options-handler.php:252
 msgid "Date-Based Archives"
 msgstr ""
 
-#: includes/class-options-handler.php:253
+#: includes/class-options-handler.php:300
 #: svn/tags/0.2.0/includes/class-options-handler.php:253
 #: svn/trunk/includes/class-options-handler.php:253
 msgid "Enable date-based archives"
 msgstr ""
 
-#: includes/class-options-handler.php:254
+#: includes/class-options-handler.php:301
 #: svn/tags/0.2.0/includes/class-options-handler.php:254
 #: svn/trunk/includes/class-options-handler.php:254
 msgid "(Experimental) Enable year, month, and day archives for notes and likes."
 msgstr ""
 
-#: includes/class-options-handler.php:257
+#: includes/class-options-handler.php:304
+msgid "Permalink format"
+msgstr ""
+
+#: includes/class-options-handler.php:309
+msgid "(Experimental) Set a custom note and like permalink format."
+msgstr ""
+
+#: includes/class-options-handler.php:313
 #: svn/tags/0.2.0/includes/class-options-handler.php:257
 #: svn/trunk/includes/class-options-handler.php:257
 msgid "Feed Modifications"
 msgstr ""
 
-#: includes/class-options-handler.php:258
+#: includes/class-options-handler.php:314
 #: svn/tags/0.2.0/includes/class-options-handler.php:258
 #: svn/trunk/includes/class-options-handler.php:258
 msgid "Modify feeds"
 msgstr ""
 
-#: includes/class-options-handler.php:259
+#: includes/class-options-handler.php:315
 #: svn/tags/0.2.0/includes/class-options-handler.php:259
 #: svn/trunk/includes/class-options-handler.php:259
 msgid "(Experimental) Remove note and like titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates."
 msgstr ""
 
-#: includes/class-options-handler.php:267
+#: includes/class-options-handler.php:325
+msgid "Enable Webmention"
+msgstr ""
+
+#: includes/class-options-handler.php:326
+msgid "(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same."
+msgstr ""
+
+#: includes/class-options-handler.php:334
+msgid "(Experimental) The post types for which webmentions (outgoing and incoming) should be enabled."
+msgstr ""
+
+#: includes/class-options-handler.php:343
 #: svn/tags/0.2.0/includes/class-options-handler.php:267
 #: svn/trunk/includes/class-options-handler.php:267
 msgid "Featured Images"
 msgstr ""
 
-#: includes/class-options-handler.php:268
+#: includes/class-options-handler.php:344
 #: svn/tags/0.2.0/includes/class-options-handler.php:268
 #: svn/trunk/includes/class-options-handler.php:268
 msgid "Add Featured Images to feeds"
 msgstr ""
 
-#: includes/class-options-handler.php:269
+#: includes/class-options-handler.php:345
 #: svn/tags/0.2.0/includes/class-options-handler.php:269
 #: svn/trunk/includes/class-options-handler.php:269
 msgid "(Experimental) Prepend Featured Images to feed items."
 msgstr ""
 
-#: includes/class-options-handler.php:272
+#: includes/class-options-handler.php:348
 #: svn/tags/0.2.0/includes/class-options-handler.php:272
 #: svn/trunk/includes/class-options-handler.php:272
 msgid "Location and Weather"
 msgstr ""
 
-#: includes/class-options-handler.php:273
+#: includes/class-options-handler.php:349
 #: svn/tags/0.2.0/includes/class-options-handler.php:273
 #: svn/trunk/includes/class-options-handler.php:273
 msgid "Enable location functions"
 msgstr ""
 
-#: includes/class-options-handler.php:274
+#: includes/class-options-handler.php:350
 #: svn/tags/0.2.0/includes/class-options-handler.php:274
 #: svn/trunk/includes/class-options-handler.php:274
 msgid "(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts."
 msgstr ""
 
-#: includes/class-options-handler.php:277
+#: includes/class-options-handler.php:353
 #: svn/tags/0.2.0/includes/class-options-handler.php:277
 #: svn/trunk/includes/class-options-handler.php:277
 msgid "Micropub"
 msgstr ""
 
-#: includes/class-options-handler.php:278
+#: includes/class-options-handler.php:354
 #: svn/tags/0.2.0/includes/class-options-handler.php:278
 #: svn/trunk/includes/class-options-handler.php:278
 msgid "Deeper Micropub integration"
 msgstr ""
 
-#: includes/class-options-handler.php:279
+#: includes/class-options-handler.php:355
 #: svn/tags/0.2.0/includes/class-options-handler.php:279
 #: svn/trunk/includes/class-options-handler.php:279
 msgid "(Experimental) Add post type and category data to responses to Micropub &ldquo;config&rdquo; queries."
 msgstr ""
 
-#: includes/class-post-types.php:88
-#: svn/tags/0.1.0/includes/class-post-types.php:80
-#: svn/tags/0.2.0/includes/class-post-types.php:87
-#: svn/trunk/includes/class-post-types.php:87
-msgid "Notes"
+#: includes/class-options-handler.php:358
+#: includes/class-options-handler.php:359
+msgid "Parse Markdown"
 msgstr ""
 
+#: includes/class-options-handler.php:360
+msgid "(Experimental) Parse Markdown inside &ldquo;Micropub&rdquo; notes or likes."
+msgstr ""
+
+#: includes/class-options-handler.php:433
 #: includes/class-post-types.php:89
-#: svn/tags/0.1.0/includes/class-post-types.php:81
-#: svn/tags/0.2.0/includes/class-post-types.php:88
-#: svn/trunk/includes/class-post-types.php:88
-msgid "Note"
-msgstr ""
-
-#: includes/class-post-types.php:90
-#: svn/tags/0.1.0/includes/class-post-types.php:82
-#: svn/tags/0.2.0/includes/class-post-types.php:89
-#: svn/trunk/includes/class-post-types.php:89
-msgid "New Note"
-msgstr ""
-
-#: includes/class-post-types.php:91
-#: svn/tags/0.1.0/includes/class-post-types.php:83
-#: svn/tags/0.2.0/includes/class-post-types.php:90
-#: svn/trunk/includes/class-post-types.php:90
-msgid "Add New Note"
-msgstr ""
-
-#: includes/class-post-types.php:92
-#: svn/tags/0.1.0/includes/class-post-types.php:84
-#: svn/tags/0.2.0/includes/class-post-types.php:91
-#: svn/trunk/includes/class-post-types.php:91
-msgid "Edit Note"
-msgstr ""
-
-#: includes/class-post-types.php:93
-#: svn/tags/0.1.0/includes/class-post-types.php:85
-#: svn/tags/0.2.0/includes/class-post-types.php:92
-#: svn/trunk/includes/class-post-types.php:92
-msgid "View Note"
-msgstr ""
-
-#: includes/class-post-types.php:94
-#: svn/tags/0.1.0/includes/class-post-types.php:86
-#: svn/tags/0.2.0/includes/class-post-types.php:93
-#: svn/trunk/includes/class-post-types.php:93
-msgid "View Notes"
-msgstr ""
-
-#: includes/class-post-types.php:95
-#: svn/tags/0.1.0/includes/class-post-types.php:87
-#: svn/tags/0.2.0/includes/class-post-types.php:94
-#: svn/trunk/includes/class-post-types.php:94
-msgid "Search Notes"
-msgstr ""
-
-#: includes/class-post-types.php:96
-#: svn/tags/0.1.0/includes/class-post-types.php:88
-#: svn/tags/0.2.0/includes/class-post-types.php:95
-#: svn/trunk/includes/class-post-types.php:95
-msgid "No notes found."
-msgstr ""
-
-#: includes/class-post-types.php:97
-#: svn/tags/0.1.0/includes/class-post-types.php:89
-#: svn/tags/0.2.0/includes/class-post-types.php:96
-#: svn/trunk/includes/class-post-types.php:96
-msgid "No notes found in trash."
-msgstr ""
-
-#: includes/class-post-types.php:103
 #: svn/tags/0.1.0/includes/class-post-types.php:95
 #: svn/tags/0.2.0/includes/class-post-types.php:102
 #: svn/trunk/includes/class-post-types.php:102
 msgid "notes"
 msgstr ""
 
-#: includes/class-post-types.php:130
+#: includes/class-options-handler.php:451
+msgid "sample-post"
+msgstr ""
+
+#: includes/class-post-types.php:74
+#: svn/tags/0.1.0/includes/class-post-types.php:80
+#: svn/tags/0.2.0/includes/class-post-types.php:87
+#: svn/trunk/includes/class-post-types.php:87
+msgid "Notes"
+msgstr ""
+
+#: includes/class-post-types.php:75
+#: svn/tags/0.1.0/includes/class-post-types.php:81
+#: svn/tags/0.2.0/includes/class-post-types.php:88
+#: svn/trunk/includes/class-post-types.php:88
+msgid "Note"
+msgstr ""
+
+#: includes/class-post-types.php:76
+#: svn/tags/0.1.0/includes/class-post-types.php:82
+#: svn/tags/0.2.0/includes/class-post-types.php:89
+#: svn/trunk/includes/class-post-types.php:89
+msgid "New Note"
+msgstr ""
+
+#: includes/class-post-types.php:77
+#: svn/tags/0.1.0/includes/class-post-types.php:83
+#: svn/tags/0.2.0/includes/class-post-types.php:90
+#: svn/trunk/includes/class-post-types.php:90
+msgid "Add New Note"
+msgstr ""
+
+#: includes/class-post-types.php:78
+#: svn/tags/0.1.0/includes/class-post-types.php:84
+#: svn/tags/0.2.0/includes/class-post-types.php:91
+#: svn/trunk/includes/class-post-types.php:91
+msgid "Edit Note"
+msgstr ""
+
+#: includes/class-post-types.php:79
+#: svn/tags/0.1.0/includes/class-post-types.php:85
+#: svn/tags/0.2.0/includes/class-post-types.php:92
+#: svn/trunk/includes/class-post-types.php:92
+msgid "View Note"
+msgstr ""
+
+#: includes/class-post-types.php:80
+#: svn/tags/0.1.0/includes/class-post-types.php:86
+#: svn/tags/0.2.0/includes/class-post-types.php:93
+#: svn/trunk/includes/class-post-types.php:93
+msgid "View Notes"
+msgstr ""
+
+#: includes/class-post-types.php:81
+#: svn/tags/0.1.0/includes/class-post-types.php:87
+#: svn/tags/0.2.0/includes/class-post-types.php:94
+#: svn/trunk/includes/class-post-types.php:94
+msgid "Search Notes"
+msgstr ""
+
+#: includes/class-post-types.php:82
+#: svn/tags/0.1.0/includes/class-post-types.php:88
+#: svn/tags/0.2.0/includes/class-post-types.php:95
+#: svn/trunk/includes/class-post-types.php:95
+msgid "No notes found."
+msgstr ""
+
+#: includes/class-post-types.php:83
+#: svn/tags/0.1.0/includes/class-post-types.php:89
+#: svn/tags/0.2.0/includes/class-post-types.php:96
+#: svn/trunk/includes/class-post-types.php:96
+msgid "No notes found in trash."
+msgstr ""
+
+#: includes/class-post-types.php:116
 #: svn/tags/0.1.0/includes/class-post-types.php:117
 #: svn/tags/0.2.0/includes/class-post-types.php:129
 #: svn/trunk/includes/class-post-types.php:129
 msgid "Likes"
 msgstr ""
 
-#: includes/class-post-types.php:131
+#: includes/class-post-types.php:117
 #: svn/tags/0.1.0/includes/class-post-types.php:118
 #: svn/tags/0.2.0/includes/class-post-types.php:130
 #: svn/trunk/includes/class-post-types.php:130
-#: blocks/context/block.js:115
+#: blocks/context/block.js:120
 msgid "Like"
 msgstr ""
 
-#: includes/class-post-types.php:132
+#: includes/class-post-types.php:118
 #: svn/tags/0.1.0/includes/class-post-types.php:119
 #: svn/tags/0.2.0/includes/class-post-types.php:131
 #: svn/trunk/includes/class-post-types.php:131
 msgid "New Like"
 msgstr ""
 
-#: includes/class-post-types.php:133
+#: includes/class-post-types.php:119
 #: svn/tags/0.1.0/includes/class-post-types.php:120
 #: svn/tags/0.2.0/includes/class-post-types.php:132
 #: svn/trunk/includes/class-post-types.php:132
 msgid "Add New Like"
 msgstr ""
 
-#: includes/class-post-types.php:134
+#: includes/class-post-types.php:120
 #: svn/tags/0.1.0/includes/class-post-types.php:121
 #: svn/tags/0.2.0/includes/class-post-types.php:133
 #: svn/trunk/includes/class-post-types.php:133
 msgid "Edit Like"
 msgstr ""
 
-#: includes/class-post-types.php:135
+#: includes/class-post-types.php:121
 #: svn/tags/0.1.0/includes/class-post-types.php:122
 #: svn/tags/0.2.0/includes/class-post-types.php:134
 #: svn/trunk/includes/class-post-types.php:134
 msgid "View Like"
 msgstr ""
 
-#: includes/class-post-types.php:136
+#: includes/class-post-types.php:122
 #: svn/tags/0.1.0/includes/class-post-types.php:123
 #: svn/tags/0.2.0/includes/class-post-types.php:135
 #: svn/trunk/includes/class-post-types.php:135
 msgid "View Likes"
 msgstr ""
 
-#: includes/class-post-types.php:137
+#: includes/class-post-types.php:123
 #: svn/tags/0.1.0/includes/class-post-types.php:124
 #: svn/tags/0.2.0/includes/class-post-types.php:136
 #: svn/trunk/includes/class-post-types.php:136
 msgid "Search Likes"
 msgstr ""
 
-#: includes/class-post-types.php:138
+#: includes/class-post-types.php:124
 #: svn/tags/0.1.0/includes/class-post-types.php:125
 #: svn/tags/0.2.0/includes/class-post-types.php:137
 #: svn/trunk/includes/class-post-types.php:137
 msgid "No likes found."
 msgstr ""
 
-#: includes/class-post-types.php:139
+#: includes/class-post-types.php:125
 #: svn/tags/0.1.0/includes/class-post-types.php:126
 #: svn/tags/0.2.0/includes/class-post-types.php:138
 #: svn/trunk/includes/class-post-types.php:138
 msgid "No likes found in trash."
 msgstr ""
 
-#: includes/class-post-types.php:145
+#: includes/class-post-types.php:131
 #: svn/tags/0.1.0/includes/class-post-types.php:132
 #: svn/tags/0.2.0/includes/class-post-types.php:144
 #: svn/trunk/includes/class-post-types.php:144
@@ -564,6 +585,12 @@ msgstr ""
 
 #: svn/tags/0.1.0/includes/class-options-handler.php:156
 msgid "(Requires &ldquo;Post Types.&rdquo;) Enable note categories and tags."
+msgstr ""
+
+#: svn/tags/0.1.0/includes/class-options-handler.php:159
+#: svn/tags/0.2.0/includes/class-options-handler.php:231
+#: svn/trunk/includes/class-options-handler.php:231
+msgid "Custom Menu Order"
 msgstr ""
 
 #: svn/tags/0.1.0/includes/class-options-handler.php:160
@@ -610,6 +637,16 @@ msgstr ""
 msgid "(Experimental) Adds microformats2 to this site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor."
 msgstr ""
 
+#: svn/tags/0.2.0/includes/class-options-handler.php:232
+#: svn/trunk/includes/class-options-handler.php:232
+msgid "Group posts, notes, and likes."
+msgstr ""
+
+#: svn/tags/0.2.0/includes/class-options-handler.php:233
+#: svn/trunk/includes/class-options-handler.php:233
+msgid "Group (regular) posts, notes, and likes at the top of WordPress&rsquo; admin menu."
+msgstr ""
+
 #. translators: %s: URL of the bookmarked page.
 #: blocks/context/block.js:18
 msgid "Bookmarked %s"
@@ -630,50 +667,50 @@ msgstr ""
 msgid "Reposted %s"
 msgstr ""
 
-#: blocks/context/block.js:74
+#: blocks/context/block.js:79
 #: svn/tags/0.1.0/blocks/context/block.js:30
 #: svn/tags/0.2.0/blocks/context/block.js:30
 #: svn/trunk/blocks/context/block.js:30
 msgid "Context"
 msgstr ""
 
-#: blocks/context/block.js:79
+#: blocks/context/block.js:84
 #: svn/tags/0.1.0/blocks/context/block.js:31
 #: svn/tags/0.2.0/blocks/context/block.js:31
 #: svn/trunk/blocks/context/block.js:31
 msgid "Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
-#: blocks/context/block.js:83
+#: blocks/context/block.js:88
 msgid "Title"
 msgstr ""
 
-#: blocks/context/block.js:99
+#: blocks/context/block.js:104
 msgid "URL"
 msgstr ""
 
-#: blocks/context/block.js:106
+#: blocks/context/block.js:111
 msgid "Customize title"
 msgstr ""
 
-#: blocks/context/block.js:111
+#: blocks/context/block.js:116
 msgid "Type"
 msgstr ""
 
-#: blocks/context/block.js:114
+#: blocks/context/block.js:119
 msgid "Bookmark"
 msgstr ""
 
-#: blocks/context/block.js:116
+#: blocks/context/block.js:121
 msgid "Reply"
 msgstr ""
 
-#: blocks/context/block.js:117
+#: blocks/context/block.js:122
 msgid "Repost"
 msgstr ""
 
 #. translators: %s: URL of the "liked" page.
-#: blocks/context/block.js:164
+#: blocks/context/block.js:169
 #: svn/tags/0.1.0/blocks/context/block.js:19
 msgid "Liked %s."
 msgstr ""

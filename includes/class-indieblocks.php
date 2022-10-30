@@ -98,6 +98,7 @@ class IndieBlocks {
 	 */
 	public function activate() {
 		Post_Types::register_post_types();
+		Post_Types::custom_permalinks();
 		Post_Types::create_date_archives();
 		Feeds::create_post_feed();
 		flush_rewrite_rules();

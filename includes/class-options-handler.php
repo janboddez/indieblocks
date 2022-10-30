@@ -25,6 +25,7 @@ class Options_Handler {
 		'automatic_titles'    => false,
 		'hide_titles'         => false,
 		'date_archives'       => false,
+		'permalink_format'    => '/%postname%/',
 		'notes_in_feed'       => true,
 		'likes_in_feed'       => false,
 		'notes_in_home'       => false,
@@ -36,6 +37,15 @@ class Options_Handler {
 		'micropub'            => false,
 		'webmention'          => false,
 		'parse_markdown'      => false,
+	);
+
+	/**
+	 * Valid permalink options (for IndieBlocks' CPTs).
+	 */
+	const PERMALINK_FORMATS = array(
+		'/%postname%/',
+		'/%year%/%monthnum%/%postname%/',
+		'/%year%/%monthnum%/%day%/%postname%/',
 	);
 
 	/**
@@ -143,6 +153,14 @@ class Options_Handler {
 			'modified_feeds'     => isset( $settings['modified_feeds'] ) ? true : false,
 		);
 
+		$permalink_format = '/%postname%/';
+
+		if ( isset( $settings['permalink_format'] ) && in_array( $settings['permalink_format'], self::PERMALINK_FORMATS, true ) ) {
+			$permalink_format = $settings['permalink_format'];
+		}
+
+		$options['permalink_format'] = apply_filters( 'indieblocks_permalink_format', $permalink_format );
+
 		$this->options = array_merge(
 			$this->options,
 			$options
@@ -228,13 +246,6 @@ class Options_Handler {
 							<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[likes_in_feed]" value="1" <?php checked( ! empty( $this->options['likes_in_feed'] ) ); ?>/> <?php esc_html_e( 'Include in main feed', 'indieblocks' ); ?></label>
 							<br /><label><input type="checkbox" name="indieblocks_settings[likes_in_home]" value="1" <?php checked( ! empty( $this->options['likes_in_home'] ) ); ?>/> <?php esc_html_e( 'Show on blog page', 'indieblocks' ); ?></label></p>
 						</tr>
-						<!--
-						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Custom Menu Order', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[custom_menu_order]" value="1" <?php checked( ! empty( $this->options['custom_menu_order'] ) ); ?>/> <?php esc_html_e( 'Group posts, notes, and likes.', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( 'Group (regular) posts, notes, and likes at the top of WordPress&rsquo; admin menu.', 'indieblocks' ); ?></p></td>
-						</tr>
-						//-->
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Random Slugs', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[random_slugs]" value="1" <?php checked( ! empty( $this->options['random_slugs'] ) ); ?>/> <?php esc_html_e( 'Generate random slugs', 'indieblocks' ); ?></label>
@@ -254,6 +265,15 @@ class Options_Handler {
 							<th scope="row"><?php esc_html_e( 'Date-Based Archives', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[date_archives]" value="1" <?php checked( ! empty( $this->options['date_archives'] ) ); ?>/> <?php esc_html_e( 'Enable date-based archives', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Enable year, month, and day archives for notes and likes.', 'indieblocks' ); ?></p></td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Permalink format', 'indieblocks' ); ?></th>
+							<td>
+								<?php foreach ( self::PERMALINK_FORMATS as $i => $format ) : ?>
+									<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="radio" name="indieblocks_settings[permalink_format]" value="<?php echo esc_attr( $format ); ?>" <?php checked( isset( $this->options['permalink_format'] ) ? $this->options['permalink_format'] : '/%postname%/', $format ); ?> /> <code><?php echo esc_html( $this->get_example_permalink( $format ) ); ?></code></label>
+								<?php endforeach; ?>
+								<p class="description"><?php esc_html_e( '(Experimental) Set a custom note and like permalink format.', 'indieblocks' ); ?></p>
+							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></th>
@@ -354,5 +374,35 @@ class Options_Handler {
 	 */
 	public function get_options() {
 		return $this->options;
+	}
+
+	/**
+	 * Generates example permalinks for use in the settings table.
+	 *
+	 * @param  string $format Permalink format.
+	 * @return string         Example permalink.
+	 */
+	private function get_example_permalink( $format ) {
+		$example_front = __( 'notes', 'indieblocks' );
+
+		if ( ! empty( $this->options['enable_notes'] ) ) {
+			$post_type = get_post_type_object( 'indieblock_note' );
+
+			if ( ! empty( $post_type->rewrite['slug'] ) ) {
+				$example_front = $post_type->rewrite['slug'];
+			}
+		} elseif ( ! empty( $this->options['enable_likes'] ) ) {
+			$post_type = get_post_type_object( 'indieblock_like' );
+
+			if ( ! empty( $post_type->rewrite['slug'] ) ) {
+				$example_front = $post_type->rewrite['slug'];
+			}
+		}
+
+		return '/' . $example_front . str_replace(
+			array( '%year%', '%monthnum%', '%day%', '%postname%' ),
+			array( date( 'Y' ), date( 'm' ), date( 'd' ), __( 'sample-post', 'indieblocks' ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+			$format
+		);
 	}
 }

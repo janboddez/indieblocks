@@ -20,7 +20,7 @@ Upload this plugin's ZIP file via the Plugins > Add New > "Upload Plugin" button
 
 After activation, head over to *Settings > IndieBlocks*, and enable or disable its different features.
 
-More details can be found on https://jan.boddez.net/wordpress/indieblocks. Issues may be filed at https://github.com/janboddez/indieblocks.
+More details can be found on [https://jan.boddez.net/wordpress/indieblocks](https://jan.boddez.net/wordpress/indieblocks). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
 = 0.2.0 =

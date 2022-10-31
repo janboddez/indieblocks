@@ -20,7 +20,7 @@ class Feeds {
 			->get_options();
 
 		// Include microblog entries in the site's main feed (but only if the
-		// settings is enabled for either CPT.
+		// setting is enabled for either CPT).
 		add_filter( 'request', array( __CLASS__, 'include_in_main_feed' ), 9 );
 
 		// Create a new, post-only feed (but only if a "permalink front" is
@@ -94,11 +94,6 @@ class Feeds {
 	 * posts).
 	 */
 	public static function create_post_feed() {
-		if ( get_transient( 'indieblocks_flush_permalinks' ) ) {
-			// Hold off a bit.
-			return;
-		}
-
 		$front = static::get_front();
 
 		if ( empty( $front ) ) {
@@ -106,7 +101,7 @@ class Feeds {
 			return;
 		}
 
-		add_rewrite_rule( '^' . $front . '/feed/?$', 'index.php?post_type=post&feed=rss2', 'top' );
+		add_rewrite_rule( "^{$front}/feed/?$", 'index.php?post_type=post&feed=rss2', 'top' );
 
 		// Set the new feed's title.
 		add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );

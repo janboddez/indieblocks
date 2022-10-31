@@ -97,7 +97,7 @@ class Webmention_Receiver {
 
 		foreach ( $webmentions as $webmention ) {
 			// Fetch source HTML.
-			$response = wp_safe_remote_get( esc_url_raw( $webmention->source ) );
+			$response = remote_get( $webmention->source );
 
 			if ( is_wp_error( $response ) ) {
 				// Something went wrong.

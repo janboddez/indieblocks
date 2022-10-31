@@ -45,24 +45,8 @@ class Parser {
 		$content = get_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ) );
 
 		if ( empty( $content ) ) {
-			$wp_version = get_bloginfo( 'version' );
-			$user_agent = 'WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' ) . '; IndieBlocks';
-
-			$args = apply_filters(
-				'indieblocks_fetch_args',
-				array(
-					'user-agent' => $user_agent,
-					'timeout'    => 11,
-				),
-				$this->url
-			);
-
-			$response = wp_remote_get(
-				esc_url_raw( $this->url ),
-				$args
-			);
-
-			$content = wp_remote_retrieve_body( $response );
+			$response = remote_get( $this->url );
+			$content  = wp_remote_retrieve_body( $response );
 
 			set_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
 		}

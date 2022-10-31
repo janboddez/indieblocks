@@ -5,6 +5,7 @@
         "michelf/php-markdown": "^2.0"
     },
     "autoload": {
-        "classmap": ["includes/"]
+        "classmap": ["includes/"],
+        "files": ["includes/functions.php"]
     }
 }

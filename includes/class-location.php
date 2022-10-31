@@ -194,24 +194,14 @@ class Location {
 		$location = get_transient( "indieblocks_loc_{$lat}_{$lon}" );
 
 		if ( empty( $location ) ) {
-			$response = wp_remote_get(
-				esc_url_raw( 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' . $lat . '&lon=' . $lon . '&zoom=18&addressdetails=1' ),
-				array(
-					'headers'             => array(
-						'Accept' => 'application/json',
-					),
-					'timeout'             => 11,
-					'limit_response_size' => 1048576,
-					'user-agent'          => 'IndieBlocks for WordPress',
-				)
-			);
+			$response = remote_get( "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lon}&zoom=18&addressdetails=1", true );
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
 				error_log( "Failed to retrieve address data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return '';
 			}
 
-			$location = @json_decode( $response['body'], true );
+			$location = json_decode( $response['body'], true );
 
 			if ( empty( $location ) ) {
 				error_log( "Failed to decode address data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -252,23 +242,14 @@ class Location {
 				return array();
 			}
 
-			$response = wp_remote_get(
-				esc_url_raw( 'https://api.openweathermap.org/data/2.5/weather?lat=' . $lat . '&lon=' . $lon . '&appid=' . OPEN_WEATHER_MAP_API_KEY . '&units=metric' ),
-				array(
-					'headers'             => array(
-						'Accept' => 'application/json',
-					),
-					'timeout'             => 11,
-					'limit_response_size' => 1048576,
-				)
-			);
+			$response = remote_get( "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid=" . OPEN_WEATHER_MAP_API_KEY . '&units=metric', true );
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
 				error_log( "Failed to retrieve weather data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return array();
 			}
 
-			$weather = @json_decode( $response['body'], true );
+			$weather = json_decode( $response['body'], true );
 
 			if ( empty( $weather ) ) {
 				error_log( "Failed to decode weather data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log

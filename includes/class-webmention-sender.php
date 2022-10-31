@@ -220,14 +220,12 @@ class Webmention_Sender {
 			return null;
 		}
 
-		$args = array(
-			'timeout'             => 11,
-			'limit_response_size' => 1048576,
-		);
-
-		$response = wp_safe_remote_head(
+		$response = wp_remote_head(
 			esc_url_raw( $url ),
-			$args
+			array(
+				'timeout'             => 11,
+				'limit_response_size' => 1048576,
+			)
 		);
 
 		if ( is_wp_error( $response ) ) {
@@ -257,10 +255,7 @@ class Webmention_Sender {
 
 		// Now do a GET since we're going to look in the HTML headers (and we're
 		// sure its not a binary file).
-		$response = wp_safe_remote_get(
-			esc_url_raw( $url ),
-			$args
-		);
+		$response = remote_get( $url );
 
 		if ( is_wp_error( $response ) ) {
 			return null;

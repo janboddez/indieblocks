@@ -65,7 +65,7 @@ class Webmention {
 		dbDelta( $sql );
 
 		// Store current database version.
-		add_option( 'webmention_comments_db_version', $this->db_version );
+		add_option( 'webmention_comments_db_version', static::$db_version );
 	}
 
 	/**

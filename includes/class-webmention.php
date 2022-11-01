@@ -88,7 +88,7 @@ class Webmention {
 	public static function uninstall() {
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'indieblocks_webmention';
+		$table_name = $wpdb->prefix . 'indieblocks_webmentions';
 		$wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		delete_option( 'indieblocks_webmention_db_version' );

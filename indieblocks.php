@@ -3,6 +3,7 @@
  * Plugin Name: IndieBlocks
  * Description: Leverage blocks and custom post types to easily "IndieWebify" your WordPress site.
  * Plugin URI:  https://jan.boddez.net/wordpress/indieblocks
+ * GitHub Plugin URI: https://github.com/janboddez/indieblocks
  * Author:      Jan Boddez
  * Author URI:  https://jan.boddez.net/
  * License:     GNU General Public License v3

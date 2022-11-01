@@ -41,11 +41,12 @@ class Webmention_Receiver {
 		// Get the target post's slug, sans permalink front.
 		$slug = trim( basename( wp_parse_url( $request['target'], PHP_URL_PATH ) ), '/' );
 
-		$supported_post_types = (array) apply_filters( 'webmention_comments_post_types', array( 'post', 'indieblocks_note' ) );
+		// We don't currently differentiate between "incoming" and "outgoing" post types.
+		$supported_post_types = Webmention_Sender::get_supported_post_types();
 
 		// Fetch the post.
 		$post = get_page_by_path( $slug, OBJECT, $supported_post_types );
-		$post = apply_filters( 'webmention_comments_post', $post, $request['target'], $supported_post_types );
+		$post = apply_filters( 'indieblocks_webmention_post', $post, $request['target'], $supported_post_types );
 
 		if ( empty( $post ) || 'publish' !== get_post_status( $post->ID ) ) {
 			// Not found.
@@ -54,13 +55,13 @@ class Webmention_Receiver {
 
 		// Set sender's IP address.
 		$ip = ! empty( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '', apply_filters( 'webmention_comments_sender_ip', $ip, $request ) );
+		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '', apply_filters( 'indieblocks_webmention_sender_ip', $ip, $request ) );
 
 		global $wpdb;
 
 		// Insert webmention into database.
 		$num_rows = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prefix . 'webmention_comments',
+			$wpdb->prefix . 'indieblocks_webmentions',
 			array(
 				'source'     => esc_url_raw( $request['source'] ),
 				'post_id'    => $post->ID,
@@ -87,7 +88,7 @@ class Webmention_Receiver {
 	public static function process_webmentions() {
 		global $wpdb;
 
-		$table_name  = $wpdb->prefix . 'webmention_comments';
+		$table_name  = $wpdb->prefix . 'indieblocks_webmentions';
 		$webmentions = $wpdb->get_results( "SELECT id, source, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( empty( $webmentions ) || ! is_array( $webmentions ) ) {
@@ -126,12 +127,12 @@ class Webmention_Receiver {
 
 			// Some defaults.
 			$commentdata = array(
-				'comment_post_ID'      => apply_filters( 'webmention_comments_post_id', $webmention->post_id ),
+				'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
 				'comment_author'       => $host,
 				'comment_author_email' => 'someone@example.org',
 				'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
 				'comment_author_IP'    => $webmention->ip,
-				'comment_content'      => __( '&hellip; commented on this.', 'webmention-comments' ),
+				'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
 				'comment_parent'       => 0,
 				'user_id'              => 0,
 				'comment_date'         => $webmention->created_at,
@@ -183,8 +184,8 @@ class Webmention_Receiver {
 	 */
 	public static function add_meta_box() {
 		add_meta_box(
-			'webmention-comments',
-			__( 'Webmention', 'tech' ),
+			'indieblocks',
+			__( 'Webmention', 'indieblocks' ),
 			array( __CLASS__, 'render_meta_box' ),
 			'comment',
 			'normal',
@@ -202,10 +203,10 @@ class Webmention_Receiver {
 		$source = get_comment_meta( $comment->comment_ID, 'webmention_source', true );
 		$kind   = get_comment_meta( $comment->comment_ID, 'webmention_kind', true );
 		?>
-			<p><label for="webmention_source"><?php esc_html_e( 'Source', 'webmention-comments' ); ?></label>
+			<p><label for="webmention_source"><?php esc_html_e( 'Source', 'indieblocks' ); ?></label>
 			<input type="url" id="webmention_source" name="webmention_source" value="<?php echo esc_attr( $source ); ?>" class="widefat" readonly="readonly" /></p>
 
-			<p><label for="webmention_kind"><?php esc_html_e( 'Type', 'webmention_comments' ); ?></label>
+			<p><label for="webmention_kind"><?php esc_html_e( 'Type', 'indieblocks' ); ?></label>
 			<input type="url" id="webmention_kind" name="webmention_kind" value="<?php echo esc_attr( ucfirst( $kind ) ); ?>" class="widefat" readonly="readonly" /></p>
 		<?php
 	}

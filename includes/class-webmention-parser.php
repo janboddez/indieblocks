@@ -146,15 +146,15 @@ class Webmention_Parser {
 
 		switch ( $hentry_kind ) {
 			case 'bookmark':
-				$comment_content = __( '&hellip; bookmarked this!', 'webmention-comments' );
+				$comment_content = __( '&hellip; bookmarked this!', 'indieblocks' );
 				break;
 
 			case 'like':
-				$comment_content = __( '&hellip; liked this!', 'webmention-comments' );
+				$comment_content = __( '&hellip; liked this!', 'indieblocks' );
 				break;
 
 			case 'repost':
-				$comment_content = __( '&hellip; reposted this!', 'webmention-comments' );
+				$comment_content = __( '&hellip; reposted this!', 'indieblocks' );
 				break;
 
 			case 'mention':
@@ -182,7 +182,7 @@ class Webmention_Parser {
 		}
 
 		$commentdata['comment_content'] = apply_filters(
-			'webmention_comments_comment',
+			'indieblocks_webmention_comment',
 			$comment_content,
 			$hentry,
 			$source,

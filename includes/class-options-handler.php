@@ -73,8 +73,7 @@ class Options_Handler {
 	 */
 	public function flush_permalinks() {
 		if ( delete_transient( 'indieblocks_flush_permalinks' ) ) {
-			$plugin = IndieBlocks::get_instance();
-			$plugin->activate();
+			flush_permalinks();
 		}
 	}
 
@@ -301,7 +300,7 @@ class Options_Handler {
 								<p class="description"><?php esc_html_e( '(Experimental) Enable year, month, and day archives for notes and likes.', 'indieblocks' ); ?></p></td>
 							</tr>
 							<tr valign="top">
-								<th scope="row"><?php esc_html_e( 'Permalink format', 'indieblocks' ); ?></th>
+								<th scope="row"><?php esc_html_e( 'Permalink Format', 'indieblocks' ); ?></th>
 								<td>
 									<?php foreach ( self::PERMALINK_FORMATS as $i => $format ) : ?>
 										<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="radio" name="indieblocks_settings[permalink_format]" value="<?php echo esc_attr( $format ); ?>" <?php checked( isset( $this->options['permalink_format'] ) ? $this->options['permalink_format'] : '/%postname%/', $format ); ?> /> <code><?php echo esc_html( $this->get_example_permalink( $format ) ); ?></code></label>
@@ -331,7 +330,7 @@ class Options_Handler {
 								<?php foreach ( $this->get_post_types() as $i => $post_type ) : ?>
 									<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="checkbox" name="indieblocks_settings[webmention_post_types][]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( isset( $this->options['webmention_post_types'] ) && in_array( $post_type->name, (array) $this->options['webmention_post_types'], true ) ); ?> /> <?php echo esc_html( isset( $post_type->labels->singular_name ) ? $post_type->labels->singular_name : $post_type->name ); ?></code></label>
 								<?php endforeach; ?>
-								<p class="description"><?php esc_html_e( '(Experimental) The post types for which webmentions (outgoing and incoming) should be enabled.', 'indieblocks' ); ?></p>
+								<p class="description"><?php esc_html_e( 'The post types for which webmentions (outgoing and incoming) should be enabled.', 'indieblocks' ); ?></p>
 							</td>
 						</tr>
 					</table>

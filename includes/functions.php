@@ -8,6 +8,18 @@
 namespace IndieBlocks;
 
 /**
+ * Registers this plugin's _active_ permalinks, then flushes the rewrite cache.
+ */
+function flush_permalinks() {
+	Post_Types::register_post_types();
+	Post_Types::custom_permalinks();
+	Post_Types::create_date_archives();
+	Feeds::create_post_feed();
+
+	flush_rewrite_rules();
+}
+
+/**
  * Wrapper around `wp_remote_get()`.
  *
  * @param  string $url          URL to fetch.

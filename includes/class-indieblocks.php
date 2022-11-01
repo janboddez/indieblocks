@@ -53,6 +53,7 @@ class IndieBlocks {
 		// Run database migrations, etc.
 		register_activation_hook( dirname( __DIR__ ) . '/indieblocks.php', array( $this, 'activate' ) );
 		register_deactivation_hook( dirname( __DIR__ ) . '/indieblocks.php', array( $this, 'deactivate' ) );
+		register_uninstall_hook( dirname( __DIR__ ) . '/indieblocks.php', array( Webmention::class, 'uninstall' ) );
 
 		// Set up the settings page.
 		$this->options_handler = new Options_Handler();
@@ -99,17 +100,15 @@ class IndieBlocks {
 	 * changed, and each time the plugin is (de)activated.
 	 */
 	public function activate() {
-		Post_Types::register_post_types();
-		Post_Types::custom_permalinks();
-		Post_Types::create_date_archives();
-		Feeds::create_post_feed();
-		flush_rewrite_rules();
+		Webmention::migrate();
+		flush_permalinks();
 	}
 
 	/**
 	 * Flushes permalinks on deactivation.
 	 */
 	public function deactivate() {
+		Webmention::deactivate();
 		flush_rewrite_rules();
 	}
 

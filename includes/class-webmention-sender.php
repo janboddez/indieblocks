@@ -68,7 +68,7 @@ class Webmention_Sender {
 
 		if ( $schedule ) {
 			// Schedule the actual sending out webmentions) in the background.
-			wp_schedule_single_event( time() + wp_rand( 300, 600 ), 'webmention_comments_send', array( $post->ID ) );
+			wp_schedule_single_event( time() + wp_rand( 300, 600 ), 'indieblocks_webmention_send', array( $post->ID ) );
 
 			update_post_meta( $post->ID, '_webmention', 'scheduled' );
 		}
@@ -159,7 +159,7 @@ class Webmention_Sender {
 				update_post_meta( $post->ID, '_webmention', $webmention );
 
 				// Schedule a retry in 5 to 15 minutes.
-				wp_schedule_single_event( time() + wp_rand( 300, 900 ), 'webmention_comments_send', array( $post->ID ) );
+				wp_schedule_single_event( time() + wp_rand( 300, 900 ), 'indieblocks_webmention_send', array( $post->ID ) );
 
 				continue;
 			}
@@ -206,7 +206,8 @@ class Webmention_Sender {
 	 * @return string|null Endpoint URL, or nothing on failure.
 	 */
 	public static function webmention_discover_endpoint( $url ) {
-		$endpoint = get_transient( 'webmention_comments_endpoint:' . esc_url( $url ) );
+		// @todo: Use a hash instead, URLs may be too long.
+		$endpoint = get_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ) );
 
 		if ( ! empty( $endpoint ) ) {
 			// We've previously established the endpoint for this web page.
@@ -241,7 +242,7 @@ class Webmention_Sender {
 					$endpoint = \WP_Http::make_absolute_url( $result[1], $url );
 
 					// Cache for one hour.
-					set_transient( 'webmention_comments_endpoint:' . esc_url( $url ), $endpoint, 3600 );
+					set_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ), $endpoint, 3600 );
 
 					return $endpoint;
 				}
@@ -275,7 +276,7 @@ class Webmention_Sender {
 			$endpoint = \WP_Http::make_absolute_url( $result->value, $url );
 
 			// Cache for one hour.
-			set_transient( 'webmention_comments_endpoint:' . esc_url( $url ), $endpoint, 3600 );
+			set_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ), $endpoint, 3600 );
 
 			return $endpoint;
 		}
@@ -295,8 +296,8 @@ class Webmention_Sender {
 
 		// Add meta box, for those post types that are supported.
 		add_meta_box(
-			'webmention-comments',
-			__( 'Webmention', 'webmention-comments' ),
+			'indieblocks',
+			__( 'Webmention', 'indieblocks' ),
 			array( __CLASS__, 'render_meta_box' ),
 			static::get_supported_post_types(),
 			'normal',
@@ -320,23 +321,23 @@ class Webmention_Sender {
 					<?php
 					if ( ! empty( $data['sent'] ) ) {
 						/* translators: 1: Webmention endpoint 2: Date sent */
-						printf( __( 'Sent to %1$s on %2$s.', 'webmention-comments' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>', date( __( 'M j, Y \a\t H:i', 'webmention-comments' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
+						printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
 					} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
 						/* translators: Webmention endpoint */
-						printf( __( 'Could not send webmention to %s.', 'webmention-comments' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					} elseif ( ! empty( $data['retries'] ) ) {
 						/* translators: Webmention endpoint */
-						printf( __( 'Could not send webmention to %s. Trying again soon.', 'webmention-comments' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						printf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					?>
 				</p>
 				<?php
 			endforeach;
-		} elseif ( ! empty( $webmention ) && 'scheduled' === $webmention /*wp_next_scheduled( 'webmention_comments_send', array( $post->ID ) )*/ ) { // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+		} elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) {
 			// Unsure why `wp_next_scheduled()` won't work.
-			esc_html_e( 'Webmention scheduled.', 'webmention-comments' );
+			esc_html_e( 'Webmention scheduled.', 'indieblocks' );
 		} else {
-			esc_html_e( 'No endpoints found.', 'webmention-comments' );
+			esc_html_e( 'No endpoints found.', 'indieblocks' );
 		}
 	}
 

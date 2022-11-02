@@ -139,6 +139,8 @@ class Webmention_Receiver {
 				continue;
 			}
 
+			error_log( "[Indieblocks/Webmention] The page at {$webmention->source} seems to mention our target URL (" . get_permalink( $webmention->post_id ) . '); creating new comment' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 			// Grab source domain.
 			$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
 
@@ -193,6 +195,9 @@ class Webmention_Receiver {
 				array( '%s' ),
 				array( '%d' )
 			);
+
+			error_log( "[Indieblocks/Webmention] And we're done parsing this particular mention" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 		}
 	}
 

@@ -100,7 +100,6 @@ class IndieBlocks {
 	 * changed, and each time the plugin is (de)activated.
 	 */
 	public function activate() {
-		Webmention::migrate();
 		flush_permalinks();
 	}
 

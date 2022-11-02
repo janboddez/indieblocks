@@ -18,24 +18,24 @@ class Options_Handler {
 	 */
 	private $options = array(
 		'enable_blocks'         => true,
-		'post_types'            => false,
+		'add_mf2'               => false,
+		'enable_notes'          => false,
+		'notes_in_home'         => false,
+		'notes_in_feed'         => true,
 		'default_taxonomies'    => false,
-		'custom_menu_order'     => false,
+		'enable_likes'          => false,
+		'likes_in_feed'         => false,
+		'likes_in_home'         => false,
 		'random_slugs'          => false,
 		'automatic_titles'      => false,
 		'hide_titles'           => false,
 		'date_archives'         => false,
-		'notes_in_feed'         => true,
-		'likes_in_feed'         => false,
-		'notes_in_home'         => false,
-		'likes_in_home'         => false,
 		'permalink_format'      => '/%postname%/',
 		'modified_feeds'        => false,
 		'webmention'            => false,
 		'webmention_post_types' => array(),
 		'add_featured_images'   => false,
 		'location_functions'    => false,
-		'add_mf2'               => false,
 		'micropub'              => false,
 		'parse_markdown'        => false,
 	);
@@ -159,6 +159,10 @@ class Options_Handler {
 		}
 
 		$options['permalink_format'] = apply_filters( 'indieblocks_permalink_format', $permalink_format );
+
+		// Ensure these (now deprecated) settings don't come back and bite us.
+		unset( $options['post_types'] );
+		unset( $options['custom_menu_order'] );
 
 		$this->options = array_merge(
 			$this->options,

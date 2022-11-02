@@ -33,8 +33,11 @@ class Webmention_Receiver {
 	 * @return WP_REST_Response         API response.
 	 */
 	public static function store_webmention( $request ) {
+		error_log( '[Indieblocks/Webmention] Got request: ' . wp_json_encode( $request->get_params() ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 		// Verify source nor target are invalid URLs.
 		if ( empty( $request['source'] ) || ! wp_http_validate_url( $request['source'] ) || empty( $request['target'] ) || ! wp_http_validate_url( $request['target'] ) ) {
+			error_log( '[Indieblocks/Webmention] Invalid source or target' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return new \WP_Error( 'invalid_request', 'Invalid source or target', array( 'status' => 400 ) );
 		}
 
@@ -50,6 +53,7 @@ class Webmention_Receiver {
 
 		if ( empty( $post ) || 'publish' !== get_post_status( $post->ID ) ) {
 			// Not found.
+			error_log( '[Indieblocks/Webmention] Target post not found' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return new \WP_Error( 'not_found', 'Not found', array( 'status' => 404 ) );
 		}
 
@@ -72,6 +76,8 @@ class Webmention_Receiver {
 		);
 
 		if ( false !== $num_rows ) {
+			error_log( '[Indieblocks/Webmention] Stored mention for later processing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 			// Create an empty REST response and add an 'Accepted' status code.
 			$response = new \WP_REST_Response( array() );
 			$response->set_status( 202 );
@@ -79,6 +85,7 @@ class Webmention_Receiver {
 			return $response;
 		}
 
+		error_log( '[Indieblocks/Webmention] Could not insert store mention into database' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		return new \WP_Error( 'invalid_request', 'Invalid source or target', array( 'status' => 400 ) );
 	}
 
@@ -97,10 +104,14 @@ class Webmention_Receiver {
 		}
 
 		foreach ( $webmentions as $webmention ) {
+			error_log( "[Indieblocks/Webmention] Fetching the page at {$webmention->source}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 			// Fetch source HTML.
 			$response = remote_get( $webmention->source );
 
 			if ( is_wp_error( $response ) ) {
+				error_log( "[Indieblocks/Webmention] Something went wrong fetching the page at {$webmention->source}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
 				// Something went wrong.
 				error_log( $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				continue;
@@ -109,6 +120,12 @@ class Webmention_Receiver {
 			$html = wp_remote_retrieve_body( $response );
 
 			if ( false === stripos( $html, get_permalink( $webmention->post_id ) ) ) {
+				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL (" . get_permalink( $webmention->post_id ) . ')' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+				// @todo: Remove these two lines.
+				error_log( '[Indieblocks/Webmention] The HTML as we retrieved it:' );
+				error_log( $html );
+
 				// Target URL not (or no longer) mentioned by source. Mark webmention as processed.
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					$table_name,

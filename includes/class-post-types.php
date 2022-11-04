@@ -38,11 +38,6 @@ class Post_Types {
 			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
 		}
 
-		if ( ! empty( $options['include_in_search'] ) ) {
-			// Include short-form entries in search results.
-			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_search' ), 99 );
-		}
-
 		// Optionally, display short-form entries on the homepage (or main blog page).
 		add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_home' ), 99 );
 
@@ -54,6 +49,12 @@ class Post_Types {
 		if ( ! empty( $options['random_slugs'] ) ) {
 			// Generate a random slug for short-form posts.
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
+		}
+
+		if ( ! empty( $options['hide_titles'] ) ) {
+			// In order to know which titles to hide, we'll need a post type.
+			add_action( 'publish_indieblocks_note', array( __CLASS__, 'store_kind' ), 20, 2 );
+			add_action( 'publish_indieblocks_like', array( __CLASS__, 'store_kind' ), 20, 2 );
 		}
 	}
 
@@ -207,32 +208,14 @@ class Post_Types {
 		$title = wp_unslash( $data['post_content'] );
 
 		/*
-		 * Some default "filters." Use the `indieblocks_title` filter to undo or
-		 * extend.
+		 * Some default "filters." Use the `indieblocks_post_title` filter to
+		 * undo or extend.
 		 */
-
-		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found,Squiz.Commenting.InlineComment.InvalidEndChar
-		// $title = preg_replace( '~\[caption.*\](.+?)\[/caption\]~', '', $title );
-
-		// We might want to later on add a feed with titles, for backwards
-		// compatibility with older feed readers. We'll then want to have (more
-		// modern) feed readers recognize these titles as truncated versions of
-		// the posts' contents.
 		$title = apply_filters( 'the_content', $title );
 		$title = trim( wp_strip_all_tags( $title ) );
+
 		// Avoid double-encoded characters.
 		$title = html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );
-
-		// phpcs:disable Squiz.PHP.CommentedOutCode.Found,Squiz.Commenting.BlockComment.NoEmptyLineBefore
-		/*
-		// Wrap lines that start with `> ` in (double) quotes.
-		$title = preg_replace( '/^> (.+)$/m', "\"$1\"", $title ); // phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-		// Prevent duplicate quotes.
-		$title = str_replace( '""', '"', $title );
-		$title = str_replace( '"“', '"', $title );
-		$title = str_replace( '”"', '"', $title );
-		*/
-		// phpcs:enable Squiz.PHP.CommentedOutCode.Found,Squiz.Commenting.BlockComment.NoEmptyLineBefore
 
 		// Collapse lines and remove excess whitespace.
 		$title = preg_replace( '/\s+/', ' ', $title );
@@ -246,7 +229,7 @@ class Post_Types {
 		$title = wp_slash( $title );
 
 		// Define a filter that allows others to do something else entirely.
-		$data['post_title'] = apply_filters( 'indieblocks_title', $title, $data['post_title'], $data['post_content'] );
+		$data['post_title'] = apply_filters( 'indieblocks_post_title', $title, $data['post_title'], $data['post_content'] );
 
 		return $data;
 	}
@@ -283,45 +266,6 @@ class Post_Types {
 
 		$post_types   = array_filter( (array) $post_types );
 		$post_types[] = 'indieblocks_note';
-
-		$query->set( 'post_type', array_unique( $post_types ) );
-
-		return $query;
-	}
-
-	/**
-	 * Includes notes (and pages) in search results.
-	 *
-	 * @param  WP_Query $query The WP_Query object.
-	 * @return WP_Query        Modified query object.
-	 */
-	public static function include_in_search( $query ) {
-		if ( is_admin() ) {
-			return $query;
-		}
-
-		if ( ! $query->is_main_query() ) {
-			return $query;
-		}
-
-		if ( ! empty( $query->query_vars['suppress_filters'] ) ) {
-			return $query;
-		}
-
-		if ( ! $query->is_search() ) {
-			return $query;
-		}
-
-		$post_types = $query->get( 'post_type' );
-		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
-
-		if ( is_string( $post_types ) ) {
-			$post_types = explode( ',', $post_types );
-		}
-
-		$post_types   = array_filter( (array) $post_types );
-		$post_types[] = 'indieblocks_note';
-		$post_types[] = 'page';
 
 		$query->set( 'post_type', array_unique( $post_types ) );
 
@@ -608,5 +552,30 @@ class Post_Types {
 		}
 
 		return $slug;
+	}
+
+	/**
+	 * Attempts to store (or update) a post's kind (i.e., its "IndieWeb type").
+	 *
+	 * @param int     $post_id    Post ID.
+	 * @param WP_Post $post       Post object.
+	 */
+	public static function store_kind( $post_id, $post ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+
+		if ( ! in_array( $post->post_type, array( 'indieblocks_note', 'indieblocks_like' ), true ) ) {
+			return;
+		}
+
+		$parser = new Parser( esc_url_raw( get_permalink( $post ) ) );
+		$parser->parse( '<div>' . apply_filters( 'the_content', $post->post_content ) . '</div>' );
+
+		$kind = $parser->get_kind();
+		$kind = ! empty( $kind ) ? $kind : str_replace( 'indieblocks_', '', $post->post_type );
+
+		// Update post kind (or type).
+		update_post_meta( $post_id, 'indieblocks_kind', $kind );
 	}
 }

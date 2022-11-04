@@ -40,18 +40,26 @@ class Parser {
 
 	/**
 	 * Fetches the page, then loads its DOM.
+	 *
+	 * @param string $content (Optional) HTML to be parsed instead.
 	 */
-	public function parse() {
-		$content = get_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ) );
-
+	public function parse( $content = '' ) {
 		if ( empty( $content ) ) {
-			$response = remote_get( $this->url );
-			$content  = wp_remote_retrieve_body( $response );
+			// No `$content` was passed along.
+			$content = get_transient( 'indieblocks:html:' . hash( 'sha256', esc_url_raw( $this->url ) ) );
 
-			set_transient( 'indieblocks:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
+			if ( empty( $content ) ) {
+				// Download page.
+				$response = remote_get( $this->url );
+				$content  = wp_remote_retrieve_body( $response );
+
+				set_transient( 'indieblocks:html:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
+			}
 		}
 
 		if ( empty( $content ) ) {
+			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+			// `$content` is (still) empty.
 			return;
 		}
 
@@ -70,6 +78,29 @@ class Parser {
 
 		if ( isset( $title->length ) && $title->length > 0 ) {
 			return trim( $title->item( 0 )->textContent );
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns post kind.
+	 *
+	 * @return string Detected kind, or empty string.
+	 */
+	public function get_kind() {
+		$xpath = new \DOMXPath( $this->dom );
+
+		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-like-of ")]' ) as $result ) {
+			return 'like';
+		}
+
+		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-in-reply-to ")]' ) as $result ) {
+			return 'reply';
+		}
+
+		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-bookmark-of ")]' ) as $result ) {
+			return 'bookmark';
 		}
 
 		return '';

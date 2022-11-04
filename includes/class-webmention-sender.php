@@ -68,9 +68,9 @@ class Webmention_Sender {
 
 		if ( $schedule ) {
 			// Schedule the actual sending out webmentions) in the background.
-			wp_schedule_single_event( time() + wp_rand( 300, 600 ), 'indieblocks_webmention_send', array( $post->ID ) );
+			wp_schedule_single_event( time() + wp_rand( 0, 300 ), 'indieblocks_webmention_send', array( $post->ID ) );
 
-			update_post_meta( $post->ID, '_webmention', 'scheduled' );
+			update_post_meta( $post->ID, 'webmention', 'scheduled' );
 		}
 	}
 
@@ -207,7 +207,7 @@ class Webmention_Sender {
 	 */
 	public static function webmention_discover_endpoint( $url ) {
 		// @todo: Use a hash instead, URLs may be too long.
-		$endpoint = get_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ) );
+		$endpoint = get_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ) );
 
 		if ( ! empty( $endpoint ) ) {
 			// We've previously established the endpoint for this web page.
@@ -242,7 +242,7 @@ class Webmention_Sender {
 					$endpoint = \WP_Http::make_absolute_url( $result[1], $url );
 
 					// Cache for one hour.
-					set_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ), $endpoint, 3600 );
+					set_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ), $endpoint, 3600 );
 
 					return $endpoint;
 				}
@@ -276,7 +276,7 @@ class Webmention_Sender {
 			$endpoint = \WP_Http::make_absolute_url( $result->value, $url );
 
 			// Cache for one hour.
-			set_transient( 'indieblocks_webmention_endpoint:' . esc_url( $url ), $endpoint, 3600 );
+			set_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ), $endpoint, 3600 );
 
 			return $endpoint;
 		}
@@ -347,9 +347,7 @@ class Webmention_Sender {
 	 * @return array Supported post types.
 	 */
 	public static function get_supported_post_types() {
-		$options = IndieBlocks::get_instance()
-				->get_options_handler()
-				->get_options();
+		$options = get_options();
 
 		$supported_post_types = isset( $options['webmention_post_types'] ) ? $options['webmention_post_types'] : array( 'post', 'indieblocks_note' );
 		$supported_post_types = (array) apply_filters( 'indieblocks_webmention_post_types', $supported_post_types );

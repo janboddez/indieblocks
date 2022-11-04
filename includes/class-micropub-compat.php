@@ -266,10 +266,7 @@ class Micropub_Compat {
 
 		if ( ! empty( $input['properties']['content'][0] ) ) {
 			$content = wp_kses_post( $input['properties']['content'][0] );
-
-			$options = IndieBlocks::get_instance()
-				->get_options_handler()
-				->get_options();
+			$options = get_options();
 
 			if ( ! empty( $options['parse_markdown'] ) ) {
 				// @todo: Filter all notes and likes, not just those posted via Micropub, and store Markdown in `post_content_filtered`, kind of like Jetpack does it.

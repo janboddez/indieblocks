@@ -68,6 +68,7 @@ class Webmention_Receiver {
 			$wpdb->prefix . 'indieblocks_webmentions',
 			array(
 				'source'     => esc_url_raw( $request['source'] ),
+				'target'     => esc_url_raw( $request['target'] ),
 				'post_id'    => $post->ID,
 				'ip'         => $ip,
 				'status'     => 'draft',
@@ -117,10 +118,11 @@ class Webmention_Receiver {
 				continue;
 			}
 
-			$html = wp_remote_retrieve_body( $response );
+			$html   = wp_remote_retrieve_body( $response );
+			$target = ! empty( $webmention->target ) ? $webmention->target : get_permalink( $webmention->post_id );
 
-			if ( false === stripos( $html, get_permalink( $webmention->post_id ) ) ) {
-				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL (" . get_permalink( $webmention->post_id ) . ')' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			if ( false === stripos( $html, $target ) ) {
+				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ({$target})" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 				// @todo: Remove these two lines.
 				error_log( '[Indieblocks/Webmention] The HTML as we retrieved it:' );

@@ -104,7 +104,8 @@ class IndieBlocks {
 	}
 
 	/**
-	 * Flushes permalinks on deactivation.
+	 * Deschedules the Webmention cron job, and resets permalinks on plugin
+	 * deactivation.
 	 */
 	public function deactivate() {
 		Webmention::deactivate();

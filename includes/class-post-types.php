@@ -15,9 +15,7 @@ class Post_Types {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		// Register short-form post types.
 		add_action( 'init', array( __CLASS__, 'register_post_types' ), 9 );
@@ -63,9 +61,7 @@ class Post_Types {
 	 * Registers custom post types.
 	 */
 	public static function register_post_types() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
 			// Notes.
@@ -339,9 +335,7 @@ class Post_Types {
 	 * @return WP_Query        Modified query object.
 	 */
 	public static function include_in_home( $query ) {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( empty( $options['notes_in_home'] ) && empty( $options['likes_in_home'] ) ) {
 			// Do nothing.
@@ -390,9 +384,7 @@ class Post_Types {
 	 * Enable custom note and like permalinks.
 	 */
 	public static function custom_permalinks() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! empty( $options['permalink_format'] ) ) {
 			$post_types = array();
@@ -434,9 +426,7 @@ class Post_Types {
 	 * Enable date-based archives.
 	 */
 	public static function create_date_archives() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( empty( $options['date_archives'] ) ) {
 			return;
@@ -580,9 +570,7 @@ class Post_Types {
 			return $slug;
 		}
 
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( empty( $options['date_archives'] ) ) {
 			// No date archives means no clashes.

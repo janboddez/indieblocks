@@ -15,9 +15,7 @@ class Feeds {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		// Include microblog entries in the site's main feed (but only if the
 		// setting is enabled for either CPT).
@@ -64,9 +62,7 @@ class Feeds {
 	 * @param array $query_vars The array of requested query variables.
 	 */
 	public static function include_in_main_feed( $query_vars ) {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( empty( $options['notes_in_feed'] ) && empty( $options['likes_in_feed'] ) ) {
 			// Do nothing.

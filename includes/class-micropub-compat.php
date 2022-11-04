@@ -16,9 +16,7 @@ class Micropub_Compat {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! empty( $options['enable_blocks'] ) ) {
 			// Assuming anyone who has our block(s) enabled would want to use
@@ -74,9 +72,7 @@ class Micropub_Compat {
 			),
 		);
 
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
 			// Add all (explicitly supported) short-form post types.
@@ -162,9 +158,7 @@ class Micropub_Compat {
 	 * @return string            Post type slug.
 	 */
 	public static function set_post_type( $post_type, $input ) {
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) ) {
 			if ( ! empty( $input['properties']['like-of'][0] ) ) {

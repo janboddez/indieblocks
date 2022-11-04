@@ -425,9 +425,7 @@ class Theme_Mf2 {
 		}
 
 		// Note and Like titles, by default, do not get the `p-name` class.
-		$options = IndieBlocks::get_instance()
-			->get_options_handler()
-			->get_options();
+		$options = get_options();
 
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			$classes[] = 'p-name';

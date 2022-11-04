@@ -8,6 +8,19 @@
 namespace IndieBlocks;
 
 /**
+ * Returns this plugin's options.
+ *
+ * Roughly equal to `get_option( 'indieblocks_settings' )`.
+ *
+ * @return array Current plugin settings.
+ */
+function get_options() {
+	return IndieBlocks::get_instance()
+		->get_options_handler()
+		->get_options();
+}
+
+/**
  * Registers this plugin's _active_ permalinks, then flushes the rewrite cache.
  */
 function flush_permalinks() {

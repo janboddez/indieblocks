@@ -18,12 +18,6 @@ class Micropub_Compat {
 	public static function register() {
 		$options = get_options();
 
-		if ( ! empty( $options['enable_blocks'] ) ) {
-			// Assuming anyone who has our block(s) enabled would want to use
-			// them also in (supported) Micropub posts.
-			add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
-		}
-
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) || ! empty( $options['enable_likes'] ) ) {
 			// Assuming anyone who has our post types enabled would also want
 			// their Micropub posts to use them.
@@ -44,6 +38,13 @@ class Micropub_Compat {
 				// Certain Micropub clients support existing category or tag
 				// lookups. Filterable.
 				add_filter( 'micropub_query', array( __CLASS__, 'query_categories' ), 20, 2 );
+			}
+
+			if ( ! empty( $options['enable_blocks'] ) ) {
+				// Rather than assume anyone who has our block(s) enabled would
+				// want to use them also in (supported) Micropub posts, let's
+				// stick this, too, behind the `micropub` setting.
+				add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
 			}
 		}
 	}
@@ -208,6 +209,8 @@ class Micropub_Compat {
 			$post_content = static::render( 'repost', $input['properties']['repost-of'][0], $input );
 		} elseif ( ! empty( $input['properties']['in-reply-to'][0] ) ) {
 			$post_content = static::render( 'reply', $input['properties']['in-reply-to'][0], $input );
+		} else {
+			$post_content = static::render( 'note', '', $input );
 		}
 
 		return $post_content;
@@ -265,7 +268,7 @@ class Micropub_Compat {
 		}
 
 		if ( ! empty( $input['properties']['content'][0] ) ) {
-			$content = wp_kses_post( $input['properties']['content'][0] );
+			$content = $input['properties']['content'][0];
 			$options = get_options();
 
 			if ( ! empty( $options['parse_markdown'] ) ) {
@@ -273,8 +276,8 @@ class Micropub_Compat {
 				$content = Michelf\MarkdownExtra::defaultTransform( $content );
 			}
 
+			$content = wp_kses_post( $content );
 			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
-			$content = wpautop( $content );
 
 			if ( 'repost' === $post_type ) {
 				$post_content .= '<!-- wp:quote {"className":"e-content"} -->

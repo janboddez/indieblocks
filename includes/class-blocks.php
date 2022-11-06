@@ -16,7 +16,8 @@ class Blocks {
 	 */
 	public static function register() {
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
-		add_action( 'init', array( __CLASS__, 'register_templates' ), 20 );
+		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
+		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 	}
 
@@ -32,9 +33,31 @@ class Blocks {
 	}
 
 	/**
+	 * Registers block patterns.
+	 */
+	public static function register_block_patterns() {
+		register_block_pattern(
+			'indieblocks/note-starter-pattern',
+			array(
+				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &lsdquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
+					<!-- wp:group {"className":"e-content"} -->
+					<div class="wp-block-group e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></div>
+					<!-- /wp:group -->',
+			)
+		);
+	}
+
+	/**
 	 * Registers Note and Like block templates.
 	 */
-	public static function register_templates() {
+	public static function register_block_templates() {
 		foreach ( array( 'indieblocks_like', 'indieblocks_note' ) as $post_type ) {
 			$post_type_object = get_post_type_object( $post_type );
 
@@ -66,6 +89,8 @@ class Blocks {
 
 	/**
 	 * Registers (block-related) REST API endpoints.
+	 *
+	 * @todo: (Eventually) also add an "author" endpoint. Or have the single endpoint return both title and author information.
 	 */
 	public static function register_api_endpoints() {
 		register_rest_route(

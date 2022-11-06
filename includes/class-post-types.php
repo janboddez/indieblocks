@@ -50,12 +50,6 @@ class Post_Types {
 			// Generate a random slug for short-form posts.
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
 		}
-
-		if ( ! empty( $options['hide_titles'] ) ) {
-			// In order to know which titles to hide, we'll need a post type.
-			add_action( 'publish_indieblocks_note', array( __CLASS__, 'store_kind' ), 20, 2 );
-			add_action( 'publish_indieblocks_like', array( __CLASS__, 'store_kind' ), 20, 2 );
-		}
 	}
 
 	/**
@@ -552,30 +546,5 @@ class Post_Types {
 		}
 
 		return $slug;
-	}
-
-	/**
-	 * Attempts to store (or update) a post's kind (i.e., its "IndieWeb type").
-	 *
-	 * @param int     $post_id    Post ID.
-	 * @param WP_Post $post       Post object.
-	 */
-	public static function store_kind( $post_id, $post ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
-			return;
-		}
-
-		if ( ! in_array( $post->post_type, array( 'indieblocks_note', 'indieblocks_like' ), true ) ) {
-			return;
-		}
-
-		$parser = new Parser( esc_url_raw( get_permalink( $post ) ) );
-		$parser->parse( '<div>' . apply_filters( 'the_content', $post->post_content ) . '</div>' );
-
-		$kind = $parser->get_kind();
-		$kind = ! empty( $kind ) ? $kind : str_replace( 'indieblocks_', '', $post->post_type );
-
-		// Update post kind (or type).
-		update_post_meta( $post_id, 'indieblocks_kind', $kind );
 	}
 }

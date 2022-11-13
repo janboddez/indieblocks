@@ -73,6 +73,12 @@ class Webmention_Parser {
 			$commentdata['comment_author_url'] = $hentry['properties']['author'][0]['properties']['url'][0];
 		}
 
+		// Add author avatar. In a future version, we could choose to run this
+		// through an image proxy of sorts, or cache a copy locally.
+		if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0] ) ) {
+			$commentdata['comment_meta']['webmention_avatar'] = esc_url_raw( $hentry['properties']['author'][0]['properties']['photo'][0] );
+		}
+
 		// Update comment datetime.
 		if ( ! empty( $hentry['properties']['published'][0] ) ) {
 			$host = wp_parse_url( $source, PHP_URL_HOST );

@@ -86,7 +86,7 @@ class Webmention_Receiver {
 			return $response;
 		}
 
-		error_log( '[Indieblocks/Webmention] Could not insert store mention into database' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[Indieblocks/Webmention] Could not insert mention into database' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		return new \WP_Error( 'invalid_request', 'Invalid source or target', array( 'status' => 400 ) );
 	}
 
@@ -123,10 +123,6 @@ class Webmention_Receiver {
 
 			if ( false === stripos( $html, $target ) ) {
 				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ({$target})" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-
-				// @todo: Remove these two lines.
-				error_log( '[Indieblocks/Webmention] The HTML as we retrieved it:' );
-				error_log( $html );
 
 				// Target URL not (or no longer) mentioned by source. Mark webmention as processed.
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching

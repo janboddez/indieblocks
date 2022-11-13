@@ -14,7 +14,7 @@ Thumbs.db
 *.log
 *.sql
 *.sqlite
-*.sh
+#*.sh
 
 # ignore compiled files
 *.com

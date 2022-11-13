@@ -70,7 +70,7 @@ class Webmention_Sender {
 			// Schedule the actual sending out webmentions) in the background.
 			wp_schedule_single_event( time() + wp_rand( 0, 300 ), 'indieblocks_webmention_send', array( $post->ID ) );
 
-			update_post_meta( $post->ID, 'webmention', 'scheduled' );
+			update_post_meta( $post->ID, '_indieblocks_webmention', 'scheduled' );
 		}
 	}
 
@@ -105,7 +105,7 @@ class Webmention_Sender {
 		}
 
 		// Fetch whatever Webmention-related stats we've got for this post.
-		$webmention = get_post_meta( $post->ID, '_webmention', true );
+		$webmention = get_post_meta( $post->ID, '_indieblocks_webmention', true );
 
 		if ( empty( $webmention ) || ! is_array( $webmention ) ) {
 			// Ensure `$webmention` is an array.
@@ -122,15 +122,18 @@ class Webmention_Sender {
 				continue;
 			}
 
-			/* @todo: We probably shouldn't use the endpoint URL for a key. */
-			if ( ! empty( $webmention[ esc_url_raw( $endpoint ) ]['sent'] ) ) {
+			$hash = hash( 'sha256', esc_url_raw( $endpoint ) );
+
+			$webmention[ $hash ]['endpoint'] = esc_url_raw( $endpoint );
+
+			if ( ! empty( $webmention[ $hash ]['sent'] ) ) {
 				// Succesfully sent before. Skip. Note that this complicates
 				// resending after an update quite a bit.
 				continue;
 			}
 
-			$retries = ! empty( $webmention[ esc_url_raw( $endpoint ) ]['retries'] )
-				? (int) $webmention[ esc_url_raw( $endpoint ) ]['retries']
+			$retries = ! empty( $webmention[ $hash ]['retries'] )
+				? (int) $webmention[ $hash ]['retries']
 				: 0;
 
 			if ( $retries >= 3 ) {
@@ -151,12 +154,12 @@ class Webmention_Sender {
 				)
 			);
 
-			if ( is_wp_error( $response ) ) {
+			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 500 ) {
 				// Something went wrong.
 				error_log( 'Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
-				$webmention[ esc_url_raw( $endpoint ) ]['retries'] = $retries + 1;
-				update_post_meta( $post->ID, '_webmention', $webmention );
+				$webmention[ $hash ]['retries'] = $retries + 1;
+				update_post_meta( $post->ID, '_indieblocks_webmention', $webmention );
 
 				// Schedule a retry in 5 to 15 minutes.
 				wp_schedule_single_event( time() + wp_rand( 300, 900 ), 'indieblocks_webmention_send', array( $post->ID ) );
@@ -165,8 +168,9 @@ class Webmention_Sender {
 			}
 
 			// Success! (Or rather, no immediate error.) Store timestamp.
-			$webmention[ esc_url_raw( $endpoint ) ]['sent'] = current_time( 'mysql' );
-			update_post_meta( $post->ID, '_webmention', $webmention );
+			$webmention[ $hash ]['sent'] = current_time( 'mysql' );
+			$webmention[ $hash ]['code'] = wp_remote_retrieve_response_code( $response );
+			update_post_meta( $post->ID, '_indieblocks_webmention', $webmention );
 
 			error_log( 'Sent webmention to ' . esc_url_raw( $endpoint ) . '. Response code: ' . wp_remote_retrieve_response_code( $response ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		}
@@ -206,11 +210,11 @@ class Webmention_Sender {
 	 * @return string|null Endpoint URL, or nothing on failure.
 	 */
 	public static function webmention_discover_endpoint( $url ) {
-		// @todo: Use a hash instead, URLs may be too long.
 		$endpoint = get_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ) );
 
 		if ( ! empty( $endpoint ) ) {
 			// We've previously established the endpoint for this web page.
+			error_log( 'Found endpoint (' . esc_url_raw( $endpoint ) . ') for ' . esc_url_raw( $url ) . ' in cache.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return $endpoint;
 		}
 
@@ -312,22 +316,24 @@ class Webmention_Sender {
 	 */
 	public static function render_meta_box( $post ) {
 		// Webmention data.
-		$webmention = get_post_meta( $post->ID, '_webmention', true );
+		$webmention = get_post_meta( $post->ID, '_indieblocks_webmention', true );
 
 		if ( ! empty( $webmention ) && is_array( $webmention ) ) {
-			foreach ( $webmention as $endpoint => $data ) :
+			foreach ( $webmention as $data ) :
 				?>
 				<p>
 					<?php
-					if ( ! empty( $data['sent'] ) ) {
-						/* translators: 1: Webmention endpoint 2: Date sent */
-						printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
-					} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
-						/* translators: Webmention endpoint */
-						printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					} elseif ( ! empty( $data['retries'] ) ) {
-						/* translators: Webmention endpoint */
-						printf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), '<a href="' . $endpoint . '" target="_blank" rel="noopener noreferrer">' . $endpoint . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					if ( ! empty( $data['endpoint'] ) ) {
+						if ( ! empty( $data['sent'] ) ) {
+							/* translators: 1: Webmention endpoint 2: Date sent */
+							printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
+						} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
+							/* translators: Webmention endpoint */
+							printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						} elseif ( ! empty( $data['retries'] ) ) {
+							/* translators: Webmention endpoint */
+							printf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						}
 					}
 					?>
 				</p>

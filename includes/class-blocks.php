@@ -30,6 +30,8 @@ class Blocks {
 		// This oughta happen automatically, but whatevs.
 		$script_handle = generate_block_asset_handle( 'indieblocks/context', 'editorScript' );
 		wp_set_script_translations( $script_handle, 'indieblocks', dirname( __DIR__ ) . '/languages' );
+
+		register_block_type( dirname( __DIR__ ) . '/blocks/reply' );
 	}
 
 	/**

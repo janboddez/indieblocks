@@ -40,7 +40,7 @@ class Blocks {
 			'indieblocks/note-starter-pattern',
 			array(
 				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
-				'description' => __( 'A nearly blank starter pattern for &lsdquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
 				'categories'  => array( 'text' ),
 				'content'     => '<!-- wp:indieblocks/context -->
 					<div class="wp-block-indieblocks-context"></div>

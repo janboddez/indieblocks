@@ -257,7 +257,7 @@ class Options_Handler {
 					<table class="form-table">
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Blocks', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[enable_blocks]" value="1" <?php checked( ! empty( $this->options['enable_blocks'] ) ); ?>/> <?php esc_html_e( 'Enable blocks?', 'indieblocks' ); ?></label>
+							<td><label><input type="checkbox" name="indieblocks_settings[enable_blocks]" value="1" <?php checked( ! empty( $this->options['enable_blocks'] ) ); ?>/> <?php esc_html_e( 'Enable blocks', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( 'Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">

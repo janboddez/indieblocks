@@ -40,13 +40,10 @@ function flush_permalinks() {
  * @return WP_Response|WP_Error Response.
  */
 function remote_get( $url, $json = false ) {
-	$wp_version = get_bloginfo( 'version' );
-	$user_agent = 'WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' ) . '; IndieBlocks';
-
 	$args = array(
 		'timeout'             => 11,
 		'limit_response_size' => 1048576,
-		'user-agent'          => $user_agent,
+		'user-agent'          => get_user_agent(),
 	);
 
 	if ( $json ) {
@@ -59,4 +56,48 @@ function remote_get( $url, $json = false ) {
 		esc_url_raw( $url ),
 		$args
 	);
+}
+
+/**
+ * Wrapper around `wp_remote_post()`.
+ *
+ * @param  string $url          URL to fetch.
+ * @param  bool   $json         Whether to accept (only) JSON.
+ * @param  array  $args         Arguments for `wp_remote_post()`.
+ * @return WP_Response|WP_Error Response.
+ */
+function remote_post( $url, $json = false, $args = array() ) {
+	$args = array_merge(
+		array(
+			'timeout'             => 11,
+			'limit_response_size' => 1048576,
+			'user-agent'          => get_user_agent(),
+		),
+		$args
+	);
+
+	if ( $json ) {
+		$args['headers'] = array( 'Accept' => 'application/json' );
+	}
+
+	$args = apply_filters( 'indieblocks_fetch_args', $args, $url );
+
+	return wp_remote_post(
+		esc_url_raw( $url ),
+		$args
+	);
+}
+
+/**
+ * Returns a user agent.
+ *
+ * @param  string $url The URL we're looking to fetch.
+ * @return string      User agent.
+ */
+function get_user_agent( $url = '' ) {
+	$wp_version = get_bloginfo( 'version' );
+	$user_agent = 'WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' ) . '; IndieBlocks';
+
+	// Allow developers to override this user agent.
+	return apply_filters( 'indieblocks_fetch_user_agent', $user_agent, $url );
 }

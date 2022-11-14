@@ -24,6 +24,8 @@ class Theme_Mf2 {
 		add_action( 'init', array( __CLASS__, 'deregister_core_blocks' ), 1 );
 		add_action( 'init', array( __CLASS__, 'reregister_core_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'deregister_gutenberg_blocks' ) );
+
+		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 	}
 
 	/**
@@ -591,6 +593,44 @@ class Theme_Mf2 {
 			$wrapper_attributes,
 			esc_attr( get_comment_date( 'c', $comment ) ),
 			$formatted_date
+		);
+	}
+
+	/**
+	 * Quick 'n dirty way to display webmention avatars.
+	 *
+	 * Note that the core blocks used by block themes call author and avatar
+	 * blocks separately, which is why these typically don't sit inside the
+	 * author `h-card`.
+	 *
+	 * @param  string|null $avatar  Default HTML.
+	 * @param  mixed       $comment Avatar to retrieve.
+	 * @param  array       $args    Additional arguments.
+	 * @return string|null          Avatar HTML.
+	 */
+	public static function get_avatar_html( $avatar, $comment, $args ) {
+		if ( ! $comment instanceof \WP_Comment ) {
+			return null;
+		}
+
+		$url = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
+
+		if ( empty( $url ) ) {
+			return null;
+		}
+
+		$classes = ! empty( $args['class'] ) ? (array) $args['class'] : array();
+		$classes = trim( implode( ' ', $classes ) );
+
+		// @todo: Have another look at all possible arguments, and cache or
+		// proxy these images!
+		// We could download these images, set filenames based on their URL hash,
+		// store all that in an avatars folder.
+		return sprintf(
+			'<img src="%s" width="%d" class="%s" />',
+			esc_url( $url ),
+			(int) ( ! empty( $args['width'] ) ? $args['width'] : 96 ),
+			$classes
 		);
 	}
 }

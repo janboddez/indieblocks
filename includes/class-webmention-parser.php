@@ -73,10 +73,14 @@ class Webmention_Parser {
 			$commentdata['comment_author_url'] = $hentry['properties']['author'][0]['properties']['url'][0];
 		}
 
-		// Add author avatar. In a future version, we could choose to run this
-		// through an image proxy of sorts, or cache a copy locally.
-		if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0] ) ) {
-			$commentdata['comment_meta']['webmention_avatar'] = esc_url_raw( $hentry['properties']['author'][0]['properties']['photo'][0] );
+		// Add author avatar.
+		if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0]['value'] ) ) {
+			// Attempt to locally store avatar.
+			$avatar_path = static::store_avatar( $hentry['properties']['author'][0]['properties']['photo'][0]['value'] );
+
+			if ( ! empty( $avatar_path ) ) {
+				$commentdata['comment_meta']['indieblocks_webmention_avatar'] = $avatar_path;
+			}
 		}
 
 		// Update comment datetime.
@@ -96,7 +100,7 @@ class Webmention_Parser {
 
 		// Update source URL.
 		if ( ! empty( $hentry['properties']['url'][0] ) ) {
-			$commentdata['comment_meta']['webmention_source'] = esc_url_raw( $hentry['properties']['url'][0] );
+			$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $hentry['properties']['url'][0] );
 		}
 
 		$hentry_kind = '';
@@ -144,7 +148,7 @@ class Webmention_Parser {
 
 		// Update h-entry kind (or type).
 		if ( ! empty( $hentry_kind ) ) {
-			$commentdata['comment_meta']['webmention_kind'] = $hentry_kind;
+			$commentdata['comment_meta']['indieblocks_webmention_kind'] = $hentry_kind;
 		}
 
 		// Update comment content.
@@ -261,5 +265,85 @@ class Webmention_Parser {
 		}
 
 		return '[&#8230;] ' . esc_html( $excerpt ) . ' [&#8230;]';
+	}
+
+	/**
+	 * Caches avatars locally.
+	 *
+	 * @param  string $url Avatar URL.
+	 * @return string|null Local avatar path, or nothing on failure.
+	 */
+	public static function store_avatar( $url ) {
+		// Get the WordPress upload dir.
+		$upload_dir = wp_upload_dir();
+		$avatar_dir = trailingslashit( $upload_dir['basedir'] ) . 'indieblocks-avatars';
+
+		if ( ! is_dir( $avatar_dir ) ) {
+			// This'll create, e.g., `wp-content/uploads/indieblocks-avatars/`.
+			mkdir( $avatar_dir, 0755 );
+		}
+
+		$hash      = hash( 'sha256', esc_url_raw( $url ) );
+		$ext       = pathinfo( $url, PATHINFO_EXTENSION );
+		$filename  = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
+		$file_path = trailingslashit( $avatar_dir ) . $filename;
+
+		if ( file_exists( $file_path ) && ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
+			// File exists and is under a month old.
+			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+		} else {
+			// Attempt to download the avatar.
+			$response = remote_get(
+				esc_url_raw( $url ),
+				false,
+				array( 'headers' => array( 'Accept' => 'image/*' ) )
+			);
+
+			$body = wp_remote_retrieve_body( $response );
+
+			if ( empty( $body ) ) {
+				return null;
+			}
+
+			// Now store it locally.
+			global $wp_filesystem;
+
+			if ( empty( $wp_filesystem ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+
+			// Write image data.
+			if ( ! $wp_filesystem->put_contents( $file_path, $body, 0644 ) ) {
+				error_log( '[IndieBlocks/Webmention] Could not save image file: ' . $file_path . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				return null;
+			}
+
+			if ( ! function_exists( 'wp_crop_image' ) ) {
+				// Load image functions.
+				require_once ABSPATH . 'wp-admin/includes/image.php';
+			}
+
+			if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
+				// Somehow not a valid image. Delete it.
+				unlink( $file_path );
+
+				error_log( '[IndieBlocks/Webmention] Invalid image file: ' . esc_url_raw( $attachment_url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				return null;
+			}
+
+			// Try to scale down and crop it.
+			$image = wp_get_image_editor( $file_path );
+
+			if ( ! is_wp_error( $image ) ) {
+				$image->resize( 150, 150, true );
+				$image->save( $file_path );
+			} else {
+				error_log( '[IndieBlocks/Webmention] Something went wrong resizing the avatar (' . $file_path . '): ' . $image->get_error_message() . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
+
+			// And return the local path.
+			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+		}
 	}
 }

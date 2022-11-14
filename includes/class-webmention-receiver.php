@@ -156,7 +156,7 @@ class Webmention_Receiver {
 				'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
 				'comment_type'         => '',
 				'comment_meta'         => array(
-					'webmention_source' => esc_url_raw( $webmention->source ),
+					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
 				),
 			);
 
@@ -220,14 +220,14 @@ class Webmention_Receiver {
 	 */
 	public static function render_meta_box( $comment ) {
 		// Webmention data.
-		$source = get_comment_meta( $comment->comment_ID, 'webmention_source', true );
-		$kind   = get_comment_meta( $comment->comment_ID, 'webmention_kind', true );
+		$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
+		$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
 		?>
-			<p><label for="webmention_source"><?php esc_html_e( 'Source', 'indieblocks' ); ?></label>
-			<input type="url" id="webmention_source" name="webmention_source" value="<?php echo esc_attr( $source ); ?>" class="widefat" readonly="readonly" /></p>
+			<p><label for="indieblocks_webmention_source"><?php esc_html_e( 'Source', 'indieblocks' ); ?></label>
+			<input type="url" id="indieblocks_webmention_source" name="indieblocks_webmention_source" value="<?php echo esc_attr( $source ); ?>" class="widefat" readonly="readonly" /></p>
 
-			<p><label for="webmention_kind"><?php esc_html_e( 'Type', 'indieblocks' ); ?></label>
-			<input type="url" id="webmention_kind" name="webmention_kind" value="<?php echo esc_attr( ucfirst( $kind ) ); ?>" class="widefat" readonly="readonly" /></p>
+			<p><label for="indieblocks_webmention_kind"><?php esc_html_e( 'Type', 'indieblocks' ); ?></label>
+			<input type="url" id="indieblocks_webmention_kind" name="indieblocks_webmention_kind" value="<?php echo esc_attr( ucfirst( $kind ) ); ?>" class="widefat" readonly="readonly" /></p>
 		<?php
 	}
 

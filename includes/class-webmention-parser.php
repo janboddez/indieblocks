@@ -45,10 +45,13 @@ class Webmention_Parser {
 					continue;
 				}
 
-				if ( static::parse_hentry( $commentdata, $child, $source, $target ) ) {
-					// Found a valid h-entry; stop here.
-					return;
+				if ( 'h-entry' !== $child['type'][0] ) {
+					continue;
 				}
+
+				static::parse_hentry( $commentdata, $child, $source, $target );
+
+				return;
 			}
 		}
 	}
@@ -60,7 +63,6 @@ class Webmention_Parser {
 	 * @param  array  $hentry      Array describing an h-entry.
 	 * @param  string $source      Source URL.
 	 * @param  string $target      Target URL.
-	 * @return bool                True on success, false on failure.
 	 */
 	public static function parse_hentry( &$commentdata, $hentry, $source, $target ) {
 		// Update author name.
@@ -198,9 +200,6 @@ class Webmention_Parser {
 			$source,
 			$target
 		);
-
-		// Well, we've replaced whatever comment data we could find.
-		return true;
 	}
 
 	/**

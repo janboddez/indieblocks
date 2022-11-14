@@ -95,10 +95,10 @@ class Blocks {
 	public static function register_api_endpoints() {
 		register_rest_route(
 			'indieblocks/v1',
-			'/title',
+			'/meta',
 			array(
 				'methods'             => array( 'GET' ),
-				'callback'            => array( __CLASS__, 'get_title' ),
+				'callback'            => array( __CLASS__, 'get_meta' ),
 				'permission_callback' => array( __CLASS__, 'permission_callback' ),
 			)
 		);
@@ -114,29 +114,38 @@ class Blocks {
 	}
 
 	/**
-	 * Returns the contents of a web page's `title` element.
+	 * Returns certain metadata.
 	 *
 	 * @param  \WP_REST_Request $request   WP REST API request.
 	 * @return \WP_REST_Response|\WP_Error Response.
 	 */
-	public static function get_title( $request ) {
+	public static function get_meta( $request ) {
 		$url = $request->get_param( 'url' );
 
 		if ( empty( $url ) ) {
-			return rest_ensure_response( '' );
+			return new \WP_Error(
+				'missing_url',
+				'Missing URL.'
+			);
 		}
 
 		$url = rawurldecode( $url );
 
 		if ( ! wp_http_validate_url( $url ) ) {
-			return rest_ensure_response( '' );
+			return new \WP_Error(
+				'invalid_url',
+				'Invalid URL.'
+			);
 		}
 
 		$parser = new Parser( $url );
 		$parser->parse();
 
-		$title = $parser->get_title();
-
-		return rest_ensure_response( $title );
+		return new \WP_REST_Response(
+			array(
+				'name'   => $parser->get_name(),
+				'author' => $parser->get_author(),
+			)
+		);
 	}
 }

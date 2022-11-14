@@ -58,14 +58,14 @@
 				}, 6000 );
 
 				apiFetch( {
-					path: '/indieblocks/v1/title?url=' + encodeURIComponent( url ),
+					path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
 					signal: controller.signal
-				} ).then( function( value ) {
-					if ( ! value || '' === value ) {
-						value = url;
+				} ).then( function( response ) {
+					if ( ! response.name || '' === response.name ) {
+						response.name = url;
 					}
 
-					props.setAttributes( { title: value } );
+					props.setAttributes( { title: response.name } );
 
 					clearTimeout(timeoutId);
 				} ).catch( function( error ) {

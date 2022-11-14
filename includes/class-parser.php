@@ -12,18 +12,25 @@ namespace IndieBlocks;
  */
 class Parser {
 	/**
-	 * URL of the page we're parsing.
+	 * Page URL.
 	 *
 	 * @var string $url URL of the page we're parsing.
 	 */
 	private $url;
 
 	/**
-	 * DOM of the page we're parsing.
+	 * Page DOM.
 	 *
-	 * @var \DOMDocument $content DOM of the page we're parsing.
+	 * @var \DOMDocument $dom DOM of the page we're parsing.
 	 */
 	private $dom;
+
+	/**
+	 * Microformats2.
+	 *
+	 * @var array $mf2 Microformats2 representation of the page we're parsing.
+	 */
+	private $mf2;
 
 	/**
 	 * Constructor.
@@ -51,7 +58,7 @@ class Parser {
 			if ( empty( $content ) ) {
 				// Download page.
 				$response = remote_get( $this->url );
-				$content  = wp_remote_retrieve_body( $response );
+				$content  = wp_remote_retrieve_body( $response ); // Cache, even if empty.
 
 				set_transient( 'indieblocks:html:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
 			}
@@ -66,14 +73,24 @@ class Parser {
 		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
 
 		$this->dom->loadHTML( $content );
+
+		$this->mf2 = Mf2\parse( $content, $this->url );
 	}
 
 	/**
-	 * Returns page title.
+	 * Returns page name.
 	 *
-	 * @return string Current page's `title` element.
+	 * @return string Current page's `title` (for now) element.
 	 */
-	public function get_title() {
+	public function get_name() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
+
+			if ( ! empty( $hentry['properties']['name'][0] ) ) {
+				return $hentry['properties']['name'][0];
+			}
+		}
+
 		$title = $this->dom->getElementsByTagName( 'title' );
 
 		if ( isset( $title->length ) && $title->length > 0 ) {
@@ -84,23 +101,17 @@ class Parser {
 	}
 
 	/**
-	 * Returns post kind.
+	 * Returns page author.
 	 *
-	 * @return string Detected kind, or empty string.
+	 * @return string Page author.
 	 */
-	public function get_kind() {
-		$xpath = new \DOMXPath( $this->dom );
+	public function get_author() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
 
-		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-like-of ")]' ) as $result ) {
-			return 'like';
-		}
-
-		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-in-reply-to ")]' ) as $result ) {
-			return 'reply';
-		}
-
-		foreach ( $xpath->query( '//*[contains(concat(" ", @class, " "), " u-bookmark-of ")]' ) as $result ) {
-			return 'bookmark';
+			if ( ! empty( $hentry['properties']['author'][0]['properties']['name'][0] ) ) {
+				return $hentry['properties']['author'][0]['properties']['name'][0];
+			}
 		}
 
 		return '';

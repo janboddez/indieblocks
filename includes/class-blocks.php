@@ -31,7 +31,8 @@ class Blocks {
 		$script_handle = generate_block_asset_handle( 'indieblocks/context', 'editorScript' );
 		wp_set_script_translations( $script_handle, 'indieblocks', dirname( __DIR__ ) . '/languages' );
 
-		register_block_type( dirname( __DIR__ ) . '/blocks/reply' );
+		register_block_type( dirname( __DIR__ ) . '/blocks/reply-context' );
+		register_block_type( dirname( __DIR__ ) . '/blocks/context-2' );
 	}
 
 	/**
@@ -146,7 +147,10 @@ class Blocks {
 		return new \WP_REST_Response(
 			array(
 				'name'   => $parser->get_name(),
-				'author' => $parser->get_author(),
+				'author' => array(
+					'name' => $parser->get_author(),
+					'url'  => $parser->get_author_url(),
+				),
 			)
 		);
 	}

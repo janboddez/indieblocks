@@ -78,9 +78,9 @@ class Parser {
 	}
 
 	/**
-	 * Returns page name.
+	 * Returns a page name.
 	 *
-	 * @return string Current page's `title` (for now) element.
+	 * @return string Current page's name or title.
 	 */
 	public function get_name() {
 		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
@@ -101,7 +101,7 @@ class Parser {
 	}
 
 	/**
-	 * Returns page author.
+	 * Returns the author, if it can find one.
 	 *
 	 * @return string Page author.
 	 */
@@ -109,8 +109,46 @@ class Parser {
 		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
 			$hentry = $this->mf2['items'][0];
 
+			if ( ! empty( $hentry['properties']['author'][0] ) && is_string( $hentry['properties']['author'][0] ) ) {
+				return $hentry['properties']['author'][0];
+			}
+
 			if ( ! empty( $hentry['properties']['author'][0]['properties']['name'][0] ) ) {
 				return $hentry['properties']['author'][0]['properties']['name'][0];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the author URL, if it can find one.
+	 *
+	 * @return string Author URL.
+	 */
+	public function get_author_url() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
+
+			if ( ! empty( $hentry['properties']['author'][0]['properties']['url'][0] ) ) {
+				return $hentry['properties']['author'][0]['properties']['url'][0];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the author's avatar, if it can find one.
+	 *
+	 * @return string Avatar URL.
+	 */
+	public function get_avatar() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
+
+			if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0] ) ) {
+				return $hentry['properties']['author'][0]['properties']['photo'][0];
 			}
 		}
 

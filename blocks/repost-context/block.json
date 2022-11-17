@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
-	"title": "Reply Context",
-	"name": "indieblocks/reply-context",
+	"title": "Repost Context",
+	"name": "indieblocks/repost-context",
 	"category": "text",
 	"icon": "format-status",
 	"editorScript": "file:./block.js",

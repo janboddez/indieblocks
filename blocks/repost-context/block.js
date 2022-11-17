@@ -1,4 +1,7 @@
 ( function ( blocks, element, blockEditor, components, i18n, apiFetch ) {
+	var createBlock    = blocks.createBlock;
+	var getSaveContent = blocks.getSaveContent;
+
 	var el = element.createElement;
 
 	var BlockControls     = blockEditor.BlockControls;
@@ -15,36 +18,13 @@
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
 
-	var messages = {
-		/* translators: %s: URL of the bookmarked page. */
-		'u-bookmark-of': __( 'Bookmarked %s', 'indieblocks' ),
-		/* translators: %s: URL of the "liked" page. */
-		'u-like-of': __( 'Likes %s', 'indieblocks' ),
-		/* translators: %s: URL of the page being replied to. */
-		'u-in-reply-to': __( 'In reply to %s', 'indieblocks' ),
-		/* translators: %s: URL of the "page" being reposted. */
-		'u-repost-of': __( 'Reposted %s', 'indieblocks' ),
-	};
-
-	var messagesBy = {
-		/* translators: %s: URL of the bookmarked page. */
-		'u-bookmark-of': __( 'Bookmarked %s by %s', 'indieblocks' ),
-		/* translators: %s: URL of the "liked" page. */
-		'u-like-of': __( 'Likes %s by %s', 'indieblocks' ),
-		/* translators: %s: URL of the page being replied to. */
-		'u-in-reply-to': __( 'In reply to %s by %s', 'indieblocks' ),
-		/* translators: %s: URL of the "page" being reposted. */
-		'u-repost-of': __( 'Reposted %s by %s', 'indieblocks' ),
-	};
-
-	blocks.registerBlockType( 'indieblocks/context-2', {
+	blocks.registerBlockType( 'indieblocks/repost-context', {
 		edit: function ( props ) {
 			var url          = props.attributes.url;
 			var customTitle  = props.attributes.customTitle;
 			var title        = props.attributes.title || '';
 			var customAuthor = props.attributes.customAuthor;
 			var author       = props.attributes.author || '';
-			var kind         = props.attributes.kind;
 
 			function updateMeta() {
 				if ( customTitle && customAuthor ) {
@@ -70,13 +50,13 @@
 
 					clearTimeout(timeoutId);
 				} ).catch( function( error ) {
-					// The request timed out or otherwise failed.
+					// The request timed out or otherwise failed. Leave as is.
 				} );
 			}
 
 			var placeholderProps = {
 				icon: 'format-status',
-				label: __( 'IndieBlocks Context', 'indieblocks' ),
+				label: __( 'Repost Context', 'indieblocks' ),
 				isColumnLayout: true,
 			};
 
@@ -129,52 +109,35 @@
 								),
 							),
 							el( Placeholder, placeholderProps,
-								[
-									el( TextControl, {
-										label: __( 'URL', 'indieblocks' ),
-										value: url,
-										onChange: ( value ) => { props.setAttributes( { url: value } ) },
-										onBlur: updateMeta,
-									} ),
-									el( RadioControl, {
-										label: __( 'Type', 'indieblocks' ),
-										selected: kind,
-										options: [
-											{ label: __( 'Bookmark', 'indieblocks' ), value: 'u-bookmark-of' },
-											{ label: __( 'Like', 'indieblocks' ), value: 'u-like-of' },
-											{ label: __( 'Reply', 'indieblocks' ), value: 'u-in-reply-to' },
-											{ label: __( 'Repost', 'indieblocks' ), value: 'u-repost-of' },
-										],
-										onChange: ( value ) => { props.setAttributes( { kind: value } ) },
-									} ),
-								]
+								el( TextControl, {
+									label: __( 'URL', 'indieblocks' ),
+									value: url,
+									onChange: ( value ) => { props.setAttributes( { url: value } ) },
+									onBlur: updateMeta,
+								} ),
 							),
 						]
 						: el( 'div', {},
 							( ! url || 'undefined' === url )
 								? null // Return nothing.
-								: el( 'div', {
-										className: kind + ' h-cite'
-									},
-									el( 'i', {},
-										( ! author || 'undefined' === author )
-											? element.createInterpolateElement(
-												// Add a period only if the "title" doesn't already end in one of these punctuation marks.
-												sprintf( messages[ kind ] + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>' ),
-												{
-													a: el( 'a', { className: 'u-url', href: url } ),
-												}
-											)
-											: element.createInterpolateElement(
-												// Add a period only if the "title" doesn't already end in one of these punctuation marks.
-												sprintf( messagesBy[ kind ], '<a>' + ( title || url ) + '</a>', '<b>' + author + '</b>' ),
-												{
-													a: el( 'a', { className: 'u-url', href: url } ),
-													b: el( 'span', { className: 'p-author h-card' } ),
-												}
-											)
+								: el( 'i', {},
+									( ! author || 'undefined' === author )
+										? element.createInterpolateElement(
+											// Add a period only if `title` doesn't already end in one of these punctuation marks.
+											sprintf( __( 'Reposted %s', 'indieblocks' ) + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>' ),
+											{
+												a: el( 'a', { className: 'u-url p-name', href: url } ),
+											}
+										)
+										: element.createInterpolateElement(
+											// Add a period only if `author` doesn't already end in one of these punctuation marks.
+											sprintf( __( 'Reposted %1$s by %2$s', 'indieblocks' ) + ( ! author.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>', '<span>' + author + '</span>' ),
+											{
+												a: el( 'a', { className: 'u-url p-name', href: url } ),
+												span: el( 'span', { className: 'p-author' } ),
+											}
+										)
 									)
-								)
 						)
 				]
 			);
@@ -190,29 +153,38 @@
 			return el( 'div', blockProps,
 				( ! url || 'undefined' === url )
 					? null // Return nothing.
-					: el( 'div', {
-							className: kind + ' h-cite'
-						},
-						el( 'i', {},
-							( ! author || 'undefined' === author )
-								? element.createInterpolateElement(
-									// Add a period only if the "title" doesn't already end in one of these punctuation marks.
-									sprintf( messages[ kind ] + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>' ),
-									{
-										a: el( 'a', { className: 'u-url', href: url } )
-									}
-								)
-								: element.createInterpolateElement(
-									// Add a period only if the "title" doesn't already end in one of these punctuation marks.
-									sprintf( messagesBy[ kind ], '<a>' + ( title || url ) + '</a>', '<span>' + author + '</span>' ),
-									{
-										a: el( 'a', { className: 'u-url', href: url } ),
-										span: el( 'span', { className: 'p-author' } ),
-									}
-								)
-						)
+					: el( 'i', {},
+						( ! author || 'undefined' === author )
+							? element.createInterpolateElement(
+								// Add a period only if `title` doesn't already end in one of these punctuation marks.
+								sprintf( __( 'Reposted %s', 'indieblocks' ) + ( ! title.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>' ),
+								{
+									a: el( 'a', { className: 'u-url', href: url } )
+								}
+							)
+							: element.createInterpolateElement(
+								// Add a period only if `author` doesn't already end in one of these punctuation marks.
+								sprintf( __( 'Reposted %1$s by %2$s', 'indieblocks' ) + ( ! author.match( /[.,:!?]$/ ) ? '.' : '' ), '<a>' + ( title || url ) + '</a>', '<span>' + author + '</span>' ),
+								{
+									a: el( 'a', { className: 'u-url', href: url } ),
+									span: el( 'span', { className: 'p-author' } ),
+								}
+							)
 					)
 			);
-		}
+		},
+		transforms: {
+			to: [
+				{
+					type: 'block',
+					blocks: [ 'core/html' ],
+					transform: ( attributes ) => {
+						return createBlock( 'core/html', {
+							content: getSaveContent( 'indieblocks/repost-context', attributes ),
+						} );
+					}
+				},
+			],
+		},
 	} );
 } )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.i18n, window.wp.apiFetch );

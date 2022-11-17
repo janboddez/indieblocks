@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
-	"title": "IndieBlocks Context",
-	"name": "indieblocks/context-2",
+	"title": "Better Context",
+	"name": "indieblocks/better-context",
 	"category": "text",
 	"icon": "format-status",
 	"editorScript": "file:./block.js",

@@ -8,6 +8,5 @@ return array(
 		'wp-block-editor',
 		'wp-components',
 		'wp-i18n',
-		'wp-api-fetch',
 	),
 );

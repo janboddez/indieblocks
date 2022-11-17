@@ -154,7 +154,7 @@
 							( ! url || 'undefined' === url )
 								? null // Return nothing.
 								: el( 'div', {
-										className: 'u-in-reply-to h-cite'
+										className: kind + ' h-cite'
 									},
 									el( 'i', {},
 										( ! author || 'undefined' === author )

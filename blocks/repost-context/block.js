@@ -137,7 +137,7 @@
 												span: el( 'span', { className: 'p-author' } ),
 											}
 										)
-									)
+								)
 						)
 				]
 			);

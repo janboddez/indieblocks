@@ -18,6 +18,4 @@ If you're running a "block theme," it will attempt to add "microformats2" to it.
 Optionally, enable webmentions for posts, notes, and likes (and any other post types of your choosing). This, in combination with the aforementioned microformats2 and this plugin's blocks (and block patterns), will enable richer _cross-site_ conversations. (If you're perfectly happy with your existing Webmention setup, here, too, you can simply leave this setting disabled.)
 
 ## Classic Editor and Themes
-IndieBlocks, despite its name, runs just fine on sites that have the Classic Editor plugin installed, or don't (yet) use a "block theme." The Custom Post Types and Webmention options will just work.
-
-It's absolutely okay to run a "classic" theme with microformats2 support and add microformats to posts some other way.
+IndieBlocks, despite its name, runs just fine on sites that have the Classic Editor plugin installed, or don't (yet) use a "block theme." The Custom Post Types and Webmention options will just work. Microformats, however, will need to be added sme other way. (It's absolutely okay to run a "classic" theme with microformats2 support and add microformats to posts by hand or through a different plugin.)

@@ -273,6 +273,12 @@ class Webmention_Parser {
 	 * @return string|null Local avatar path, or nothing on failure.
 	 */
 	public static function store_avatar( $url ) {
+		$options = get_options();
+
+		if ( empty( $options['cache_avatars'] ) ) {
+			return null;
+		}
+
 		// Get the WordPress upload dir.
 		$upload_dir = wp_upload_dir();
 		$avatar_dir = trailingslashit( $upload_dir['basedir'] ) . 'indieblocks-avatars';

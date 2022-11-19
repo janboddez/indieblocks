@@ -34,6 +34,7 @@ class Options_Handler {
 		'modified_feeds'        => false,
 		'webmention'            => false,
 		'webmention_post_types' => array(),
+		'cache_avatars'         => false,
 		'add_featured_images'   => false,
 		'location_functions'    => false,
 		'micropub'              => false,
@@ -184,7 +185,8 @@ class Options_Handler {
 	 */
 	public function sanitize_webmention_settings( $settings ) {
 		$options = array(
-			'webmention' => isset( $settings['webmention'] ) ? true : false,
+			'webmention'    => isset( $settings['webmention'] ) ? true : false,
+			'cache_avatars' => isset( $settings['cache_avatars'] ) ? true : false,
 		);
 
 		$webmention_post_types = array();
@@ -336,6 +338,11 @@ class Options_Handler {
 								<?php endforeach; ?>
 								<p class="description"><?php esc_html_e( 'The post types for which webmentions (outgoing and incoming) should be enabled.', 'indieblocks' ); ?></p>
 							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Avatars', 'indieblocks' ); ?></th>
+							<td><label><input type="checkbox" name="indieblocks_settings[cache_avatars]" value="1" <?php checked( ! empty( $this->options['cache_avatars'] ) ); ?>/> <?php esc_html_e( 'Cache avatars', 'indieblocks' ); ?></label>
+							<p class="description"><?php esc_html_e( '(Experimental) Attempt to locally cache avatars. Uncheck to disable webmention avatars altogether.', 'indieblocks' ); ?></p></td>
 						</tr>
 					</table>
 				<?php endif; ?>

@@ -597,7 +597,7 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Quick 'n dirty way to display webmention avatars.
+	 * Quick 'n' dirty way to display webmention avatars.
 	 *
 	 * Note that the core blocks used by block themes call author and avatar
 	 * blocks separately, which is why these typically don't sit inside the
@@ -609,6 +609,12 @@ class Theme_Mf2 {
 	 * @return string|null          Avatar HTML.
 	 */
 	public static function get_avatar_html( $avatar, $comment, $args ) {
+		$options = get_options();
+
+		if ( empty( $options['cache_avatars'] ) ) {
+			return null;
+		}
+
 		if ( ! $comment instanceof \WP_Comment ) {
 			return null;
 		}
@@ -619,18 +625,24 @@ class Theme_Mf2 {
 			return null;
 		}
 
-		$classes = ! empty( $args['class'] ) ? (array) $args['class'] : array();
-		$classes = trim( implode( ' ', $classes ) );
+		$classes   = ! empty( $args['class'] ) ? (array) $args['class'] : array();
+		$classes[] = 'avatar photo';
+		$classes   = trim( implode( ' ', $classes ) );
+
+		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );
+		$height = (int) ( ! empty( $args['height'] ) ? $args['height'] : 96 );
 
 		// @todo: Have another look at all possible arguments, and cache or
 		// proxy these images!
 		// We could download these images, set filenames based on their URL hash,
 		// store all that in an avatars folder.
 		return sprintf(
-			'<img src="%s" width="%d" class="%s" />',
+			'<img src="%s" width="%d" height="%d" class="%s" %s/>',
 			esc_url( $url ),
-			(int) ( ! empty( $args['width'] ) ? $args['width'] : 96 ),
-			$classes
+			$width,
+			$height,
+			$classes,
+			'style="border-radius: ' . ( $width / 2 ) . 'px;"'
 		);
 	}
 }

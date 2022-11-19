@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse
 Tested up to: 6.1
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -23,6 +23,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://jan.boddez.net/wordpress/indieblocks](https://jan.boddez.net/wordpress/indieblocks). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.3.3 =
+Slight block changes. Bug fixes, and basic Webmention support.
 = 0.2.0 =
 Slightly improved "empty" URL handling, and permalink flushing. Additional CPT, feed and Micropub options. Date-based CPT archives, and basic location functions.
 = 0.1.0 =

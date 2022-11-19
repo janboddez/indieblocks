@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.3.0\n"
+"Project-Id-Version: IndieBlocks 0.3.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-11-14T12:14:53+00:00\n"
-"PO-Revision-Date: 2022-11-14 13:32+0100\n"
+"POT-Creation-Date: 2022-11-19T14:13:10+00:00\n"
+"PO-Revision-Date: 2022-11-19 15:15+0100\n"
 "Language: nl_NL\n"
 "X-Generator: Poedit 2.4\n"
 "X-Domain: indieblocks\n"
@@ -16,9 +16,6 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;esc_html_e\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: languages\n"
-"X-Poedit-SearchPathExcluded-1: svn\n"
-"X-Poedit-SearchPathExcluded-2: vendor\n"
 
 #. Plugin Name of the plugin
 #: includes/class-options-handler.php:85
@@ -43,11 +40,11 @@ msgstr "Jan Boddez"
 msgid "https://jan.boddez.net/"
 msgstr "https://jan.boddez.net/"
 
-#: includes/class-blocks.php:42
+#: includes/class-blocks.php:45
 msgid "Note Starter Pattern"
 msgstr "Note-startpatroon"
 
-#: includes/class-blocks.php:43
+#: includes/class-blocks.php:46
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr "Een bijna blanco startpatroon voor notes, &lsquo;IndieWeb&rsquo;-stijl."
 
@@ -78,24 +75,28 @@ msgstr "Locatie"
 
 #. translators: %s: URL of the "liked" page.
 #: includes/class-micropub-compat.php:243
+#: blocks/context/block.js:24
 msgid "Likes %s."
 msgstr "Vindt %s leuk."
 
 #. translators: %s: URL of the bookmarked page.
 #: includes/class-micropub-compat.php:250
-#: blocks/context/block.js:167
+#: blocks/context/block.js:22
+#: blocks/context/block.js:97
 msgid "Bookmarked %s."
 msgstr "Bookmarkte %s."
 
 #. translators: %s: URL of the page being replied to.
 #: includes/class-micropub-compat.php:257
-#: blocks/context/block.js:171
+#: blocks/context/block.js:26
+#: blocks/context/block.js:101
 msgid "In reply to %s."
 msgstr "Als antwoord op %s."
 
 #. translators: %s: URL of the "page" being reposted.
 #: includes/class-micropub-compat.php:264
-#: blocks/context/block.js:173
+#: blocks/context/block.js:28
+#: blocks/context/block.js:103
 msgid "Reposted %s."
 msgstr "Herpostte %s."
 
@@ -348,7 +349,7 @@ msgid "Likes"
 msgstr "Likes"
 
 #: includes/class-post-types.php:108
-#: blocks/context/block.js:120
+#: blocks/context/block.js:74
 msgid "Like"
 msgstr "Like"
 
@@ -388,15 +389,15 @@ msgstr "Geen likes gevonden in prullenbak."
 msgid "likes"
 msgstr "likes"
 
-#: includes/class-webmention-parser.php:155
+#: includes/class-webmention-parser.php:161
 msgid "&hellip; bookmarked this!"
 msgstr "&hellip; bookmarkte dit!"
 
-#: includes/class-webmention-parser.php:159
+#: includes/class-webmention-parser.php:165
 msgid "&hellip; liked this!"
 msgstr "&hellip; vond dit leuk!"
 
-#: includes/class-webmention-parser.php:163
+#: includes/class-webmention-parser.php:169
 msgid "&hellip; reposted this!"
 msgstr "&hellip; herpostte dit!"
 
@@ -409,7 +410,7 @@ msgid "Source"
 msgstr "Bron"
 
 #: includes/class-webmention-receiver.php:229
-#: blocks/context/block.js:116
+#: blocks/context/block.js:70
 msgid "Type"
 msgstr "Type"
 

@@ -256,7 +256,7 @@ class Webmention_Sender {
 			}
 		}
 
-		if ( preg_match( '#(image|audio|video|model)/#is', wp_remote_retrieve_header( $response, 'content-type' ) ) ) {
+		if ( preg_match( '~(image|audio|video|model)/~is', wp_remote_retrieve_header( $response, 'content-type' ) ) ) {
 			// Not an (X)HTML, SGML, or XML document. No use going further.
 			return null;
 		}
@@ -283,7 +283,7 @@ class Webmention_Sender {
 			$endpoint = \WP_Http::make_absolute_url( $result->value, $url );
 
 			// Cache for one hour.
-			set_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ), $endpoint, 3600 );
+			set_transient( 'indieblocks:webmention_endpoint:' . hash( 'sha256', esc_url_raw( $url ) ), $endpoint, HOUR_IN_SECONDS );
 
 			return $endpoint;
 		}

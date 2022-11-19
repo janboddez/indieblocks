@@ -436,13 +436,13 @@ class Options_Handler {
 		$example_front = __( 'notes', 'indieblocks' );
 
 		if ( ! empty( $this->options['enable_notes'] ) ) {
-			$post_type = get_post_type_object( 'indieblock_note' );
+			$post_type = get_post_type_object( 'indieblocks_note' );
 
 			if ( ! empty( $post_type->rewrite['slug'] ) ) {
 				$example_front = $post_type->rewrite['slug'];
 			}
 		} elseif ( ! empty( $this->options['enable_likes'] ) ) {
-			$post_type = get_post_type_object( 'indieblock_like' );
+			$post_type = get_post_type_object( 'indieblocks_like' );
 
 			if ( ! empty( $post_type->rewrite['slug'] ) ) {
 				$example_front = $post_type->rewrite['slug'];

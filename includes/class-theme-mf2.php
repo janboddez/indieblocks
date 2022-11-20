@@ -638,7 +638,7 @@ class Theme_Mf2 {
 			$width,
 			$height,
 			$classes,
-			! empty( $args['extra_attr'] ) ? $args['extra_attr'] : '',
+			! empty( $args['extra_attr'] ) ? $args['extra_attr'] : ''
 		);
 	}
 }

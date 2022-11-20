@@ -67,10 +67,10 @@ class Webmention_Sender {
 		}
 
 		if ( $schedule ) {
-			// Schedule the actual sending out webmentions) in the background.
+			// Schedule sending out the actual webmentions.
 			wp_schedule_single_event( time() + wp_rand( 0, 300 ), 'indieblocks_webmention_send', array( $post->ID ) );
 
-			update_post_meta( $post->ID, '_indieblocks_webmention', 'scheduled' );
+			add_post_meta( $post->ID, '_indieblocks_webmention', 'scheduled', true ); // Does not affect existing values.
 		}
 	}
 
@@ -193,9 +193,8 @@ class Webmention_Sender {
 		$doc = new \DOMDocument();
 		$doc->loadHTML( $html );
 
-		$xpath   = new \DOMXPath( $doc );
-		$wp_host = wp_parse_url( home_url(), PHP_URL_HOST );
-		$urls    = array();
+		$xpath = new \DOMXPath( $doc );
+		$urls  = array();
 
 		foreach ( $xpath->query( '//a/@href' ) as $result ) {
 			$urls[] = $result->value;

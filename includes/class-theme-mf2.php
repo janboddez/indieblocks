@@ -625,24 +625,20 @@ class Theme_Mf2 {
 			return null;
 		}
 
-		$classes   = ! empty( $args['class'] ) ? (array) $args['class'] : array();
-		$classes[] = 'avatar photo';
-		$classes   = trim( implode( ' ', $classes ) );
-
 		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );
 		$height = (int) ( ! empty( $args['height'] ) ? $args['height'] : 96 );
 
-		// @todo: Have another look at all possible arguments, and cache or
-		// proxy these images!
-		// We could download these images, set filenames based on their URL hash,
-		// store all that in an avatars folder.
+		$classes   = ! empty( $args['class'] ) ? (array) $args['class'] : array();
+		$classes[] = "avatar avatar-{$width} photo";
+		$classes   = trim( implode( ' ', $classes ) );
+
 		return sprintf(
 			'<img src="%s" width="%d" height="%d" class="%s" %s/>',
 			esc_url( $url ),
 			$width,
 			$height,
 			$classes,
-			'style="border-radius: ' . ( $width / 2 ) . 'px;"'
+			! empty( $args['extra_attr'] ) ? $args['extra_attr'] : '',
 		);
 	}
 }

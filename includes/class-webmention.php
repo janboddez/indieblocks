@@ -14,18 +14,20 @@ class Webmention {
 	/**
 	 * Database table version.
 	 */
-	const DB_VERSION = '2.0';
+	const DB_VERSION = '3.0';
 
 	/**
 	 * Registers hook callbacks.
 	 */
 	public static function register() {
-		// Schedule WP-Cron job.
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
 		add_action( 'transition_post_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
+
+		add_action( 'admin_enqueue_scripts', array( Webmention_Sender::class, 'enqueue_scripts' ) );
+		add_action( 'wp_ajax_indieblocks_webmention_resend', array( Webmention_Sender::class, 'reschedule_webmention' ) );
 
 		add_action( 'add_meta_boxes_comment', array( Webmention_Receiver::class, 'add_meta_box' ) );
 		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_route' ) );
@@ -88,6 +90,7 @@ class Webmention {
 				ip varchar(100) DEFAULT '' NOT NULL,
 				status varchar(20) DEFAULT '' NOT NULL,
 				created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+				modified_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 				PRIMARY KEY (id)
 			) $charset_collate;";
 

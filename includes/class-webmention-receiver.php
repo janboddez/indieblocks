@@ -87,7 +87,7 @@ class Webmention_Receiver {
 		}
 
 		error_log( '[Indieblocks/Webmention] Could not insert mention into database.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		return new \WP_Error( 'invalid_request', 'Invalid source or target', array( 'status' => 400 ) );
+		return new \WP_Error( 'server_error', 'Internal server error', array( 'status' => 500 ) );
 	}
 
 	/**
@@ -105,9 +105,36 @@ class Webmention_Receiver {
 		}
 
 		foreach ( $webmentions as $webmention ) {
-			error_log( "[Indieblocks/Webmention] Fetching the page at {$webmention->source}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			$update = false;
+
+			// Look for an existing comment with this source URL, see if it
+			// needs updated or deleted.
+			$query = new \WP_Comment_Query(
+				array(
+					'comment_post_ID' => $webmention->post_id,
+					'orderby'         => 'comment_ID',
+					'order'           => 'DESC',
+					'fields'          => 'ids',
+					'limit'           => 1,
+					'meta_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+						'relation' => 'AND',
+						array(
+							'key'     => 'indieblocks_webmention_source',
+							'compare' => 'EXISTS',
+						),
+						array(
+							'key'     => 'indieblocks_webmention_source',
+							'compare' => '=',
+							'value'   => esc_url( $webmention->source ),
+						),
+					),
+				)
+			);
+
+			$comments = $query->comments;
 
 			// Fetch source HTML.
+			error_log( "[Indieblocks/Webmention] Fetching the page at {$webmention->source}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			$response = remote_get( $webmention->source );
 
 			if ( is_wp_error( $response ) ) {
@@ -116,6 +143,33 @@ class Webmention_Receiver {
 				// Something went wrong.
 				error_log( $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				continue;
+			}
+
+			if ( ! empty( $comments ) && is_array( $comments ) ) {
+				$update     = true;
+				$comment_id = reset( $comments );
+
+				error_log( "[Indieblocks/Webmention] Found an existing comment ({$comment_id}) for this mention." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+				if ( in_array( wp_remote_retrieve_response_code( $response ), array( 404, 410 ), true ) ) {
+					// Delete instead.
+					if ( wp_delete_comment( $comment_id ) ) {
+						$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+							$table_name,
+							array(
+								'status'      => 'deleted',
+								'modified_at' => current_time( 'mysql' ),
+							),
+							array( 'id' => $webmention->id ),
+							null,
+							array( '%d' )
+						);
+					} else {
+						error_log( "[Indieblocks/Webmention] Something went wrong deleting comment {$comment_id} for source URL (" . esc_url_raw( $webmention->source ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					}
+
+					continue;
+				}
 			}
 
 			$html   = wp_remote_retrieve_body( $response );
@@ -127,9 +181,12 @@ class Webmention_Receiver {
 				// Target URL not (or no longer) mentioned by source. Mark webmention as processed.
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					$table_name,
-					array( 'status' => 'invalid' ),
+					array(
+						'status'      => 'invalid',
+						'modified_at' => current_time( 'mysql' ),
+					),
 					array( 'id' => $webmention->id ),
-					array( '%s' ),
+					null,
 					array( '%d' )
 				);
 
@@ -168,17 +225,26 @@ class Webmention_Receiver {
 			remove_action( 'check_comment_flood', 'check_comment_flood_db' );
 
 			// Insert new comment.
-			$comment_id = wp_new_comment( $commentdata, true );
+			if ( $update ) {
+				$commentdata['comment_ID']       = $comment_id;
+				$commentdata['comment_approved'] = '0'; // Force re-approval, for now. To do: We should do this only if the content has changed.
+
+				error_log( "[Indieblocks/Webmention] Updating comment {$comment_id}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				$result = wp_update_comment( $commentdata, true );
+			} else {
+				error_log( '[Indieblocks/Webmention] Creating new comment.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				$result = wp_new_comment( $commentdata, true );
+			}
 
 			// Default status. "Complete" means "done processing," rather than
 			// 'success'.
-			$status = 'complete';
+			$status = $update ? 'updated' : 'created';
 
-			if ( is_wp_error( $comment_id ) ) {
+			if ( is_wp_error( $result ) ) {
 				// For troubleshooting.
 				error_log( print_r( $comment_id, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
-				if ( in_array( 'comment_duplicate', $comment_id->get_error_codes(), true ) ) {
+				if ( in_array( 'comment_duplicate', $result->get_error_codes(), true ) ) {
 					// Log if deemed duplicate. Could come in useful if we ever
 					// wanna support "updated" webmentions.
 					$status = 'duplicate';
@@ -188,9 +254,12 @@ class Webmention_Receiver {
 			// Mark webmention as processed.
 			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				$table_name,
-				array( 'status' => $status ),
+				array(
+					'status'      => $status,
+					'modified_at' => current_time( 'mysql' ),
+				),
 				array( 'id' => $webmention->id ),
-				array( '%s' ),
+				null,
 				array( '%d' )
 			);
 

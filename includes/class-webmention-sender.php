@@ -302,7 +302,7 @@ class Webmention_Sender {
 
 		// Add meta box, for those post types that are supported.
 		add_meta_box(
-			'indieblocks',
+			'indieblocks-webmention',
 			__( 'Webmention', 'indieblocks' ),
 			array( __CLASS__, 'render_meta_box' ),
 			static::get_supported_post_types(),
@@ -321,34 +321,114 @@ class Webmention_Sender {
 		$webmention = get_post_meta( $post->ID, '_indieblocks_webmention', true );
 
 		if ( ! empty( $webmention ) && is_array( $webmention ) ) :
+			wp_nonce_field( basename( __FILE__ ), 'indieblocks_webmention_nonce' );
+
 			?>
-			<ul>
-				<?php foreach ( $webmention as $data ) : ?>
-					<li>
-						<?php
-						if ( ! empty( $data['endpoint'] ) ) {
-							if ( ! empty( $data['sent'] ) ) {
-								/* translators: 1: Webmention endpoint 2: Date sent */
-								printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
-							} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
-								/* translators: Webmention endpoint */
-								printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-							} elseif ( ! empty( $data['retries'] ) ) {
-								/* translators: Webmention endpoint */
-								printf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-							}
-						}
-						?>
-					</li>
-				<?php endforeach; ?>
-			</ul>
+			<div style="display: flex; align-items: start; justify-content: space-between;">
+				<ul style="margin: 0 0 6px;">
+					<?php
+					foreach ( $webmention as $data ) :
+						if ( ! empty( $data['endpoint'] ) ) :
+							?>
+							<li>
+								<?php
+								if ( ! empty( $data['sent'] ) ) {
+									/* translators: 1: Webmention endpoint 2: Date sent */
+									printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
+								} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
+									/* translators: Webmention endpoint */
+									printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+								} elseif ( ! empty( $data['retries'] ) ) {
+									/* translators: Webmention endpoint */
+									printf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+								}
+								?>
+							</li>
+							<?php
+						endif;
+					endforeach;
+					?>
+				</ul>
+
+				<button class="button indieblocks-webmention-resend" data-post-id="<?php echo esc_attr( $post->ID ); ?>" title="<?php esc_attr_e( 'Reset webmention history, and reschedule', 'indieblocks' ); ?>"><?php esc_html_e( 'Resend', 'indieblocks' ); ?></button>
+			</div>
+		<?php elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) : // Unsure why `wp_next_scheduled()` won't work. ?>
+			<p style="margin: 0 0 6px;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>
+		<?php else : ?>
+			<p style="margin: 0 0 6px;"><?php esc_html_e( 'No endpoints found.', 'indieblocks' ); ?></p>
 			<?php
-		elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) :
-			// Unsure why `wp_next_scheduled()` won't work.
-			esc_html_e( 'Webmention scheduled.', 'indieblocks' );
-		else :
-			esc_html_e( 'No endpoints found.', 'indieblocks' );
 		endif;
+	}
+
+	/**
+	 * Adds admin scripts and styles.
+	 *
+	 * @param string $hook_suffix Current admin page.
+	 */
+	public static function enqueue_scripts( $hook_suffix ) {
+		if ( 'post-new.php' !== $hook_suffix && 'post.php' !== $hook_suffix ) {
+			// Not an "Edit Post" screen.
+			return;
+		}
+
+		global $post;
+
+		if ( empty( $post ) ) {
+			// Can't do much without a `$post` object.
+			return;
+		}
+
+		if ( ! in_array( $post->post_type, static::get_supported_post_types(), true ) ) {
+			// Unsupported post type.
+			return;
+		}
+
+		// Enqueue CSS and JS.
+		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/indieblocks-webmention.js', dirname( __FILE__ ) ), array( 'jquery' ), '0.3.3', false );
+		wp_localize_script(
+			'indieblocks-webmention',
+			'indieblocks_webmention_obj',
+			array(
+				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
+			)
+		);
+	}
+
+	/**
+	 * Reschedules a previously sent webmention.
+	 *
+	 * Should only ever be called through AJAX.
+	 */
+	public static function reschedule_webmention() {
+		if ( ! isset( $_POST['indieblocks_webmention_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['indieblocks_webmention_nonce'] ), basename( __FILE__ ) ) ) {
+			status_header( 400 );
+			esc_html_e( 'Missing or invalid nonce.', 'indieblocks' );
+			wp_die();
+		}
+
+		if ( ! isset( $_POST['post_id'] ) || ! ctype_digit( $_POST['post_id'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			status_header( 400 );
+			esc_html_e( 'Missing or incorrect post ID.', 'indieblocks' );
+			wp_die();
+		}
+
+		$post_id = (int) $_POST['post_id'];
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			status_header( 400 );
+			esc_html_e( 'Insufficient rights.', 'indieblocks' );
+			wp_die();
+		}
+
+		if ( '' !== get_post_meta( $post_id, '_indieblocks_webmention', true ) ) {
+			// Delete webmention history.
+			delete_post_meta( $post_id, '_indieblocks_webmention' );
+		}
+
+		$post = get_post( $post_id );
+		static::schedule_webmention( $post->post_status, $post->post_status, $post );
+
+		wp_die();
 	}
 
 	/**

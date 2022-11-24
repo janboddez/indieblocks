@@ -8,8 +8,8 @@ jQuery( document ).ready( function ( $ ) {
 		};
 
 		$.post( ajaxurl, data, function( response ) {
+			button.parent().find( 'p' ).remove();
 			button.parent().append( '<p style="margin: 0 0 6px;">' + indieblocks_webmention_obj.message + '</p>' );
-			button.parent().find( 'ul' ).remove();
 			button.remove();
 		} );
 	} );

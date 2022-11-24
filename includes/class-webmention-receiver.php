@@ -211,7 +211,7 @@ class Webmention_Receiver {
 				'user_id'              => 0,
 				'comment_date'         => $webmention->created_at,
 				'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
-				'comment_type'         => '',
+				'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
 				'comment_meta'         => array(
 					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
 				),

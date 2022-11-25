@@ -222,7 +222,6 @@ class Options_Handler {
 			'location_functions'  => isset( $settings['location_functions'] ) ? true : false,
 			'micropub'            => isset( $settings['micropub'] ) ? true : false,
 			'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
-			'webmention'          => isset( $settings['webmention'] ) ? true : false,
 		);
 
 		$this->options = array_merge(

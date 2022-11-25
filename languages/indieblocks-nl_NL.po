@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-11-19T14:13:10+00:00\n"
-"PO-Revision-Date: 2022-11-19 15:15+0100\n"
+"POT-Creation-Date: 2022-11-25T23:03:04+00:00\n"
+"PO-Revision-Date: 2022-11-26 00:05+0100\n"
 "Language: nl_NL\n"
 "X-Generator: Poedit 2.4\n"
 "X-Domain: indieblocks\n"
@@ -18,9 +18,9 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 #. Plugin Name of the plugin
-#: includes/class-options-handler.php:85
 #: includes/class-options-handler.php:86
-#: includes/class-options-handler.php:241
+#: includes/class-options-handler.php:87
+#: includes/class-options-handler.php:243
 msgid "IndieBlocks"
 msgstr "IndieBlocks"
 
@@ -100,207 +100,219 @@ msgstr "Als antwoord op %s."
 msgid "Reposted %s."
 msgstr "Herpostte %s."
 
-#: includes/class-options-handler.php:250
+#: includes/class-options-handler.php:252
 msgid "Microformats and Blocks"
 msgstr "Microformats en blokken"
 
-#: includes/class-options-handler.php:251
-#: includes/class-options-handler.php:332
+#: includes/class-options-handler.php:253
+#: includes/class-options-handler.php:334
 msgid "Post Types"
 msgstr "Berichttypes"
 
-#: includes/class-options-handler.php:252
-#: includes/class-options-handler.php:327
-#: includes/class-webmention-receiver.php:208
-#: includes/class-webmention-sender.php:307
+#: includes/class-options-handler.php:254
+#: includes/class-options-handler.php:329
+#: includes/class-webmention-receiver.php:277
+#: includes/class-webmention-sender.php:314
 msgid "Webmention"
 msgstr "Webmention"
 
-#: includes/class-options-handler.php:253
+#: includes/class-options-handler.php:255
 msgid "Miscellaneous"
 msgstr "Diverse"
 
-#: includes/class-options-handler.php:259
+#: includes/class-options-handler.php:261
 msgid "Blocks"
 msgstr "Blokken"
 
-#: includes/class-options-handler.php:260
+#: includes/class-options-handler.php:262
 msgid "Enable blocks"
 msgstr "Blokken inschakelen"
 
-#: includes/class-options-handler.php:261
+#: includes/class-options-handler.php:263
 msgid "Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!"
 msgstr "Introduceert een &lsquo;Context&rsquo;-blok dat aan replies, likes enz. de correcte microformats toevoegt. Meer zulke &lsquo;IndieWeb&rsquo;-blokken zijn onderweg!"
 
-#: includes/class-options-handler.php:264
+#: includes/class-options-handler.php:266
 msgid "Microformats"
 msgstr "Microformats"
 
-#: includes/class-options-handler.php:265
+#: includes/class-options-handler.php:267
 msgid "Enable microformats"
 msgstr "Microformats inschakelen"
 
-#: includes/class-options-handler.php:266
+#: includes/class-options-handler.php:268
 msgid "(Experimental) Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor."
 msgstr "(Experimenteel) Voegt microformats2 toe aan de frontend van je site. Vereist dat het actieve thema WordPress&rsquo; nieuwe Site Editor ondersteunt."
 
-#: includes/class-options-handler.php:274
+#: includes/class-options-handler.php:276
 msgid "Custom Post Types"
 msgstr "Custom berichttypes"
 
-#: includes/class-options-handler.php:275
+#: includes/class-options-handler.php:277
 msgid "Enable &ldquo;Notes&rdquo;"
 msgstr "&lsquo;Notes&rsquo; inschakelen"
 
-#: includes/class-options-handler.php:276
-#: includes/class-options-handler.php:282
+#: includes/class-options-handler.php:278
+#: includes/class-options-handler.php:284
 msgid "Include in main feed"
 msgstr "Aan hoofdfeed toevoegen"
 
-#: includes/class-options-handler.php:277
-#: includes/class-options-handler.php:283
+#: includes/class-options-handler.php:279
+#: includes/class-options-handler.php:285
 msgid "Show on blog page"
 msgstr "Op blogpagina tonen"
 
-#: includes/class-options-handler.php:278
+#: includes/class-options-handler.php:280
 msgid "Enable categories and tags"
 msgstr "Categorieën en tags inschakelen"
 
-#: includes/class-options-handler.php:281
+#: includes/class-options-handler.php:283
 msgid "Enable &ldquo;Likes&rdquo;"
 msgstr "&lsquo;Likes&rsquo; inschakelen"
 
-#: includes/class-options-handler.php:286
+#: includes/class-options-handler.php:288
 msgid "Random Slugs"
 msgstr "Willekeurige slugs"
 
-#: includes/class-options-handler.php:287
+#: includes/class-options-handler.php:289
 msgid "Generate random slugs"
 msgstr "Willekeurige slugs genereren"
 
-#: includes/class-options-handler.php:288
+#: includes/class-options-handler.php:290
 msgid "Autogenerate unique note and like slugs. Disable for WordPress&rsquo; default behavior."
 msgstr "Automatisch note- en like-slugs genereren. Zet dit uit als je WordPress&rsquo; standaardgedrag verkiest."
 
-#: includes/class-options-handler.php:291
+#: includes/class-options-handler.php:293
 msgid "Autogenerate Titles"
 msgstr "Automatisch titels genereren"
 
-#: includes/class-options-handler.php:292
+#: includes/class-options-handler.php:294
 msgid "Automatically generate titles"
 msgstr "Automatisch titels genereren"
 
-#: includes/class-options-handler.php:293
+#: includes/class-options-handler.php:295
 msgid "Autogenerate note and like titles. (Your theme should probably hide these, still.)"
 msgstr "Genereer automatisch note- en like-titels. (Je thema zou deze vervolgens moeten verbergen.)"
 
-#: includes/class-options-handler.php:296
+#: includes/class-options-handler.php:298
 msgid "Hide Titles"
 msgstr "Titels verbergen"
 
-#: includes/class-options-handler.php:297
+#: includes/class-options-handler.php:299
 msgid "Hide note and like titles"
 msgstr "Note- en like-titels verbergen"
 
-#: includes/class-options-handler.php:298
+#: includes/class-options-handler.php:300
 msgid "(Experimental) Attempts to hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor."
 msgstr "(Experimenteel) Probeert van notes en likes de titel te verbergen, als je ook microformats hebt ingeschakeld en je thema de Full-Site Editor ondersteunt."
 
-#: includes/class-options-handler.php:302
+#: includes/class-options-handler.php:304
 msgid "Date-Based Archives"
 msgstr "Datumarchieven"
 
-#: includes/class-options-handler.php:303
+#: includes/class-options-handler.php:305
 msgid "Enable date-based archives"
 msgstr "Datumarchieven inschakelen"
 
-#: includes/class-options-handler.php:304
+#: includes/class-options-handler.php:306
 msgid "(Experimental) Enable year, month, and day archives for notes and likes."
 msgstr "(Experimenteel) Jaar-, maand- en dagarchieven voor notes en likes inschakelen"
 
-#: includes/class-options-handler.php:307
+#: includes/class-options-handler.php:309
 msgid "Permalink Format"
 msgstr "Permalinkformaat"
 
-#: includes/class-options-handler.php:312
+#: includes/class-options-handler.php:314
 msgid "(Experimental) Set a custom note and like permalink format."
 msgstr "(Experimenteel) Een custom permalinkformaat instellen voor notes en likes."
 
-#: includes/class-options-handler.php:316
+#: includes/class-options-handler.php:318
 msgid "Feed Modifications"
 msgstr "Feedwijzigingen"
 
-#: includes/class-options-handler.php:317
+#: includes/class-options-handler.php:319
 msgid "Modify feeds"
 msgstr "Feeds wijzigen"
 
-#: includes/class-options-handler.php:318
+#: includes/class-options-handler.php:320
 msgid "(Experimental) Remove note and like titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates."
 msgstr "(Experimenteel) Laat note- en like-titels weg uit RSS- and Atomfeeds. Dit kan feedreaders helpen om ze als &lsquo;notes,&rsquo; te herkennen, maar zou tot een conflict met bestaande custom feedtemplates kunnen leiden."
 
-#: includes/class-options-handler.php:328
+#: includes/class-options-handler.php:330
 msgid "Enable Webmention"
 msgstr "Webmention inschakelen"
 
-#: includes/class-options-handler.php:329
+#: includes/class-options-handler.php:331
 msgid "(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same."
 msgstr "(Experimenteel) Laat pagina&rsquo;s waarnaar je hebt gelinkt automatisch iets weten, en laat toe dat andere websites hetzelfde doen."
 
-#: includes/class-options-handler.php:337
+#: includes/class-options-handler.php:339
 msgid "The post types for which webmentions (outgoing and incoming) should be enabled."
 msgstr "De berichttypes waarvoor (uitgaande en inkomende) webmentions moeten worden ingeschakeld."
 
-#: includes/class-options-handler.php:346
+#: includes/class-options-handler.php:343
+msgid "Avatars"
+msgstr "Avatars"
+
+#: includes/class-options-handler.php:344
+msgid "Cache avatars"
+msgstr "Avatars cachen"
+
+#: includes/class-options-handler.php:345
+msgid "(Experimental) Attempt to locally cache avatars. Uncheck to disable webmention avatars altogether."
+msgstr "(Experimenteel) Probeer avatars lokaal te cachen. Vink uit om webmention-avatars volledig uit te schakelen."
+
+#: includes/class-options-handler.php:353
 msgid "Featured Images"
 msgstr "Uitgelichte afbeeldingen"
 
-#: includes/class-options-handler.php:347
+#: includes/class-options-handler.php:354
 msgid "Add Featured Images to feeds"
 msgstr "Uitgelichte afbeeldingen aan feeds toevoegen"
 
-#: includes/class-options-handler.php:348
+#: includes/class-options-handler.php:355
 msgid "(Experimental) Prepend Featured Images to feed items."
 msgstr "(Experimenteel) Voegt uitgelichte afbeeldingen aan feed items toe."
 
-#: includes/class-options-handler.php:351
+#: includes/class-options-handler.php:358
 msgid "Location and Weather"
 msgstr "Locatie en weer"
 
-#: includes/class-options-handler.php:352
+#: includes/class-options-handler.php:359
 msgid "Enable location functions"
 msgstr "Locatiefuncties inschakelen"
 
-#: includes/class-options-handler.php:353
+#: includes/class-options-handler.php:360
 msgid "(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts."
 msgstr "(Experimenteel) Eenvoudige locatie- en weergegevens &ndash; die nog niet op de frontend worden getoond &ndash; aan berichten toevoegen."
 
-#: includes/class-options-handler.php:356
+#: includes/class-options-handler.php:363
 msgid "Micropub"
 msgstr "Micropub"
 
-#: includes/class-options-handler.php:357
+#: includes/class-options-handler.php:364
 msgid "Deeper Micropub integration"
 msgstr "Diepere Micropubintegratie"
 
-#: includes/class-options-handler.php:358
+#: includes/class-options-handler.php:365
 msgid "(Experimental) Add post type and category data to responses to Micropub &ldquo;config&rdquo; queries."
 msgstr "(Experimenteel) Berichttype- en categorie-data aan responses op Micropub-&lsquo;config&rsquo;-queries toevoegen."
 
-#: includes/class-options-handler.php:361
-#: includes/class-options-handler.php:362
+#: includes/class-options-handler.php:368
+#: includes/class-options-handler.php:369
 msgid "Parse Markdown"
 msgstr "Markdown parsen"
 
-#: includes/class-options-handler.php:363
+#: includes/class-options-handler.php:370
 msgid "(Experimental) Parse Markdown inside &ldquo;Micropub&rdquo; notes or likes."
 msgstr "(Experimenteel) Markdown in &ldquo;Micropub&rdquo;-notes of -likes parsen."
 
-#: includes/class-options-handler.php:436
+#: includes/class-options-handler.php:443
 #: includes/class-post-types.php:80
 msgid "notes"
 msgstr "notes"
 
-#: includes/class-options-handler.php:454
+#: includes/class-options-handler.php:461
 msgid "sample-post"
 msgstr "voorbeeldbericht"
 
@@ -401,46 +413,67 @@ msgstr "&hellip; vond dit leuk!"
 msgid "&hellip; reposted this!"
 msgstr "&hellip; herpostte dit!"
 
-#: includes/class-webmention-receiver.php:152
+#: includes/class-webmention-receiver.php:209
 msgid "&hellip; commented on this."
 msgstr "&hellip; reageerde hierop."
 
-#: includes/class-webmention-receiver.php:226
+#: includes/class-webmention-receiver.php:295
 msgid "Source"
 msgstr "Bron"
 
-#: includes/class-webmention-receiver.php:229
+#: includes/class-webmention-receiver.php:298
 #: blocks/context/block.js:70
 msgid "Type"
 msgstr "Type"
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:333
+#: includes/class-webmention-sender.php:348
 msgid "Sent to %1$s on %2$s."
 msgstr "Verstuurd naar %1$s op %2$s."
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:333
+#: includes/class-webmention-sender.php:348
 msgid "M j, Y \\a\\t H:i"
 msgstr "j/m/Y \\o\\m H:i"
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:336
+#: includes/class-webmention-sender.php:351
 msgid "Could not send webmention to %s."
 msgstr "Kon webmention niet versturen naar %s."
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:339
+#: includes/class-webmention-sender.php:354
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr "Kon webmention niet versturen naar %s. Probeer het binnenkort opnieuw."
 
-#: includes/class-webmention-sender.php:349
+#: includes/class-webmention-sender.php:363
+msgid "Reset webmention history, and reschedule"
+msgstr "Webmentiongeschiedenis resetten, en opnieuw plannen"
+
+#: includes/class-webmention-sender.php:363
+msgid "Resend"
+msgstr "Opnieuw verzenden"
+
+#: includes/class-webmention-sender.php:366
+#: includes/class-webmention-sender.php:402
 msgid "Webmention scheduled."
 msgstr "Webmention gepland."
 
-#: includes/class-webmention-sender.php:351
+#: includes/class-webmention-sender.php:368
 msgid "No endpoints found."
 msgstr "Geen endpoints gevonden."
+
+#: includes/class-webmention-sender.php:415
+msgid "Missing or invalid nonce."
+msgstr "Ontbrekende of ongeldige nonce."
+
+#: includes/class-webmention-sender.php:421
+msgid "Missing or incorrect post ID."
+msgstr "Ontbrekend of onjuist post-ID."
+
+#: includes/class-webmention-sender.php:429
+msgid "Insufficient rights."
+msgstr "Onvoldoende rechten."
 
 #: blocks/context/block.json
 msgctxt "block title"

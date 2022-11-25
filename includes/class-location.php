@@ -99,6 +99,11 @@ class Location {
 			return;
 		}
 
+		/* @see https://github.com/WordPress/gutenberg/issues/15094#issuecomment-1021288811. */
+		if ( ! empty( $_REQUEST['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
 		if ( ! isset( $_POST['indieblocks_loc_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['indieblocks_loc_nonce'] ), basename( __FILE__ ) ) ) {
 			// Nonce missing or invalid.
 			return;
@@ -141,6 +146,11 @@ class Location {
 	 */
 	public static function set_location( $new_status, $old_status, $post ) {
 		if ( wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ) {
+			return;
+		}
+
+		/* @see https://github.com/WordPress/gutenberg/issues/15094#issuecomment-1021288811. */
+		if ( ! empty( $_REQUEST['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 

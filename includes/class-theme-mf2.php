@@ -20,12 +20,12 @@ class Theme_Mf2 {
 		add_filter( 'body_class', array( __CLASS__, 'add_body_class' ), 99 );
 		add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 99 );
 		add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 99 );
+		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
+		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 
 		add_action( 'init', array( __CLASS__, 'deregister_core_blocks' ), 1 );
 		add_action( 'init', array( __CLASS__, 'reregister_core_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'deregister_gutenberg_blocks' ) );
-
-		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 	}
 
 	/**
@@ -594,6 +594,23 @@ class Theme_Mf2 {
 			esc_attr( get_comment_date( 'c', $comment ) ),
 			$formatted_date
 		);
+	}
+
+	/**
+	 * Filter comment links.
+	 *
+	 * @param  string     $link    The comment permalink with '#comment-$id' appended.
+	 * @param  WP_Comment $comment The current comment object.
+	 * @return string              Comment link.
+	 */
+	public static function get_comment_link( $link, $comment ) {
+		$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
+
+		if ( empty( $source ) ) {
+			return $link;
+		}
+
+		return $source;
 	}
 
 	/**

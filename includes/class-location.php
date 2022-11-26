@@ -221,6 +221,8 @@ class Location {
 			set_transient( "indieblocks_loc_{$lat}_{$lon}", $location, WEEK_IN_SECONDS );
 		}
 
+		$geo_address = '';
+
 		if ( ! empty( $location['address']['town'] ) ) {
 			$geo_address = $location['address']['town'];
 		} elseif ( ! empty( $location['address']['city'] ) ) {

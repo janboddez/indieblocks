@@ -333,7 +333,7 @@ class Webmention_Parser {
 				// Somehow not a valid image. Delete it.
 				unlink( $file_path );
 
-				error_log( '[IndieBlocks/Webmention] Invalid image file: ' . esc_url_raw( $attachment_url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[IndieBlocks/Webmention] Invalid image file: ' . esc_url_raw( $url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return null;
 			}
 

@@ -345,7 +345,7 @@ class Webmention_Sender {
 
 							if ( ! empty( $data['sent'] ) ) {
 								/* translators: 1: Webmention endpoint 2: Date sent */
-								printf( __( 'Sent to %1$s on %2$s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer" title="' . $data['target'] . '">' . $data['endpoint'] . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
+								printf( __( 'Sent to %1$s on %2$s. Response code: %3$d.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer" title="' . $data['target'] . '">' . $data['endpoint'] . '</a>', date( __( 'M j, Y \a\t H:i', 'indieblocks' ), strtotime( $data['sent'] ) ), $data['code'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.DateTime.RestrictedFunctions.date_date
 							} elseif ( ! empty( $data['retries'] ) && $data['retries'] >= 3 ) {
 								/* translators: Webmention endpoint */
 								printf( __( 'Could not send webmention to %s.', 'indieblocks' ), '<a href="' . $data['endpoint'] . '" target="_blank" rel="noopener noreferrer" title="' . $data['target'] . '">' . $data['endpoint'] . '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -360,7 +360,7 @@ class Webmention_Sender {
 					?>
 				</p>
 
-				<button class="button indieblocks-webmention-resend" data-post-id="<?php echo esc_attr( $post->ID ); ?>" title="<?php esc_attr_e( 'Reset webmention history, and reschedule', 'indieblocks' ); ?>"><?php esc_html_e( 'Resend', 'indieblocks' ); ?></button>
+				<button type="button" class="button indieblocks-webmention-resend" data-post-id="<?php echo esc_attr( $post->ID ); ?>" title="<?php esc_attr_e( 'Reset webmention history, and reschedule', 'indieblocks' ); ?>"><?php esc_html_e( 'Resend', 'indieblocks' ); ?></button>
 			</div>
 		<?php elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) : // Unsure why `wp_next_scheduled()` won't work. ?>
 			<p style="margin: 0 0 6px;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>

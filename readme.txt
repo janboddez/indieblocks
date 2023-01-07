@@ -1,8 +1,8 @@
 === IndieBlocks ===
 Contributors: janboddez
-Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse
+Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse, site editor
 Tested up to: 6.1
-Stable tag: 0.3.5
+Stable tag: 0.3.6
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,9 +20,11 @@ Upload this plugin's ZIP file via the Plugins > Add New > "Upload Plugin" button
 
 After activation, head over to *Settings > IndieBlocks*, and enable or disable its different features.
 
-More details can be found on [https://jan.boddez.net/wordpress/indieblocks](https://jan.boddez.net/wordpress/indieblocks). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
+More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.3.6 =
+Minor bug fix, new plugin URL.
 = 0.3.5 =
 Fix rescheduling of webmentions from the classic editor.
 = 0.3.4 =

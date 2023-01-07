@@ -242,7 +242,7 @@ class Webmention_Receiver {
 
 			if ( is_wp_error( $result ) ) {
 				// For troubleshooting.
-				error_log( print_r( $comment_id, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				error_log( print_r( $result, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 				if ( in_array( 'comment_duplicate', $result->get_error_codes(), true ) ) {
 					// Log if deemed duplicate. Could come in useful if we ever

@@ -6,6 +6,7 @@ use Isolated\Symfony\Component\Finder\Finder;
 
 return [
     'prefix' => 'IndieBlocks',
+    'output-dir' => 'build',
     // For more see: https://github.com/humbug/php-scoper#finders-and-paths
     'finders' => [
         Finder::create()

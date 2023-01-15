@@ -26,8 +26,9 @@ class Webmention {
 		add_action( 'transition_post_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
 
-		add_action( 'admin_enqueue_scripts', array( Webmention_Sender::class, 'enqueue_scripts' ) );
-		add_action( 'wp_ajax_indieblocks_webmention_resend', array( Webmention_Sender::class, 'reschedule_webmention' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'wp_ajax_indieblocks_resend_webmention', array( Webmention_Sender::class, 'reschedule_webmention' ) );
+		add_action( 'wp_ajax_indieblocks_delete_avatar', array( Webmention_Receiver::class, 'delete_avatar' ) );
 
 		add_action( 'add_meta_boxes_comment', array( Webmention_Receiver::class, 'add_meta_box' ) );
 		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_route' ) );
@@ -101,5 +102,58 @@ class Webmention {
 			// Store current database version.
 			update_option( 'indieblocks_webmention_db_version', self::DB_VERSION );
 		}
+	}
+
+	/**
+	 * Adds admin scripts and styles.
+	 *
+	 * @param string $hook_suffix Current admin page.
+	 */
+	public static function enqueue_scripts( $hook_suffix ) {
+		$include = false;
+
+		if ( 'post-new.php' === $hook_suffix || 'post.php' === $hook_suffix ) {
+			global $post;
+
+			if ( empty( $post ) ) {
+				// Can't do much without a `$post` object.
+				return;
+			}
+
+			if ( ! in_array( $post->post_type, static::get_supported_post_types(), true ) ) {
+				// Unsupported post type.
+				return;
+			}
+
+			$include = true;
+		}
+
+		if ( ! $include && 'comment.php' !== $hook_suffix ) {
+			return;
+		}
+
+		// Enqueue CSS and JS.
+		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/indieblocks-webmention.js', dirname( __FILE__ ) ), array( 'jquery' ), IndieBlocks::VERSION, false );
+		wp_localize_script(
+			'indieblocks-webmention',
+			'indieblocks_webmention_obj',
+			array(
+				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
+			)
+		);
+	}
+
+	/**
+	 * Returns post types that support Webmention.
+	 *
+	 * @return array Supported post types.
+	 */
+	public static function get_supported_post_types() {
+		$options = get_options();
+
+		$supported_post_types = isset( $options['webmention_post_types'] ) ? $options['webmention_post_types'] : array( 'post', 'indieblocks_note' );
+		$supported_post_types = (array) apply_filters( 'indieblocks_webmention_post_types', $supported_post_types );
+
+		return $supported_post_types;
 	}
 }

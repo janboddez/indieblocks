@@ -78,10 +78,10 @@ class Webmention_Parser {
 		// Add author avatar.
 		if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0]['value'] ) ) {
 			// Attempt to locally store avatar.
-			$avatar_path = static::store_avatar( $hentry['properties']['author'][0]['properties']['photo'][0]['value'] );
+			$avatar_url = static::store_avatar( $hentry['properties']['author'][0]['properties']['photo'][0]['value'] );
 
-			if ( ! empty( $avatar_path ) ) {
-				$commentdata['comment_meta']['indieblocks_webmention_avatar'] = $avatar_path;
+			if ( ! empty( $avatar_url ) ) {
+				$commentdata['comment_meta']['indieblocks_webmention_avatar'] = $avatar_url;
 			}
 		}
 
@@ -307,6 +307,7 @@ class Webmention_Parser {
 			$body = wp_remote_retrieve_body( $response );
 
 			if ( empty( $body ) ) {
+				error_log( '[IndieBlocks/Webmention] Could not download the image at ' . esc_url_raw( $url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return null;
 			}
 
@@ -325,7 +326,7 @@ class Webmention_Parser {
 			}
 
 			if ( ! function_exists( 'wp_crop_image' ) ) {
-				// Load image functions.
+				// Load WordPress' image functions.
 				require_once ABSPATH . 'wp-admin/includes/image.php';
 			}
 
@@ -344,10 +345,10 @@ class Webmention_Parser {
 				$image->resize( 150, 150, true );
 				$image->save( $file_path );
 			} else {
-				error_log( '[IndieBlocks/Webmention] Something went wrong resizing the avatar (' . $file_path . '): ' . $image->get_error_message() . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[IndieBlocks/Webmention] Could not reisize ' . $file_path . ': ' . $image->get_error_message() . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
-			// And return the local path.
+			// And return the local URL.
 			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 		}
 	}

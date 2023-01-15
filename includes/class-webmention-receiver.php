@@ -45,7 +45,7 @@ class Webmention_Receiver {
 		$slug = trim( basename( wp_parse_url( $request['target'], PHP_URL_PATH ) ), '/' );
 
 		// We don't currently differentiate between "incoming" and "outgoing" post types.
-		$supported_post_types = Webmention_Sender::get_supported_post_types();
+		$supported_post_types = Webmention::get_supported_post_types();
 
 		// Fetch the post.
 		$post = get_page_by_path( $slug, OBJECT, $supported_post_types );
@@ -291,12 +291,23 @@ class Webmention_Receiver {
 		// Webmention data.
 		$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 		$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
+		$avatar = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
 		?>
-			<p><label for="indieblocks_webmention_source"><?php esc_html_e( 'Source', 'indieblocks' ); ?></label>
-			<input type="url" id="indieblocks_webmention_source" name="indieblocks_webmention_source" value="<?php echo esc_attr( $source ); ?>" class="widefat" readonly="readonly" /></p>
+			<p><label for="indieblocks_webmention_source"><?php esc_html_e( 'Source', 'indieblocks' ); ?></label><br />
+			<input type="url" id="indieblocks_webmention_source" value="<?php echo esc_url( $source ); ?>" class="widefat" readonly="readonly" /></p>
 
-			<p><label for="indieblocks_webmention_kind"><?php esc_html_e( 'Type', 'indieblocks' ); ?></label>
-			<input type="url" id="indieblocks_webmention_kind" name="indieblocks_webmention_kind" value="<?php echo esc_attr( ucfirst( $kind ) ); ?>" class="widefat" readonly="readonly" /></p>
+			<p><label for="indieblocks_webmention_kind"><?php esc_html_e( 'Type', 'indieblocks' ); ?></label><br />
+			<input type="url" id="indieblocks_webmention_kind" value="<?php echo esc_attr( ucfirst( $kind ) ); ?>" class="widefat" readonly="readonly" /></p>
+
+			<?php if ( '' !== $avatar ) : ?>
+				<p><label for="indieblocks_webmention_avatar"><?php esc_html_e( 'Avatar', 'indieblocks' ); ?></label><br />
+				<span style="display: flex; gap: 1em; justify-content: space-between;">
+					<input type="url" id="indieblocks_webmention_avatar" value="<?php echo esc_url( $avatar ); ?>" class="widefat" style="vertical-align: baseline;" readonly="readonly" />
+					<button type="button" class="button indieblocks-delete-avatar" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:delete-avatar:' . $comment->comment_ID ) ); ?>">
+						<?php esc_html_e( 'Delete', 'indieblocks' ); ?>
+					</button>
+				</span></p>
+			<?php endif; ?>
 		<?php
 	}
 
@@ -305,5 +316,47 @@ class Webmention_Receiver {
 	 */
 	public static function webmention_link() {
 		echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
+	}
+
+	/**
+	 * Deletes a previously stored avatar.
+	 *
+	 * Should only ever be called through AJAX.
+	 */
+	public static function delete_avatar() {
+		if ( ! isset( $_POST['_wp_nonce'] ) || ! isset( $_POST['comment_id'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wp_nonce'] ), 'indieblocks:delete-avatar:' . intval( $_POST['comment_id'] ) ) ) {
+			status_header( 400 );
+			esc_html_e( 'Missing or invalid nonce.', 'indieblocks' );
+			wp_die();
+		}
+
+		if ( ! ctype_digit( $_POST['comment_id'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			status_header( 400 );
+			esc_html_e( 'Invalid comment ID.', 'indieblocks' );
+			wp_die();
+		}
+
+		$comment_id = (int) $_POST['comment_id'];
+
+		if ( ! current_user_can( 'edit_comment', $comment_id ) ) {
+			status_header( 400 );
+			esc_html_e( 'Insufficient rights.', 'indieblocks' );
+			wp_die();
+		}
+
+		$url = get_comment_meta( $comment_id, 'indieblocks_webmention_avatar', true );
+
+		if ( '' !== $url ) {
+			$upload_dir = wp_upload_dir();
+			$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+
+			// Delete file.
+			if ( is_file( $file_path ) && unlink( $file_path ) )  {
+				// Delete reference in database.
+				delete_comment_meta( $comment_id, 'indieblocks_webmention_avatar' );
+			}
+		}
+
+		wp_die();
 	}
 }

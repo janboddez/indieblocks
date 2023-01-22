@@ -235,7 +235,7 @@ class Location {
 			$geo_address .= ', ' . strtoupper( $location['address']['country_code'] );
 		}
 
-		return $geo_address;
+		return sanitize_text_field( $geo_address );
 	}
 
 	/**
@@ -268,21 +268,33 @@ class Location {
 				return array();
 			}
 
+			// Valid JSON. Store response for half an hour.
 			set_transient( "indieblocks_weather_{$lat}_{$lon}", $weather, HOUR_IN_SECONDS / 2 );
 		}
 
-		$weather_data                = array();
-		$weather_data['temperature'] = isset( $weather['main']['temp'] ) ? $weather['main']['temp'] : null;
-		$weather_data['humidity']    = isset( $weather['main']['humidity'] ) ? $weather['main']['humidity'] : null;
+		$weather_data = array();
+
+		$weather_data['temperature'] = isset( $weather['main']['temp'] ) && is_numeric( $weather['main']['temp'] )
+			? round( $weather['main']['temp'], 2 )
+			: null;
+
+		$weather_data['humidity'] = isset( $weather['main']['humidity'] ) && is_numeric( $weather['main']['humidity'] )
+			? round( $weather['main']['humidity'] )
+			: null;
 
 		if ( ! empty( $weather['weather'] ) ) {
 			$weather = ( (array) $weather['weather'] )[0];
 
-			$weather_data['id']          = isset( $weather['id'] ) ? static::icon_map( (int) $weather['id'] ) : '';
-			$weather_data['description'] = isset( $weather['description'] ) ? ucfirst( $weather['description'] ) : '';
+			$weather_data['id'] = isset( $weather['id'] ) && is_int( $weather['id'] )
+				? static::icon_map( (int) $weather['id'] )
+				: '';
+
+			$weather_data['description'] = isset( $weather['description'] )
+				? ucfirst( sanitize_text_field( $weather['description'] ) )
+				: '';
 		}
 
-		return array_filter( $weather_data );
+		return array_filter( $weather_data ); // Removes empty values.
 	}
 
 	/**

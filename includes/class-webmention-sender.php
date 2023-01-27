@@ -194,6 +194,10 @@ class Webmention_Sender {
 	 * @return array        Array of URLs.
 	 */
 	public static function find_outgoing_links( $html ) {
+		if ( empty( $html ) ) {
+			return array();
+		}
+
 		$html = mb_convert_encoding( $html, 'HTML-ENTITIES', mb_detect_encoding( $html ) );
 
 		libxml_use_internal_errors( true );

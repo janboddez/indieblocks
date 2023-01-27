@@ -41,8 +41,6 @@ class Parser {
 
 		$this->url = $url;
 		$this->dom = new \DOMDocument();
-
-		libxml_use_internal_errors( true );
 	}
 
 	/**
@@ -65,15 +63,14 @@ class Parser {
 		}
 
 		if ( empty( $content ) ) {
-			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
-			// `$content` is (still) empty.
 			return;
 		}
 
 		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
 
-		$this->dom->loadHTML( $content );
+		libxml_use_internal_errors( true );
 
+		$this->dom->loadHTML( $content );
 		$this->mf2 = Mf2\parse( $content, $this->url );
 	}
 

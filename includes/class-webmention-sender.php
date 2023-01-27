@@ -198,12 +198,12 @@ class Webmention_Sender {
 			return array();
 		}
 
-		$html = mb_convert_encoding( $html, 'HTML-ENTITIES', mb_detect_encoding( $html ) );
+		$html = '<div>' . mb_convert_encoding( $html, 'HTML-ENTITIES', mb_detect_encoding( $html ) ) . '</div>';
 
 		libxml_use_internal_errors( true );
 
 		$doc = new \DOMDocument();
-		$doc->loadHTML( $html );
+		$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 		$xpath = new \DOMXPath( $doc );
 		$urls  = array();

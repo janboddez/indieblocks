@@ -312,10 +312,12 @@ class Webmention_Receiver {
 	}
 
 	/**
-	 * Prints the webmention endpoint.
+	 * Prints the webmention endpoint (on pages that actually support them).
 	 */
 	public static function webmention_link() {
-		echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
+		if ( is_singular( Webmention::get_supported_post_types() ) ) {
+			echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
+		}
 	}
 
 	/**

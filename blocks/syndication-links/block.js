@@ -11,14 +11,6 @@
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
 
-	String.prototype.trimRight = function( charlist ) {
-		if ( undefined === charlist ) {
-			charlist = "\s";
-		}
-
-		return this.replace( new RegExp( "[" + charlist + "]+$" ), "" );
-	};
-
 	function render( urls ) {
 		var output = '';
 
@@ -30,7 +22,7 @@
 			) ) + ', ';
 		} );
 
-		output = output.trimRight( ', ' );
+		output = output.replace( /[,\s]+$/, '' );
 
 		return sprintf( __( 'Also on %s', 'indieblocks' ), output );
 	}

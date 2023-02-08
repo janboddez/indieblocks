@@ -25,6 +25,20 @@ class Blocks {
 	 * Registers the "Note Context" block.
 	 */
 	public static function register_blocks() {
+		register_block_type_from_metadata(
+			dirname( __DIR__ ) . '/blocks/syndication-links',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block' ),
+			)
+		);
+
+		// This oughta happen automatically, but whatevs.
+		wp_set_script_translations(
+			generate_block_asset_handle( 'indieblocks/syndication-links', 'editorScript' ),
+			'indieblocks',
+			dirname( __DIR__ ) . '/languages'
+		);
+
 		register_block_type( dirname( __DIR__ ) . '/blocks/context' );
 
 		// This oughta happen automatically, but whatevs.
@@ -154,5 +168,46 @@ class Blocks {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Renders the `indieblocks/syndication-links` block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string             Returns the filtered post content of the current post.
+	 */
+	public static function render_block( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			return '';
+		}
+
+		$urls = array_filter(
+			array(
+				__( 'Mastodon', 'indieblocks' ) => get_post_meta( $block->context['postId'], '_share_on_mastodon_url', true ),
+				__( 'Pixelfed', 'indieblocks' ) => get_post_meta( $block->context['postId'], '_share_on_pixelfed_url', true ),
+			)
+		);
+
+		$urls = apply_filters( 'indieblocks_syndication_links', $urls );
+
+		if ( empty( $urls ) ) {
+			return '';
+		}
+
+		$output = esc_html__( 'Also on', 'indieblocks' ) . ' ';
+
+		foreach ( $urls as $name => $url ) {
+			$output .= ' <a class="u-syndication" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>, ';
+		}
+
+		$output = rtrim( $output, ', ' );
+
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return '<div ' . $wrapper_attributes . '>' .
+			$output .
+		'</div>';
 	}
 }

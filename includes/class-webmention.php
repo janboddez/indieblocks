@@ -133,7 +133,7 @@ class Webmention {
 		}
 
 		// Enqueue CSS and JS.
-		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/indieblocks-webmention.js', dirname( __FILE__ ) ), array( 'jquery' ), IndieBlocks::VERSION, false );
+		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/indieblocks-webmention.js', dirname( __FILE__ ) ), array( 'jquery' ), IndieBlocks::PLUGIN_VERSION, false );
 		wp_localize_script(
 			'indieblocks-webmention',
 			'indieblocks_webmention_obj',

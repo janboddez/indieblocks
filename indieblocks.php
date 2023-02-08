@@ -8,7 +8,7 @@
  * License:           GNU General Public License v3
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       indieblocks
- * Version:           0.3.6
+ * Version:           0.4.0
  * GitHub Plugin URI: https://github.com/janboddez/indieblocks
  * Primary Branch:    main
  *

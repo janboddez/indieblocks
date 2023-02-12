@@ -179,7 +179,16 @@ class Blocks {
 	 * @return string             Returns the filtered post content of the current post.
 	 */
 	public static function render_block( $attributes, $content, $block ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+
 		if ( ! isset( $block->context['postId'] ) ) {
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				// Without a post ID, return the block title.
+				return '<div ' . $wrapper_attributes . '>' .
+					esc_html__( 'Syndication Links', 'indieblocks' ) .
+				'</div>';
+			}
+
 			return '';
 		}
 
@@ -193,6 +202,12 @@ class Blocks {
 		$urls = apply_filters( 'indieblocks_syndication_links', $urls );
 
 		if ( empty( $urls ) ) {
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				return '<div ' . $wrapper_attributes . '>' .
+					esc_html__( 'No links found', 'indieblocks' ) .
+				'</div>';
+			}
+
 			return '';
 		}
 
@@ -203,8 +218,6 @@ class Blocks {
 		}
 
 		$output = rtrim( $output, ', ' );
-
-		$wrapper_attributes = get_block_wrapper_attributes();
 
 		return '<div ' . $wrapper_attributes . '>' .
 			$output .

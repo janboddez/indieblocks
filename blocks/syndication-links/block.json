@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"title": "Syndication Links",
 	"name": "indieblocks/syndication-links",
-	"category": "text",
+	"category": "theme",
 	"icon": "admin-links",
 	"editorScript": "file:./block.js",
 	"usesContext": [ "postId", "postType" ],

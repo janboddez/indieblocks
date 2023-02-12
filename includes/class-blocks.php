@@ -183,7 +183,9 @@ class Blocks {
 
 		if ( ! isset( $block->context['postId'] ) ) {
 			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-				// Without a post ID, return the block title.
+				// Without a post ID, return the block title. Note that due to
+				// https://github.com/WordPress/gutenberg/discussions/43659,
+				// actual syndication links will never show in the block editor.
 				return '<div ' . $wrapper_attributes . '>' .
 					esc_html__( 'Syndication Links', 'indieblocks' ) .
 				'</div>';

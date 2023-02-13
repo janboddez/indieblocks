@@ -1,0 +1,18 @@
+.wp-block-indieblocks-context .components-checkbox-control__input[type="checkbox"],
+.wp-block-indieblocks-context .components-radio-control__input[type="radio"] {
+	/* Restore "default" values, should themes want to change these. */
+	height: 24px;
+	width: 24px;
+}
+
+@media (min-width: 600px) {
+	.wp-block-indieblocks-context .components-checkbox-control__input[type="checkbox"],
+	.wp-block-indieblocks-context .components-radio-control__input[type="radio"] {
+		height: 20px;
+		width: 20px;
+	}
+}
+
+.wp-block-indieblocks-context .components-text-control__input[readonly] {
+	background-color: rgb(240, 240, 241);
+}

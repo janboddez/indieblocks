@@ -18,11 +18,11 @@ class Blocks {
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
-		// add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 	}
 
 	/**
-	 * Registers the "Note Context" block.
+	 * Registers the different blocks.
 	 */
 	public static function register_blocks() {
 		register_block_type_from_metadata(
@@ -39,14 +39,16 @@ class Blocks {
 			dirname( __DIR__ ) . '/languages'
 		);
 
-		register_block_type( dirname( __DIR__ ) . '/blocks/context' );
+		foreach ( array( 'context', 'reply', 'repost' ) as $block ) {
+			register_block_type( dirname( __DIR__ ) . "/blocks/$block" );
 
-		// This oughta happen automatically, but whatevs.
-		wp_set_script_translations(
-			generate_block_asset_handle( 'indieblocks/context', 'editorScript' ),
-			'indieblocks',
-			dirname( __DIR__ ) . '/languages'
-		);
+			// This oughta happen automatically, but whatevs.
+			wp_set_script_translations(
+				generate_block_asset_handle( "indieblocks/$block", 'editorScript' ),
+				'indieblocks',
+				dirname( __DIR__ ) . '/languages'
+			);
+		}
 	}
 
 	/**

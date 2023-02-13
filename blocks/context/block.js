@@ -6,25 +6,23 @@
 	var interpolateEl = element.createInterpolateElement;
 
 	var BlockControls = blockEditor.BlockControls;
-	var InnerBlocks   = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var CheckboxControl = components.CheckboxControl;
-	var Placeholder     = components.Placeholder;
-	var RadioControl    = components.RadioControl;
-	var TextControl     = components.TextControl;
+	var Placeholder  = components.Placeholder;
+	var RadioControl = components.RadioControl;
+	var TextControl  = components.TextControl;
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
 
 	var messages = {
-		/* translators: %s: URL of the bookmarked page. */
+		/* translators: %s: Link to the bookmarked page. */
 		'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
-		/* translators: %s: URL of the "liked" page. */
+		/* translators: %s: Link to the "liked" page. */
 		'u-like-of': __( 'Likes %s.', 'indieblocks' ),
-		/* translators: %s: URL of the page being replied to. */
+		/* translators: %s: Link to the page being replied to. */
 		'u-in-reply-to': __( 'In reply to %s.', 'indieblocks' ),
-		/* translators: %s: URL of the "page" being reposted. */
+		/* translators: %s: Link to the "page" being reposted. */
 		'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 	};
 
@@ -93,13 +91,13 @@
 					var kind = props.attributes.kind;
 
 					var messages = {
-						/* translators: %s: URL of the bookmarked page. */
+						/* translators: %s: Link to the bookmarked page. */
 						'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
-						/* translators: %s: URL of the "liked" page. */
+						/* translators: %s: Link to the "liked" page. */
 						'u-like-of': __( 'Liked %s.', 'indieblocks' ),
-						/* translators: %s: URL of the page being replied to. */
+						/* translators: %s: Link to the page being replied to. */
 						'u-in-reply-to': __( 'In reply to %s.', 'indieblocks' ),
-						/* translators: %s: URL of the "page" being reposted. */
+						/* translators: %s: Link to the "page" being reposted. */
 						'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 					};
 
@@ -122,7 +120,7 @@
 						return createBlock( 'core/html', {
 							content: getSaveContent( 'indieblocks/context', attributes ),
 						} );
-					}
+					},
 				},
 			],
 		},

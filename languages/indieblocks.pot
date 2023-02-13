@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-02-13T14:30:22+00:00\n"
+"POT-Creation-Date: 2023-02-13T19:09:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
@@ -37,25 +37,25 @@ msgstr ""
 msgid "https://jan.boddez.net/"
 msgstr ""
 
-#: includes/class-blocks.php:59
+#: includes/class-blocks.php:68
 msgid "Note Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:60
+#: includes/class-blocks.php:69
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:188
+#: includes/class-blocks.php:197
 #: blocks/syndication-links/block.js:32
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:189
+#: includes/class-blocks.php:198
 #: blocks/syndication-links/block.js:36
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:199
+#: includes/class-blocks.php:208
 msgid "Also on"
 msgstr ""
 
@@ -84,30 +84,31 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#. translators: %s: URL of the "liked" page.
+#. translators: %s: Link to the "liked" page.
 #: includes/class-micropub-compat.php:243
-#: blocks/context/block.js:24
+#: blocks/context/block.js:22
 msgid "Likes %s."
 msgstr ""
 
-#. translators: %s: URL of the bookmarked page.
+#. translators: %s: Link to the bookmarked page.
 #: includes/class-micropub-compat.php:250
-#: blocks/context/block.js:22
-#: blocks/context/block.js:97
+#: blocks/context/block.js:20
+#: blocks/context/block.js:95
 msgid "Bookmarked %s."
 msgstr ""
 
-#. translators: %s: URL of the page being replied to.
+#. translators: %s: Link to the page being replied to.
 #: includes/class-micropub-compat.php:257
-#: blocks/context/block.js:26
-#: blocks/context/block.js:101
+#: blocks/context/block.js:24
+#: blocks/context/block.js:99
+#: blocks/reply/block.js:32
 msgid "In reply to %s."
 msgstr ""
 
-#. translators: %s: URL of the "page" being reposted.
+#. translators: %s: Link to the "page" being reposted.
 #: includes/class-micropub-compat.php:264
-#: blocks/context/block.js:28
-#: blocks/context/block.js:103
+#: blocks/context/block.js:26
+#: blocks/context/block.js:101
 msgid "Reposted %s."
 msgstr ""
 
@@ -372,7 +373,7 @@ msgid "Likes"
 msgstr ""
 
 #: includes/class-post-types.php:108
-#: blocks/context/block.js:74
+#: blocks/context/block.js:72
 msgid "Like"
 msgstr ""
 
@@ -433,7 +434,7 @@ msgid "Source"
 msgstr ""
 
 #: includes/class-webmention-receiver.php:299
-#: blocks/context/block.js:70
+#: blocks/context/block.js:68
 msgid "Type"
 msgstr ""
 
@@ -496,33 +497,60 @@ msgstr ""
 msgid "Invalid post ID."
 msgstr ""
 
-#: blocks/context/block.js:50
+#: blocks/context/block.js:48
 msgid "Context"
 msgstr ""
 
-#: blocks/context/block.js:55
+#: blocks/context/block.js:53
 msgid "Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
-#: blocks/context/block.js:65
+#: blocks/context/block.js:63
+#: blocks/reply/block.js:161
 msgid "URL"
 msgstr ""
 
-#: blocks/context/block.js:73
+#: blocks/context/block.js:71
 msgid "Bookmark"
 msgstr ""
 
-#: blocks/context/block.js:75
+#: blocks/context/block.js:73
+#: blocks/reply/block.js:107
 msgid "Reply"
 msgstr ""
 
-#: blocks/context/block.js:76
+#: blocks/context/block.js:74
 msgid "Repost"
 msgstr ""
 
-#. translators: %s: URL of the "liked" page.
-#: blocks/context/block.js:99
+#. translators: %s: Link to the "liked" page.
+#: blocks/context/block.js:97
 msgid "Liked %s."
+msgstr ""
+
+#. translators: %1$s: Link to the page being replied to. %2$s: Author of the web page being replied to.
+#: blocks/reply/block.js:39
+msgid "In reply to %1$s by %2$s."
+msgstr ""
+
+#: blocks/reply/block.js:112
+msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
+msgstr ""
+
+#: blocks/reply/block.js:116
+msgid "Title"
+msgstr ""
+
+#: blocks/reply/block.js:126
+msgid "Author"
+msgstr ""
+
+#: blocks/reply/block.js:148
+msgid "Customize title"
+msgstr ""
+
+#: blocks/reply/block.js:154
+msgid "Customize author"
 msgstr ""
 
 #. translators: %s: plain-text "list" of links.
@@ -541,6 +569,11 @@ msgstr ""
 #: blocks/context/block.json
 msgctxt "block title"
 msgid "Context"
+msgstr ""
+
+#: blocks/reply/block.json
+msgctxt "block title"
+msgid "Reply"
 msgstr ""
 
 #: blocks/syndication-links/block.json

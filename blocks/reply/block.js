@@ -78,11 +78,11 @@
 					path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
 					signal: controller.signal
 				} ).then( function( response ) {
-					if ( ! customTitle && response.name ) {
+					if ( ! customTitle && ( response.name || '' === response.name ) ) {
 						props.setAttributes( { title: response.name } );
 					}
 
-					if ( ! customAuthor && response.author.name ) {
+					if ( ! customAuthor && ( response.author.name || '' === response.author.name ) ) {
 						props.setAttributes( { author: response.author.name } );
 					}
 

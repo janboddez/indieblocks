@@ -39,7 +39,7 @@ class Blocks {
 			dirname( __DIR__ ) . '/languages'
 		);
 
-		foreach ( array( 'context', 'reply', 'repost' ) as $block ) {
+		foreach ( array( 'context', 'bookmark', 'like', 'reply', 'repost' ) as $block ) {
 			register_block_type( dirname( __DIR__ ) . "/blocks/$block" );
 
 			// This oughta happen automatically, but whatevs.
@@ -95,15 +95,15 @@ class Blocks {
 				),
 			);
 
-			if ( 'indieblocks_note' === $post_type ) {
-				$post_type_object->template[] = array(
-					'core/group',
-					array( 'className' => 'e-content' ),
-					array(
-						array( 'core/paragraph' ),
-					),
-				);
-			}
+			// if ( 'indieblocks_note' === $post_type ) {
+			// 	$post_type_object->template[] = array(
+			// 		'core/group',
+			// 		array( 'className' => 'e-content' ),
+			// 		array(
+			// 			array( 'core/paragraph' ),
+			// 		),
+			// 	);
+			// }
 		}
 	}
 
@@ -145,7 +145,8 @@ class Blocks {
 		if ( empty( $url ) ) {
 			return new \WP_Error(
 				'missing_url',
-				'Missing URL.'
+				'Missing URL.',
+				array( 'status' => 400 )
 			);
 		}
 
@@ -154,7 +155,8 @@ class Blocks {
 		if ( ! wp_http_validate_url( $url ) ) {
 			return new \WP_Error(
 				'invalid_url',
-				'Invalid URL.'
+				'Invalid URL.',
+				array( 'status' => 400 )
 			);
 		}
 

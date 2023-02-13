@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-02-13T19:09:41+00:00\n"
+"POT-Creation-Date: 2023-02-13T22:53:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
@@ -37,25 +37,25 @@ msgstr ""
 msgid "https://jan.boddez.net/"
 msgstr ""
 
-#: includes/class-blocks.php:68
+#: includes/class-blocks.php:61
 msgid "Note Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:69
+#: includes/class-blocks.php:62
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:197
+#: includes/class-blocks.php:192
 #: blocks/syndication-links/block.js:32
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:198
+#: includes/class-blocks.php:193
 #: blocks/syndication-links/block.js:36
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:208
+#: includes/class-blocks.php:203
 msgid "Also on"
 msgstr ""
 
@@ -92,6 +92,7 @@ msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
 #: includes/class-micropub-compat.php:250
+#: blocks/bookmark/block.js:32
 #: blocks/context/block.js:20
 #: blocks/context/block.js:95
 msgid "Bookmarked %s."
@@ -109,6 +110,7 @@ msgstr ""
 #: includes/class-micropub-compat.php:264
 #: blocks/context/block.js:26
 #: blocks/context/block.js:101
+#: blocks/repost/block.js:31
 msgid "Reposted %s."
 msgstr ""
 
@@ -374,6 +376,7 @@ msgstr ""
 
 #: includes/class-post-types.php:108
 #: blocks/context/block.js:72
+#: blocks/like/block.js:107
 msgid "Like"
 msgstr ""
 
@@ -497,6 +500,59 @@ msgstr ""
 msgid "Invalid post ID."
 msgstr ""
 
+#. translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page.
+#: blocks/bookmark/block.js:39
+msgid "Bookmarked %1$s by %2$s."
+msgstr ""
+
+#: blocks/bookmark/block.js:107
+#: blocks/context/block.js:71
+msgid "Bookmark"
+msgstr ""
+
+#: blocks/bookmark/block.js:112
+#: blocks/like/block.js:112
+#: blocks/reply/block.js:112
+#: blocks/repost/block.js:127
+msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
+msgstr ""
+
+#: blocks/bookmark/block.js:116
+#: blocks/like/block.js:116
+#: blocks/reply/block.js:116
+#: blocks/repost/block.js:131
+msgid "Title"
+msgstr ""
+
+#: blocks/bookmark/block.js:126
+#: blocks/like/block.js:126
+#: blocks/reply/block.js:126
+#: blocks/repost/block.js:141
+msgid "Author"
+msgstr ""
+
+#: blocks/bookmark/block.js:148
+#: blocks/like/block.js:148
+#: blocks/reply/block.js:148
+#: blocks/repost/block.js:163
+msgid "Customize title"
+msgstr ""
+
+#: blocks/bookmark/block.js:154
+#: blocks/like/block.js:154
+#: blocks/reply/block.js:154
+#: blocks/repost/block.js:169
+msgid "Customize author"
+msgstr ""
+
+#: blocks/bookmark/block.js:161
+#: blocks/context/block.js:63
+#: blocks/like/block.js:161
+#: blocks/reply/block.js:161
+#: blocks/repost/block.js:176
+msgid "URL"
+msgstr ""
+
 #: blocks/context/block.js:48
 msgid "Context"
 msgstr ""
@@ -505,27 +561,25 @@ msgstr ""
 msgid "Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
-#: blocks/context/block.js:63
-#: blocks/reply/block.js:161
-msgid "URL"
-msgstr ""
-
-#: blocks/context/block.js:71
-msgid "Bookmark"
-msgstr ""
-
 #: blocks/context/block.js:73
 #: blocks/reply/block.js:107
 msgid "Reply"
 msgstr ""
 
 #: blocks/context/block.js:74
+#: blocks/repost/block.js:122
 msgid "Repost"
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
 #: blocks/context/block.js:97
+#: blocks/like/block.js:32
 msgid "Liked %s."
+msgstr ""
+
+#. translators: %1$s: Link to the "liked" page. %2$s: Author of the liked page.
+#: blocks/like/block.js:39
+msgid "Liked %1$s by %2$s."
 msgstr ""
 
 #. translators: %1$s: Link to the page being replied to. %2$s: Author of the web page being replied to.
@@ -533,24 +587,9 @@ msgstr ""
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
-#: blocks/reply/block.js:112
-msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
-msgstr ""
-
-#: blocks/reply/block.js:116
-msgid "Title"
-msgstr ""
-
-#: blocks/reply/block.js:126
-msgid "Author"
-msgstr ""
-
-#: blocks/reply/block.js:148
-msgid "Customize title"
-msgstr ""
-
-#: blocks/reply/block.js:154
-msgid "Customize author"
+#. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the web page being replied to.
+#: blocks/repost/block.js:41
+msgid "Reposted %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: plain-text "list" of links.
@@ -566,14 +605,29 @@ msgstr ""
 msgid "Syndication Links"
 msgstr ""
 
+#: blocks/bookmark/block.json
+msgctxt "block title"
+msgid "Bookmark"
+msgstr ""
+
 #: blocks/context/block.json
 msgctxt "block title"
 msgid "Context"
 msgstr ""
 
+#: blocks/like/block.json
+msgctxt "block title"
+msgid "Like"
+msgstr ""
+
 #: blocks/reply/block.json
 msgctxt "block title"
 msgid "Reply"
+msgstr ""
+
+#: blocks/repost/block.json
+msgctxt "block title"
+msgid "Repost"
 msgstr ""
 
 #: blocks/syndication-links/block.json

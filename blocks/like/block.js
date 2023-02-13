@@ -20,64 +20,49 @@
 	var sprintf = i18n.sprintf;
 
 	/**
-	 * Returns a microformatted introductory paragraph.
+	 * Returns a "bookmark context" `div`.
 	 */
-	function renderPara( attributes ) {
-		return  el( 'p', {},
-			el( 'i', {},
-				( ! attributes.author || 'undefined' === attributes.author )
-					? interpolateEl(
-						/* translators: %s: Link to the "page" being reposted. */
-						sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
-						{
-							a: el( 'a', {
-								className: attributes.title || attributes.name !== attributes.url ? 'u-url p-name' : 'u-url',
-								href: attributes.url,
-							} ),
-						}
-					)
-					: interpolateEl(
-						/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the web page being replied to. */
-						sprintf( __( 'Reposted %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
-						{
-							a: el( 'a', {
-								className: attributes.title || attributes.name !== attributes.url ? 'u-url p-name' : 'u-url',
-								href: attributes.url,
-							} ),
-							span: el( 'span', { className: 'p-author' } ),
-						}
-					)
+	function hCite( attributes ) {
+		return el( 'div', { className: 'u-like-of h-cite' },
+			el( 'p', {}, // Adding paragraphs this time around.
+				el( 'i', {},
+					( ! attributes.author || 'undefined' === attributes.author )
+						? interpolateEl(
+						/* translators: %s: Link to the "liked" page. */
+						sprintf( __( 'Liked %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
+							{
+								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+							}
+						)
+						: interpolateEl(
+							/* translators: %1$s: Link to the "liked" page. %2$s: Author of the liked page. */
+							sprintf( __( 'Liked %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
+							{
+								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+								span: el( 'span', { className: 'p-author' } ),
+							}
+						)
+				)
 			)
 		);
 	}
 
-	/**
-	 * Returns `div.h-cite`, with or without inner `e-content`.
-	 */
-	function hCite( attributes, save = false ) {
-		return el( 'div', { className: 'u-repost-of h-cite' },
-			save
-				? [
-					renderPara( attributes ),
-					el ( InnerBlocks.Content ), // By default contains one Quote block with `e-content` class.
-				]
-				: renderPara( attributes )
-		);
-	}
-
-	/**
-	 * Renders our block, including typography classes and whatnot, with or
-	 * without inner `e-content`.
-	 */
 	function render( blockProps, attributes, save = false ) {
 		return el( 'div', blockProps,
 			( ! attributes.url || 'undefined' === attributes.url )
 				? null // Can't do much without a URL.
-				: hCite( attributes, save )
+				: save
+					? [
+						hCite( attributes ),
+						el( 'div', { className: 'e-content' },
+							el( InnerBlocks.Content )
+						),
+					]
+					: hCite( attributes ),
 		);
 	}
 
-	blocks.registerBlockType( 'indieblocks/repost', {
+	blocks.registerBlockType( 'indieblocks/like', {
 		edit: function ( props ) {
 			function updateMeta() {
 				if ( customTitle && customAuthor ) {
@@ -118,8 +103,8 @@
 			var author       = props.attributes.author || '';
 
 			var placeholderProps = {
-				icon: 'update',
-				label: __( 'Repost', 'indieblocks' ),
+				icon: 'star-filled',
+				label: __( 'Like', 'indieblocks' ),
 				isColumnLayout: true,
 			};
 
@@ -181,9 +166,7 @@
 							]
 						)
 						: render( {}, props.attributes ),
-					el( InnerBlocks, {
-						template: [ [ 'core/quote', { className: 'e-content' } ] ],
-					} ),
+					el( InnerBlocks ),
 				]
 			);
 		},
@@ -201,7 +184,7 @@
 							attributes,
 							[
 								createBlock( 'core/html', { content: element.renderToString( hCite( attributes ) ) } ),
-								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
+								createBlock( 'core/group', { className: 'e-content' }, innerBlocks ),
 							]
 						);
 					},

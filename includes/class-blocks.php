@@ -202,12 +202,10 @@ class Blocks {
 			$output .= ' <a class="u-syndication" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>, ';
 		}
 
-		$output = rtrim( $output, ', ' );
-
 		$wrapper_attributes = get_block_wrapper_attributes();
 
 		return '<div ' . $wrapper_attributes . '>' .
-			$output .
+			rtrim( $output, ', ' ) .
 		'</div>';
 	}
 }

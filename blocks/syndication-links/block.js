@@ -1,12 +1,8 @@
 ( function ( blocks, element, blockEditor, coreData, i18n ) {
-	var el             = element.createElement;
-	var interpolateEl  = element.createInterpolateElement;
-	var renderToString = element.renderToString;
+	var el = element.createElement;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
-
-	var useEntityProp = coreData.useEntityProp;
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
@@ -15,21 +11,20 @@
 		var output = '';
 
 		urls.forEach( function( url ) {
-			output += renderToString(
-				interpolateEl( '<a>' + url.name + '</a>', {
-					a: el( 'a', { className: 'u-syndication', href: encodeURI( url.value ) } ),
-				}
-			) ) + ', ';
+			output += '<a class="u-syndication" href="' + encodeURI( url.value ) + '">' + url.name + '</a>, ';
 		} );
 
-		output = output.replace( /[,\s]+$/, '' );
-
-		return sprintf( __( 'Also on %s', 'indieblocks' ), output );
+		/* translators: %s: plain-text "list" of links. */
+		return sprintf( __( 'Also on %s', 'indieblocks' ), output.replace( /[,\s]+$/, '' ) );
 	}
 
 	blocks.registerBlockType( 'indieblocks/syndication-links', {
 		edit: function ( props ) {
-			var [ meta ] = useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
+			// We'd use `serverSideRender` but it doesn't support passing block
+			// context to PHP. I.e., rendering in JS better reflects what the
+			// block will look like on the front end.
+			// @see https://github.com/WordPress/gutenberg/issues/40714
+			var [ meta ] = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
 			var urls     = [];
 
 			if ( 'undefined' !== typeof meta ) {

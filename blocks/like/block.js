@@ -86,7 +86,7 @@
 						props.setAttributes( { author: response.author.name } );
 					}
 
-					clearTimeout(timeoutId);
+					clearTimeout( timeoutId );
 				} ).catch( function( error ) {
 					// The request timed out or otherwise failed. Leave as is.
 				} );

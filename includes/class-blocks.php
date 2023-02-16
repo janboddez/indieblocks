@@ -86,24 +86,17 @@ class Blocks {
 				continue;
 			}
 
-			$post_type_object->template = array(
-				array(
-					'indieblocks/context',
-					'indieblocks_like' === $post_type
-						? array( 'kind' => 'u-like-of' )
-						: array(),
-				),
-			);
+			if ( 'indieblocks_like' === $post_type ) {
+				$post_type_object->template = array(
+					array(
+						'indieblocks/like',
+						array(),
+						array( array( 'core/paragraph' ) ),
+					),
+				);
 
-			// if ( 'indieblocks_note' === $post_type ) {
-			// 	$post_type_object->template[] = array(
-			// 		'core/group',
-			// 		array( 'className' => 'e-content' ),
-			// 		array(
-			// 			array( 'core/paragraph' ),
-			// 		),
-			// 	);
-			// }
+				$post_type_object->template_lock = 'insert';
+			}
 		}
 	}
 

@@ -86,6 +86,8 @@ class Parser {
 			if ( ! empty( $hentry['properties']['name'][0] ) ) {
 				return $hentry['properties']['name'][0];
 			}
+
+			return ''; // If the page supports microformats, it may very well be a (titleless) note.
 		}
 
 		$title = $this->dom->getElementsByTagName( 'title' );

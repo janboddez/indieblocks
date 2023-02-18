@@ -1,17 +1,14 @@
 ( function ( blocks, element, blockEditor, components, data, apiFetch, i18n ) {
 	var createBlock = blocks.createBlock;
 
-	var el            = element.createElement;
-	var interpolateEl = element.createInterpolateElement;
+	var el          = element.createElement;
+	var interpolate = element.createInterpolateElement;
+	var useEffect   = element.useEffect;
 
-	var BlockControls     = blockEditor.BlockControls;
-	var InnerBlocks       = blockEditor.InnerBlocks;
-	var InspectorControls = blockEditor.InspectorControls;
-	var useBlockProps     = blockEditor.useBlockProps;
+	var InnerBlocks   = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	var CheckboxControl = components.CheckboxControl;
-	var PanelBody       = components.PanelBody;
-	var Placeholder     = components.Placeholder;
 	var TextControl     = components.TextControl;
 
 	var useSelect = data.useSelect;
@@ -20,70 +17,78 @@
 	var sprintf = i18n.sprintf;
 
 	/**
-	 * Returns a microformatted introductory paragraph.
+	 * Returns a "repost context" `div`.
 	 */
-	function renderPara( attributes ) {
-		return  el( 'p', {},
-			el( 'i', {},
-				( ! attributes.author || 'undefined' === attributes.author )
-					? interpolateEl(
-						/* translators: %s: Link to the "page" being reposted. */
+	function hCite( attributes ) {
+		return el( 'div', { className: 'u-repost-of h-cite' },
+			el( 'p', {}, // Adding paragraphs this time around.
+				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
+					( ! attributes.author || 'undefined' === attributes.author )
+						? interpolate(
+						/* translators: %s: Link to the reposted page. */
 						sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
-						{
-							a: el( 'a', {
-								className: attributes.title || attributes.name !== attributes.url ? 'u-url p-name' : 'u-url',
-								href: attributes.url,
-							} ),
-						}
-					)
-					: interpolateEl(
-						/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the web page being replied to. */
-						sprintf( __( 'Reposted %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
-						{
-							a: el( 'a', {
-								className: attributes.title || attributes.name !== attributes.url ? 'u-url p-name' : 'u-url',
-								href: attributes.url,
-							} ),
-							span: el( 'span', { className: 'p-author' } ),
-						}
-					)
+							{
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name' // No title means no `p-name`.
+										: 'u-url',
+									href: attributes.url,
+								} ),
+							}
+						)
+						: interpolate(
+							/* translators: %1$s: Link to the reposted page. %2$s: Author of the reposted page. */
+							sprintf( __( 'Reposted %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
+							{
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name'
+										: 'u-url',
+									href: attributes.url,
+								} ),
+								span: el( 'span', { className: 'p-author' } ),
+							}
+						)
+				)
 			)
 		);
 	}
 
-	/**
-	 * Returns `div.h-cite`, with or without inner `e-content`.
-	 */
-	function hCite( attributes, save = false ) {
-		return el( 'div', { className: 'u-repost-of h-cite' },
-			save
-				? [
-					renderPara( attributes ),
-					el ( InnerBlocks.Content ), // By default contains one Quote block with `e-content` class.
-				]
-				: renderPara( attributes )
-		);
-	}
-
-	/**
-	 * Renders our block, including typography classes and whatnot, with or
-	 * without inner `e-content`.
-	 */
-	function render( blockProps, attributes, save = false ) {
-		return el( 'div', blockProps,
-			( ! attributes.url || 'undefined' === attributes.url )
-				? null // Can't do much without a URL.
-				: hCite( attributes, save )
-		);
-	}
-
 	blocks.registerBlockType( 'indieblocks/repost', {
-		edit: function ( props ) {
+		edit: ( props ) => {
+			var url          = props.attributes.url;
+			var customTitle  = props.attributes.customTitle;
+			var title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
+			var customAuthor = props.attributes.customAuthor;
+			var author       = props.attributes.author || '';
+			var empty        = true;
+
+			function isValidUrl( string ) {
+				try {
+					new URL( string );
+				} catch ( error ) {
+					return false;
+				}
+
+				return true;
+			}
+
+			/**
+			 * Calls a backend function that parses a URL for microformats and
+			 * the like.
+			 */
 			function updateMeta() {
 				if ( customTitle && customAuthor ) {
+					// We're using custom values for both title and author;
+					// nothing to do here.
 					return;
 				}
 
+				if ( ! isValidUrl( url ) ) {
+					return;
+				}
+
+				// Like a time-out.
 				var controller = new AbortController();
 				var timeoutId  = setTimeout( function() {
 					controller.abort();
@@ -91,13 +96,15 @@
 
 				apiFetch( {
 					path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
-					signal: controller.signal
+					signal: controller.signal, // That time-out thingy.
 				} ).then( function( response ) {
 					if ( ! customTitle && ( response.name || '' === response.name ) ) {
+						// Got a, possibly empty, title.
 						props.setAttributes( { title: response.name } );
 					}
 
 					if ( ! customAuthor && ( response.author.name || '' === response.author.name ) ) {
+						// Got a, possibly empty, name.
 						props.setAttributes( { author: response.author.name } );
 					}
 
@@ -107,18 +114,38 @@
 				} );
 			}
 
-			var is_inner_block_selected = useSelect(
-				( select ) => select( 'core/block-editor' ).hasSelectedInnerBlock( props.clientId, true )
-			);
+			var parentClientId = useSelect( ( select ) => select( 'core/block-editor' ).getBlockHierarchyRootClientId( props.clientId ) );
+			var innerBlocks    = useSelect( ( select ) => select( 'core/block-editor' ).getBlocks( parentClientId ) );
 
-			var url          = props.attributes.url;
-			var customTitle  = props.attributes.customTitle;
-			var title        = props.attributes.title || '';
-			var customAuthor = props.attributes.customAuthor;
-			var author       = props.attributes.author || '';
+			// To determine whether `.e-content` and `InnerBlocks.Content`
+			// should be saved (and echoed).
+			useEffect( () => {
+				if ( innerBlocks.length > 1 ) {
+					// More than one child block.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && 'undefined' !== typeof innerBlocks[0].attributes.content && innerBlocks[0].attributes.content.length ) {
+					// A non-empty paragraph or heading. Empty paragraphs are
+					// almost unavoidable, so it's important to get this right.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && 'undefined' !== typeof innerBlocks[0].attributes.href && innerBlocks[0].attributes.href.length ) {
+					// A non-empty image.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && innerBlocks[0].innerBlocks.length ) {
+					// A quote or gallery, empty or not.
+					empty = false;
+				}
+
+				props.setAttributes( { empty } )
+			}, [ innerBlocks ] );
 
 			var placeholderProps = {
-				icon: 'update',
+				icon: 'update-alt',
 				label: __( 'Repost', 'indieblocks' ),
 				isColumnLayout: true,
 			};
@@ -149,12 +176,12 @@
 
 			return el( 'div', useBlockProps(),
 				[
-					el( BlockControls ),
-					( props.isSelected || is_inner_block_selected || ! url || 'undefined' === url )
-						? el( Placeholder, placeholderProps,
+					el( blockEditor.BlockControls ),
+					( props.isSelected || ! url || 'undefined' === url )
+						? el( components.Placeholder, placeholderProps,
 							[
-								el( InspectorControls, { key: 'inspector' },
-									el( PanelBody, {
+								el( blockEditor.InspectorControls, { key: 'inspector' },
+									el( components.PanelBody, {
 											title: __( 'Title and Author' ),
 											initialOpen: true,
 										},
@@ -176,20 +203,37 @@
 									label: __( 'URL', 'indieblocks' ),
 									value: url,
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
+									onKeyDown: ( event ) => {
+										if ( 13 === event.keyCode ) {
+											updateMeta();
+										}
+									},
 									onBlur: updateMeta,
 								} ),
 							]
 						)
-						: render( {}, props.attributes ),
-					el( InnerBlocks, {
-						template: [ [ 'core/quote', { className: 'e-content' } ] ],
-					} ),
+						: hCite( props.attributes ),
+					el( 'blockquote', { className: 'wp-block-quote e-content' },
+						el( InnerBlocks, {
+							template: [ [ 'core/paragraph' ] ],
+							templateLock: false,
+						} ), // Always **show** (editable) `InnerBlocks`.
+					),
 				]
 			);
 		},
-		save: function ( props ) {
-			return render( useBlockProps.save(), props.attributes, true );
-		},
+		save: ( props ) => el( 'div', useBlockProps.save(),
+			( ! props.attributes.url || 'undefined' === props.attributes.url )
+				? null // Can't do much without a URL.
+				: [
+					hCite( props.attributes ),
+					props.attributes.empty
+						? null
+						: el( 'blockquote', { className: 'wp-block-quote e-content' },
+							el( InnerBlocks.Content )
+						),
+				]
+		),
 		transforms: {
 			to: [
 				{

@@ -353,10 +353,12 @@ class Webmention_Receiver {
 			$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
 
 			// Delete file.
-			if ( is_file( $file_path ) && unlink( $file_path ) )  {
-				// Delete reference in database.
-				delete_comment_meta( $comment_id, 'indieblocks_webmention_avatar' );
+			if ( is_file( $file_path ) ) {
+				unlink( $file_path );
 			}
+
+			// Delete reference in database.
+			delete_comment_meta( $comment_id, 'indieblocks_webmention_avatar' );
 		}
 
 		wp_die();

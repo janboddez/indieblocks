@@ -189,7 +189,6 @@ class Webmention_Sender {
 				continue;
 			}
 
-
 			// Success! (Or rather, no immediate error.) Store timestamp.
 			$webmention[ $hash ]['sent'] = current_time( 'mysql' );
 			$webmention[ $hash ]['code'] = wp_remote_retrieve_response_code( $response );

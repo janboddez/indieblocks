@@ -164,9 +164,21 @@ class Webmention_Sender {
 				)
 			);
 
-			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 500 ) {
+			if ( is_wp_error( $response ) ) {
 				// Something went wrong.
 				error_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+				$webmention[ $hash ]['retries'] = $retries + 1;
+				update_post_meta( $post->ID, '_indieblocks_webmention', $webmention );
+
+				// Schedule a retry in 5 to 15 minutes.
+				wp_schedule_single_event( time() + wp_rand( 300, 900 ), 'indieblocks_webmention_send', array( $post->ID ) );
+
+				continue;
+			} elseif ( wp_remote_retrieve_response_code( $response ) >= 500 ) {
+				// Something went wrong.
+				error_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $response, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 				$webmention[ $hash ]['retries'] = $retries + 1;
 				update_post_meta( $post->ID, '_indieblocks_webmention', $webmention );

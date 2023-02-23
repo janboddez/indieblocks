@@ -173,7 +173,7 @@ class Blocks {
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
-	 * @return string             Returns the filtered post content of the current post.
+	 * @return string               The filtered post content of the current post.
 	 */
 	public static function render_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {

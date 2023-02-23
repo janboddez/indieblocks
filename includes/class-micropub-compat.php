@@ -225,7 +225,22 @@ class Micropub_Compat {
 	 * @return string            Rendered content.
 	 */
 	public static function render( $post_type, $url = '', $input = array() ) {
+		// Determine the content, if any.
+		if ( ! empty( $input['properties']['content'][0] ) ) {
+			$content = $input['properties']['content'][0];
+			$options = get_options();
+
+			if ( ! empty( $options['parse_markdown'] ) ) {
+				// @todo: Filter all notes and likes, not just those posted via Micropub, and store Markdown in `post_content_filtered`, kind of like Jetpack does it.
+				$content = Michelf\MarkdownExtra::defaultTransform( $content );
+			}
+
+			$content = wp_kses_post( $content );
+			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
+		}
+
 		if ( ! empty( $url ) ) {
+			// Could be we're looking at a note or like here.
 			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
 				// Depending on the scenario, Micropub clients may add a page
 				// title in front of the URL.
@@ -233,7 +248,15 @@ class Micropub_Compat {
 			}
 
 			// So that developers can, e.g., remove certain query strings.
-			$url          = apply_filters( 'indieblocks_micropub_url', $url );
+			$url = apply_filters( 'indieblocks_micropub_url', $url );
+
+			// Try to parse the web page at this URL, and use the newer block instead?
+			$parser = new Parser( $url );
+			$parser->parse();
+
+			$name   = sanitize_text_field( $parser->get_name() );
+			$author = sanitize_text_field( $parser->get_author() );
+
 			$post_content = '';
 
 			switch ( $post_type ) {
@@ -259,31 +282,72 @@ class Micropub_Compat {
 					break;
 
 				case 'repost':
-					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
-					/* translators: %s: Link to the "page" being reposted. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
+					if ( '' !== $author ) {
+						// We're given an author name; use newer Repost block.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/repost -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/repost {"empty":false} -->' . PHP_EOL;
+						}
+
+						$name = ( '' !== $name ? $name : esc_url( $url ) );
+
+						$post_content .= '<div class="wp-block-indieblocks-repost"><div class="u-repost-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted. */
+							__( 'Reposted %1$s by %2$s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>',
+							'<span class="p-author">' . esc_html( $author ) . '</span>'
+						);
+						$post_content .= '</i></p>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>';
+						}
+
+						$post_content .= '</div></div>
+							<!-- /wp:indieblocks/repost -->' . PHP_EOL;
+					} elseif ( '' !== $name ) {
+						// We've got a post title; use the Repost block, but without byline.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/repost -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/repost {"empty":false} -->' . PHP_EOL;
+						}
+
+						$post_content .= '<div class="wp-block-indieblocks-repost"><div class="u-repost-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %s: Link to the "page" being reposted. */
+							__( 'Reposted %s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>'
+						);
+						$post_content .= '</i></p>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>';
+						}
+
+						$post_content .= '</div></div>
+							<!-- /wp:indieblocks/repost -->' . PHP_EOL;
+					} else {
+						// Use the simpler Context block.
+						$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
+						/* translators: %s: Link to the "page" being reposted. */
+						$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>' ) . '</i></div>
+							<!-- /wp:indieblocks/context -->' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<!-- wp:quote {"className":"e-content"} -->
+								<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>
+								<!-- /wp:quote -->';
+						}
+					}
 					break;
 			}
 		}
 
-		if ( ! empty( $input['properties']['content'][0] ) ) {
-			$content = $input['properties']['content'][0];
-			$options = get_options();
-
-			if ( ! empty( $options['parse_markdown'] ) ) {
-				// @todo: Filter all notes and likes, not just those posted via Micropub, and store Markdown in `post_content_filtered`, kind of like Jetpack does it.
-				$content = Michelf\MarkdownExtra::defaultTransform( $content );
-			}
-
-			$content = wp_kses_post( $content );
-			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
-
-			if ( 'repost' === $post_type ) {
-				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content">' . $content . '</blockquote>
-					<!-- /wp:quote -->';
-			} else {
+		if ( ! empty( $content ) ) {
+			if ( 'repost' !== $post_type ) {
 				$post_content .= '<!-- wp:group {"className":"e-content"} -->
 					<div class="wp-block-group e-content"><!-- wp:freeform -->
 					' . $content . '

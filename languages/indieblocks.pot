@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-02-13T22:53:08+00:00\n"
+"POT-Creation-Date: 2023-02-23T21:06:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
@@ -45,17 +45,17 @@ msgstr ""
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:192
+#: includes/class-blocks.php:185
 #: blocks/syndication-links/block.js:32
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:193
+#: includes/class-blocks.php:186
 #: blocks/syndication-links/block.js:36
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:203
+#: includes/class-blocks.php:196
 msgid "Also on"
 msgstr ""
 
@@ -85,13 +85,13 @@ msgid "Location"
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
-#: includes/class-micropub-compat.php:243
+#: includes/class-micropub-compat.php:266
 #: blocks/context/block.js:22
 msgid "Likes %s."
 msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
-#: includes/class-micropub-compat.php:250
+#: includes/class-micropub-compat.php:273
 #: blocks/bookmark/block.js:32
 #: blocks/context/block.js:20
 #: blocks/context/block.js:95
@@ -99,18 +99,25 @@ msgid "Bookmarked %s."
 msgstr ""
 
 #. translators: %s: Link to the page being replied to.
-#: includes/class-micropub-compat.php:257
+#: includes/class-micropub-compat.php:280
 #: blocks/context/block.js:24
 #: blocks/context/block.js:99
 #: blocks/reply/block.js:32
 msgid "In reply to %s."
 msgstr ""
 
+#. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted.
+#: includes/class-micropub-compat.php:298
+#: blocks/repost/block.js:42
+msgid "Reposted %1$s by %2$s."
+msgstr ""
+
 #. translators: %s: Link to the "page" being reposted.
-#: includes/class-micropub-compat.php:264
+#: includes/class-micropub-compat.php:321
+#: includes/class-micropub-compat.php:336
 #: blocks/context/block.js:26
 #: blocks/context/block.js:101
-#: blocks/repost/block.js:31
+#: blocks/repost/block.js:30
 msgid "Reposted %s."
 msgstr ""
 
@@ -126,7 +133,7 @@ msgstr ""
 #: includes/class-options-handler.php:253
 #: includes/class-options-handler.php:328
 #: includes/class-webmention-receiver.php:277
-#: includes/class-webmention-sender.php:318
+#: includes/class-webmention-sender.php:330
 msgid "Webmention"
 msgstr ""
 
@@ -376,7 +383,7 @@ msgstr ""
 
 #: includes/class-post-types.php:108
 #: blocks/context/block.js:72
-#: blocks/like/block.js:107
+#: blocks/like/block.js:150
 msgid "Like"
 msgstr ""
 
@@ -450,7 +457,7 @@ msgid "Delete"
 msgstr ""
 
 #: includes/class-webmention-receiver.php:331
-#: includes/class-webmention-sender.php:385
+#: includes/class-webmention-sender.php:397
 msgid "Missing or invalid nonce."
 msgstr ""
 
@@ -459,44 +466,44 @@ msgid "Invalid comment ID."
 msgstr ""
 
 #: includes/class-webmention-receiver.php:345
-#: includes/class-webmention-sender.php:399
+#: includes/class-webmention-sender.php:411
 msgid "Insufficient rights."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:350
+#: includes/class-webmention-sender.php:362
 msgid "Sent to %1$s on %2$s. Response code: %3$d."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:350
+#: includes/class-webmention-sender.php:362
 msgid "M j, Y \\a\\t H:i"
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:353
+#: includes/class-webmention-sender.php:365
 msgid "Could not send webmention to %s."
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:356
+#: includes/class-webmention-sender.php:368
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr ""
 
-#: includes/class-webmention-sender.php:366
+#: includes/class-webmention-sender.php:378
 msgid "Resend"
 msgstr ""
 
-#: includes/class-webmention-sender.php:370
+#: includes/class-webmention-sender.php:382
 #: includes/class-webmention.php:141
 msgid "Webmention scheduled."
 msgstr ""
 
-#: includes/class-webmention-sender.php:372
+#: includes/class-webmention-sender.php:384
 msgid "No endpoints found."
 msgstr ""
 
-#: includes/class-webmention-sender.php:391
+#: includes/class-webmention-sender.php:403
 msgid "Invalid post ID."
 msgstr ""
 
@@ -511,45 +518,45 @@ msgid "Bookmark"
 msgstr ""
 
 #: blocks/bookmark/block.js:112
-#: blocks/like/block.js:112
+#: blocks/like/block.js:155
 #: blocks/reply/block.js:112
-#: blocks/repost/block.js:127
+#: blocks/repost/block.js:167
 msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
 #: blocks/bookmark/block.js:116
-#: blocks/like/block.js:116
+#: blocks/like/block.js:159
 #: blocks/reply/block.js:116
-#: blocks/repost/block.js:131
+#: blocks/repost/block.js:171
 msgid "Title"
 msgstr ""
 
 #: blocks/bookmark/block.js:126
-#: blocks/like/block.js:126
+#: blocks/like/block.js:169
 #: blocks/reply/block.js:126
-#: blocks/repost/block.js:141
+#: blocks/repost/block.js:181
 msgid "Author"
 msgstr ""
 
 #: blocks/bookmark/block.js:148
-#: blocks/like/block.js:148
+#: blocks/like/block.js:191
 #: blocks/reply/block.js:148
-#: blocks/repost/block.js:163
+#: blocks/repost/block.js:203
 msgid "Customize title"
 msgstr ""
 
 #: blocks/bookmark/block.js:154
-#: blocks/like/block.js:154
+#: blocks/like/block.js:197
 #: blocks/reply/block.js:154
-#: blocks/repost/block.js:169
+#: blocks/repost/block.js:209
 msgid "Customize author"
 msgstr ""
 
 #: blocks/bookmark/block.js:161
 #: blocks/context/block.js:63
-#: blocks/like/block.js:161
+#: blocks/like/block.js:204
 #: blocks/reply/block.js:161
-#: blocks/repost/block.js:176
+#: blocks/repost/block.js:216
 msgid "URL"
 msgstr ""
 
@@ -567,18 +574,18 @@ msgid "Reply"
 msgstr ""
 
 #: blocks/context/block.js:74
-#: blocks/repost/block.js:122
+#: blocks/repost/block.js:162
 msgid "Repost"
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
 #: blocks/context/block.js:97
-#: blocks/like/block.js:32
+#: blocks/like/block.js:29
 msgid "Liked %s."
 msgstr ""
 
-#. translators: %1$s: Link to the "liked" page. %2$s: Author of the liked page.
-#: blocks/like/block.js:39
+#. translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page.
+#: blocks/like/block.js:41
 msgid "Liked %1$s by %2$s."
 msgstr ""
 
@@ -587,9 +594,8 @@ msgstr ""
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
-#. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the web page being replied to.
-#: blocks/repost/block.js:41
-msgid "Reposted %1$s by %2$s."
+#: blocks/repost/block.js:65
+msgid "Use the Repost block to “reblog” another (short) post verbatim while still giving credit."
 msgstr ""
 
 #. translators: %s: plain-text "list" of links.

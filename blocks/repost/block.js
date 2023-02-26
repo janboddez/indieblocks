@@ -163,7 +163,7 @@
 							'core/group',
 							attributes,
 							[
-								createBlock( 'core/html', { content: element.renderToString( hCite( 'u-repost-of', attributes ) ) } ),
+								createBlock( 'core/html', { content: element.renderToString( IndieBlocks.hCite( 'u-repost-of', attributes ) ) } ),
 								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
 							]
 						);

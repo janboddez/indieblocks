@@ -1,4 +1,4 @@
-( function ( blocks, element, blockEditor, components, data, apiFetch, i18n, IndieBlocks ) {
+( function ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) {
 	var createBlock = blocks.createBlock;
 
 	var el          = element.createElement;
@@ -15,51 +15,6 @@
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
-
-	/**
-	 * Returns a "repost context" `div`.
-	 */
-	function hCite( attributes, innerBlocks = null ) {
-		return el( 'div', { className: 'u-repost-of h-cite' },
-			[
-				el( 'p', {}, // Adding paragraphs this time around.
-					el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
-						( ! attributes.author || 'undefined' === attributes.author )
-							? interpolate(
-							/* translators: %s: Link to the "page" being reposted. */
-							sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
-								{
-									a: el( 'a', {
-										className: attributes.title && attributes.url !== attributes.title
-											? 'u-url p-name' // No title means no `p-name`.
-											: 'u-url',
-										href: attributes.url,
-									} ),
-								}
-							)
-							: interpolate(
-								/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted. */
-								sprintf( __( 'Reposted %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
-								{
-									a: el( 'a', {
-										className: attributes.title && attributes.url !== attributes.title
-											? 'u-url p-name'
-											: 'u-url',
-										href: attributes.url,
-									} ),
-									span: el( 'span', { className: 'p-author' } ),
-								}
-							)
-					)
-				),
-				innerBlocks && ! attributes.empty
-					? el( 'blockquote', { className: 'wp-block-quote e-content' },
-						el( innerBlocks )
-					)
-					: null,
-			]
-		);
-	}
 
 	blocks.registerBlockType( 'indieblocks/repost', {
 		description: __( 'Use the Repost block to “reblog” another (short) post verbatim while still giving credit.', 'indieblocks' ),
@@ -167,14 +122,14 @@
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
 									onKeyDown: ( event ) => {
 										if ( 13 === event.keyCode ) {
-											IndieBlocks.updateMeta( props, apiFetch );
+											IndieBlocks.updateMeta( props );
 										}
 									},
-									onBlur: () => { IndieBlocks.updateMeta( props, apiFetch ) },
+									onBlur: () => { IndieBlocks.updateMeta( props ) },
 								} ),
 							]
 						)
-						: hCite( props.attributes ),
+						: IndieBlocks.hCite( 'u-repost-of', props.attributes ),
 					el( 'blockquote', { className: 'wp-block-quote e-content' },
 						el( InnerBlocks, {
 							template: [ [ 'core/paragraph' ] ],
@@ -187,9 +142,18 @@
 		save: ( props ) => el( 'div', useBlockProps.save(),
 			( ! props.attributes.url || 'undefined' === props.attributes.url )
 				? null // Can't do much without a URL.
-				: hCite( props.attributes, InnerBlocks.Content )
+				: IndieBlocks.hCite( 'u-repost-of', props.attributes, InnerBlocks.Content )
 		),
 		transforms: {
+			from: [
+				{
+					type: 'block',
+					blocks: [ 'indieblocks/context' ],
+					transform: ( { url } ) => {
+						return createBlock( 'indieblocks/repost', { url } );
+					},
+				},
+			],
 			to: [
 				{
 					type: 'block',
@@ -199,7 +163,7 @@
 							'core/group',
 							attributes,
 							[
-								createBlock( 'core/html', { content: element.renderToString( hCite( attributes ) ) } ),
+								createBlock( 'core/html', { content: element.renderToString( hCite( 'u-repost-of', attributes ) ) } ),
 								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
 							]
 						);
@@ -208,4 +172,4 @@
 			],
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n, window.IndieBlocks );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.i18n, window.IndieBlocks );

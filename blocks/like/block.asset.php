@@ -7,7 +7,6 @@ return array(
 		'wp-element',
 		'wp-block-editor',
 		'wp-components',
-		'wp-api-fetch',
 		'wp-i18n',
 		'indieblocks-common',
 	),

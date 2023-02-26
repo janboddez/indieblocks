@@ -26,7 +26,13 @@ class Blocks {
 	 * Registers common JS.
 	 */
 	public static function register_scripts() {
-		wp_register_script( 'indieblocks-common', plugins_url( '/assets/common.js', dirname( __FILE__ ) ), array(), \IndieBlocks\IndieBlocks::PLUGIN_VERSION, true );
+		wp_register_script(
+			'indieblocks-common',
+			plugins_url( '/assets/common.js', dirname( __FILE__ ) ),
+			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
+			\IndieBlocks\IndieBlocks::PLUGIN_VERSION,
+			true
+		);
 	}
 
 	/**

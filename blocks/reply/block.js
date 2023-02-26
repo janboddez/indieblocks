@@ -1,4 +1,4 @@
-( function ( blocks, element, blockEditor, components, data, apiFetch, i18n, IndieBlocks ) {
+( function ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) {
 	var createBlock = blocks.createBlock;
 
 	var el          = element.createElement;
@@ -15,44 +15,6 @@
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
-
-	/**
-	 * Returns a "reply context" `div`.
-	 */
-	function hCite( attributes ) {
-		return el( 'div', { className: 'u-in-reply-to h-cite' },
-			el( 'p', {}, // Adding paragraphs this time around.
-				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
-					( ! attributes.author || 'undefined' === attributes.author )
-						? interpolate(
-						/* translators: %s: Link to the page being replied to. */
-						sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
-							{
-								a: el( 'a', {
-									className: attributes.title && attributes.url !== attributes.title
-										? 'u-url p-name' // No title means no `p-name`.
-										: 'u-url',
-									href: attributes.url,
-								} ),
-							}
-						)
-						: interpolate(
-							/* translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to. */
-							sprintf( __( 'In reply to %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
-							{
-								a: el( 'a', {
-									className: attributes.title && attributes.url !== attributes.title
-										? 'u-url p-name'
-										: 'u-url',
-									href: attributes.url,
-								} ),
-								span: el( 'span', { className: 'p-author' } ),
-							}
-						)
-				)
-			)
-		);
-	}
 
 	blocks.registerBlockType( 'indieblocks/reply', {
 		description: __( 'Reply to others’ (or your own) posts and pages.', 'indieblocks' ),
@@ -160,14 +122,14 @@
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
 									onKeyDown: ( event ) => {
 										if ( 13 === event.keyCode ) {
-											IndieBlocks.updateMeta( props, apiFetch );
+											IndieBlocks.updateMeta( props );
 										}
 									},
-									onBlur: () => { IndieBlocks.updateMeta( props, apiFetch ) },
+									onBlur: () => { IndieBlocks.updateMeta( props ) },
 								} ),
 							]
 						)
-						: hCite( props.attributes ),
+						: IndieBlocks.hCite( 'u-in-reply-to', props.attributes ),
 					el( InnerBlocks, {
 						template: [ [ 'core/paragraph' ] ],
 						templateLock: false,
@@ -179,7 +141,7 @@
 			( ! props.attributes.url || 'undefined' === props.attributes.url )
 				? null // Can't do much without a URL.
 				: [
-					hCite( props.attributes ),
+					IndieBlocks.hCite( 'u-in-reply-to', props.attributes ),
 					! props.attributes.empty
 						? el( 'div', { className: 'e-content' },
 							el( InnerBlocks.Content )
@@ -188,6 +150,15 @@
 				]
 		),
 		transforms: {
+			from: [
+				{
+					type: 'block',
+					blocks: [ 'indieblocks/context' ],
+					transform: ( { url } ) => {
+						return createBlock( 'indieblocks/reply', { url } );
+					},
+				},
+			],
 			to: [
 				{
 					type: 'block',
@@ -197,7 +168,7 @@
 							'core/group',
 							attributes,
 							[
-								createBlock( 'core/html', { content: element.renderToString( hCite( attributes ) ) } ),
+								createBlock( 'core/html', { content: element.renderToString( IndieBlocks.hCite( 'u-in-reply-to', attributes ) ) } ),
 								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
 							]
 						);
@@ -206,4 +177,4 @@
 			],
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n, window.IndieBlocks );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.i18n, window.IndieBlocks );

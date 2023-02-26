@@ -106,8 +106,6 @@ class Blocks {
 				array( array( 'core/paragraph' ) ),
 			),
 		);
-
-		$post_type_object->template_lock = 'insert';
 	}
 
 	/**

@@ -358,7 +358,7 @@ class Micropub_Compat {
 							$post_content .= '<!-- wp:indieblocks/bookmark {"empty":false} -->' . PHP_EOL;
 						}
 
-						$post_content .= '<div class="wp-block-indieblocks-reply"><div class="u-bookmark-of h-cite"><p><i>';
+						$post_content .= '<div class="wp-block-indieblocks-bookmark"><div class="u-bookmark-of h-cite"><p><i>';
 						$post_content .= sprintf(
 							/* translators: %s: Link to the bookmarked page. */
 							__( 'Bookmarked %s.', 'indieblocks' ),

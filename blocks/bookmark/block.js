@@ -122,10 +122,10 @@
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
 									onKeyDown: ( event ) => {
 										if ( 13 === event.keyCode ) {
-											IndieBlocks.updateMeta( props, apiFetch );
+											IndieBlocks.updateMeta( props );
 										}
 									},
-									onBlur: () => { IndieBlocks.updateMeta( props, apiFetch ) },
+									onBlur: () => { IndieBlocks.updateMeta( props ) },
 								} ),
 							]
 						)

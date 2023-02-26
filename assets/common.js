@@ -34,7 +34,7 @@ var IndieBlocks = {
 					el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
 						( ! attributes.author || 'undefined' === attributes.author )
 							? interpolate(
-							sprintf( messages[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
+							    sprintf( messages[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
 								{
 									a: el( 'a', {
 										className: attributes.title && attributes.url !== attributes.title

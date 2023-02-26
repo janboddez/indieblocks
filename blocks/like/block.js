@@ -169,7 +169,7 @@
 							attributes,
 							[
 								createBlock( 'core/html', { content: element.renderToString( IndieBlocks.hCite( 'u-like-of', attributes ) ) } ),
-								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
+								createBlock( 'core/group', { className: 'e-content' }, innerBlocks ),
 							]
 						);
 					},

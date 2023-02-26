@@ -33,6 +33,12 @@ class Blocks {
 			\IndieBlocks\IndieBlocks::PLUGIN_VERSION,
 			true
 		);
+
+		wp_set_script_translations(
+			'indieblocks-common',
+			'indieblocks',
+			dirname( __DIR__ ) . '/languages'
+		);
 	}
 
 	/**

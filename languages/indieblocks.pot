@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-02-26T15:09:54+00:00\n"
+"POT-Creation-Date: 2023-02-26T16:06:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
@@ -45,17 +45,17 @@ msgstr ""
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:195
+#: includes/class-blocks.php:193
 #: blocks/syndication-links/block.js:32
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:196
+#: includes/class-blocks.php:194
 #: blocks/syndication-links/block.js:36
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:206
+#: includes/class-blocks.php:204
 msgid "Also on"
 msgstr ""
 

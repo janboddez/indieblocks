@@ -86,26 +86,22 @@ class Blocks {
 	 * Registers Note and Like block templates.
 	 */
 	public static function register_block_templates() {
-		foreach ( array( 'indieblocks_like', 'indieblocks_note' ) as $post_type ) {
-			$post_type_object = get_post_type_object( $post_type );
+		$post_type_object = get_post_type_object( 'indieblocks_like' );
 
-			if ( ! $post_type_object ) {
-				// Post type not active.
-				continue;
-			}
-
-			if ( 'indieblocks_like' === $post_type ) {
-				$post_type_object->template = array(
-					array(
-						'indieblocks/like',
-						array(),
-						array( array( 'core/paragraph' ) ),
-					),
-				);
-
-				$post_type_object->template_lock = 'insert';
-			}
+		if ( ! $post_type_object ) {
+			// Post type not active.
+			return;
 		}
+
+		$post_type_object->template = array(
+			array(
+				'indieblocks/like',
+				array(),
+				array( array( 'core/paragraph' ) ),
+			),
+		);
+
+		$post_type_object->template_lock = 'insert';
 	}
 
 	/**

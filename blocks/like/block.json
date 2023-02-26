@@ -21,7 +21,7 @@
 		"title": {
 			"type": "string",
 			"source": "text",
-			"selector": ".u-url",
+			"selector": ".p-name",
 			"default": ""
 		},
 		"customAuthor": {

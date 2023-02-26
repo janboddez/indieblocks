@@ -1,17 +1,14 @@
-( function ( blocks, element, blockEditor, components, data, apiFetch, i18n ) {
+( function ( blocks, element, blockEditor, components, data, apiFetch, i18n, IndieBlocks ) {
 	var createBlock = blocks.createBlock;
 
-	var el            = element.createElement;
-	var interpolateEl = element.createInterpolateElement;
+	var el          = element.createElement;
+	var interpolate = element.createInterpolateElement;
+	var useEffect   = element.useEffect;
 
-	var BlockControls     = blockEditor.BlockControls;
-	var InnerBlocks       = blockEditor.InnerBlocks;
-	var InspectorControls = blockEditor.InspectorControls;
-	var useBlockProps     = blockEditor.useBlockProps;
+	var InnerBlocks   = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	var CheckboxControl = components.CheckboxControl;
-	var PanelBody       = components.PanelBody;
-	var Placeholder     = components.Placeholder;
 	var TextControl     = components.TextControl;
 
 	var useSelect = data.useSelect;
@@ -25,20 +22,30 @@
 	function hCite( attributes ) {
 		return el( 'div', { className: 'u-bookmark-of h-cite' },
 			el( 'p', {}, // Adding paragraphs this time around.
-				el( 'i', {},
+				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
 					( ! attributes.author || 'undefined' === attributes.author )
-						? interpolateEl(
+						? interpolate(
 						/* translators: %s: Link to the bookmarked page. */
-						sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
+						sprintf( __( 'Bookmark %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
 							{
-								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name' // No title means no `p-name`.
+										: 'u-url',
+									href: attributes.url,
+								} ),
 							}
 						)
-						: interpolateEl(
+						: interpolate(
 							/* translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page. */
 							sprintf( __( 'Bookmarked %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
 							{
-								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name'
+										: 'u-url',
+									href: attributes.url,
+								} ),
 								span: el( 'span', { className: 'p-author' } ),
 							}
 						)
@@ -47,60 +54,50 @@
 		);
 	}
 
-	function render( blockProps, attributes, save = false ) {
-		return el( 'div', blockProps,
-			( ! attributes.url || 'undefined' === attributes.url )
-				? null // Can't do much without a URL.
-				: save
-					? [
-						hCite( attributes ),
-						el( 'div', { className: 'e-content' },
-							el( InnerBlocks.Content )
-						),
-					]
-					: hCite( attributes ),
-		);
-	}
-
 	blocks.registerBlockType( 'indieblocks/bookmark', {
-		edit: function ( props ) {
-			function updateMeta() {
-				if ( customTitle && customAuthor ) {
-					return;
-				}
-
-				var controller = new AbortController();
-				var timeoutId  = setTimeout( function() {
-					controller.abort();
-				}, 6000 );
-
-				apiFetch( {
-					path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
-					signal: controller.signal
-				} ).then( function( response ) {
-					if ( ! customTitle && ( response.name || '' === response.name ) ) {
-						props.setAttributes( { title: response.name } );
-					}
-
-					if ( ! customAuthor && ( response.author.name || '' === response.author.name ) ) {
-						props.setAttributes( { author: response.author.name } );
-					}
-
-					clearTimeout( timeoutId );
-				} ).catch( function( error ) {
-					// The request timed out or otherwise failed. Leave as is.
-				} );
-			}
-
-			var is_inner_block_selected = useSelect(
-				( select ) => select( 'core/block-editor' ).hasSelectedInnerBlock( props.clientId, true )
-			);
-
+		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
+		edit: ( props ) => {
 			var url          = props.attributes.url;
 			var customTitle  = props.attributes.customTitle;
-			var title        = props.attributes.title || '';
+			var title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
 			var customAuthor = props.attributes.customAuthor;
 			var author       = props.attributes.author || '';
+
+			function updateEmpty( empty ) {
+				props.setAttributes( { empty } );
+			}
+
+			var parentClientId = useSelect( ( select ) => select( 'core/block-editor' ).getBlockHierarchyRootClientId( props.clientId ) );
+			var innerBlocks    = useSelect( ( select ) => select( 'core/block-editor' ).getBlocks( parentClientId ) );
+
+			// To determine whether `.e-content` and `InnerBlocks.Content`
+			// should be saved (and echoed).
+			useEffect( () => {
+				var empty = true;
+
+				if ( innerBlocks.length > 1 ) {
+					// More than one child block.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && 'undefined' !== typeof innerBlocks[0].attributes.content && innerBlocks[0].attributes.content.length ) {
+					// A non-empty paragraph or heading. Empty paragraphs are
+					// almost unavoidable, so it's important to get this right.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && 'undefined' !== typeof innerBlocks[0].attributes.href && innerBlocks[0].attributes.href.length ) {
+					// A non-empty image.
+					empty = false;
+				}
+
+				if ( 'undefined' !== typeof innerBlocks[0] && innerBlocks[0].innerBlocks.length ) {
+					// A quote or gallery, empty or not.
+					empty = false;
+				}
+
+				updateEmpty( empty );
+			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
 				icon: 'star-filled',
@@ -134,12 +131,12 @@
 
 			return el( 'div', useBlockProps(),
 				[
-					el( BlockControls ),
-					( props.isSelected || is_inner_block_selected || ! url || 'undefined' === url )
-						? el( Placeholder, placeholderProps,
+					el( blockEditor.BlockControls ),
+					( props.isSelected || ! url || 'undefined' === url )
+						? el( components.Placeholder, placeholderProps,
 							[
-								el( InspectorControls, { key: 'inspector' },
-									el( PanelBody, {
+								el( blockEditor.InspectorControls, { key: 'inspector' },
+									el( components.PanelBody, {
 											title: __( 'Title and Author' ),
 											initialOpen: true,
 										},
@@ -161,18 +158,35 @@
 									label: __( 'URL', 'indieblocks' ),
 									value: url,
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
-									onBlur: updateMeta,
+									onKeyDown: ( event ) => {
+										if ( 13 === event.keyCode ) {
+											IndieBlocks.updateMeta( props, apiFetch );
+										}
+									},
+									onBlur: () => { IndieBlocks.updateMeta( props, apiFetch ) },
 								} ),
 							]
 						)
-						: render( {}, props.attributes ),
-					el( InnerBlocks ),
+						: hCite( props.attributes ),
+					el( InnerBlocks, {
+						template: [ [ 'core/paragraph' ] ],
+						templateLock: false,
+					} ), // Always **show** (editable) `InnerBlocks`.
 				]
 			);
 		},
-		save: function ( props ) {
-			return render( useBlockProps.save(), props.attributes, true );
-		},
+		save: ( props ) => el( 'div', useBlockProps.save(),
+			( ! props.attributes.url || 'undefined' === props.attributes.url )
+				? null // Can't do much without a URL.
+				: [
+					hCite( props.attributes ),
+					! props.attributes.empty
+						? el( 'div', { className: 'e-content' },
+							el( InnerBlocks.Content )
+						)
+						: null,
+				]
+		),
 		transforms: {
 			to: [
 				{
@@ -184,7 +198,7 @@
 							attributes,
 							[
 								createBlock( 'core/html', { content: element.renderToString( hCite( attributes ) ) } ),
-								createBlock( 'core/group', { className: 'e-content' }, innerBlocks ),
+								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
 							]
 						);
 					},
@@ -192,4 +206,4 @@
 			],
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n, window.IndieBlocks );

@@ -21,7 +21,7 @@
 		"title": {
 			"type": "string",
 			"source": "text",
-			"selector": ".u-url",
+			"selector": ".p-name",
 			"default": ""
 		},
 		"customAuthor": {
@@ -33,6 +33,10 @@
 			"source": "text",
 			"selector": ".p-author",
 			"default": ""
+		},
+		"empty": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"example": {

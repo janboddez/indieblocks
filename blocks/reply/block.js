@@ -22,20 +22,30 @@
 	function hCite( attributes ) {
 		return el( 'div', { className: 'u-in-reply-to h-cite' },
 			el( 'p', {}, // Adding paragraphs this time around.
-				el( 'i', {},
+				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
 					( ! attributes.author || 'undefined' === attributes.author )
 						? interpolate(
 						/* translators: %s: Link to the page being replied to. */
 						sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
 							{
-								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name' // No title means no `p-name`.
+										: 'u-url',
+									href: attributes.url,
+								} ),
 							}
 						)
 						: interpolate(
-							/* translators: %1$s: Link to the page being replied to. %2$s: Author of the web page being replied to. */
+							/* translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to. */
 							sprintf( __( 'In reply to %1$s by %2$s.', 'indieblocks' ), '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
 							{
-								a: el( 'a', { className: 'u-url p-name', href: attributes.url } ),
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name'
+										: 'u-url',
+									href: attributes.url,
+								} ),
 								span: el( 'span', { className: 'p-author' } ),
 							}
 						)
@@ -45,13 +55,13 @@
 	}
 
 	blocks.registerBlockType( 'indieblocks/reply', {
-		edit: function ( props ) {
+		description: __( 'Reply to others’ (or your own) posts and pages.', 'indieblocks' ),
+		edit: ( props ) => {
 			var url          = props.attributes.url;
 			var customTitle  = props.attributes.customTitle;
-			var title        = props.attributes.title || '';
+			var title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
 			var customAuthor = props.attributes.customAuthor;
 			var author       = props.attributes.author || '';
-
 
 			function updateEmpty( empty ) {
 				props.setAttributes( { empty } );
@@ -90,7 +100,7 @@
 			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
-				icon: 'admin-comments',
+				icon: 'comments',
 				label: __( 'Reply', 'indieblocks' ),
 				isColumnLayout: true,
 			};
@@ -188,7 +198,7 @@
 							attributes,
 							[
 								createBlock( 'core/html', { content: element.renderToString( hCite( attributes ) ) } ),
-								createBlock( 'core/group', { className: 'e-content' }, innerBlocks ),
+								createBlock( 'core/quote', { className: 'e-content' }, innerBlocks ),
 							]
 						);
 					},

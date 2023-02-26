@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-02-26T12:24:44+00:00\n"
+"POT-Creation-Date: 2023-02-26T15:09:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
@@ -37,25 +37,25 @@ msgstr ""
 msgid "https://jan.boddez.net/"
 msgstr ""
 
-#: includes/class-blocks.php:69
+#: includes/class-blocks.php:75
 msgid "Note Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:70
+#: includes/class-blocks.php:76
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:189
+#: includes/class-blocks.php:195
 #: blocks/syndication-links/block.js:32
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:190
+#: includes/class-blocks.php:196
 #: blocks/syndication-links/block.js:36
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:200
+#: includes/class-blocks.php:206
 msgid "Also on"
 msgstr ""
 
@@ -86,27 +86,28 @@ msgstr ""
 
 #. translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page.
 #: includes/class-micropub-compat.php:278
-#: blocks/like/block.js:41
+#: assets/common.js:13
 msgid "Likes %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
 #: includes/class-micropub-compat.php:301
 #: includes/class-micropub-compat.php:316
+#: assets/common.js:24
 #: blocks/context/block.js:22
-#: blocks/like/block.js:29
 msgid "Likes %s."
 msgstr ""
 
 #. translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page.
 #: includes/class-micropub-compat.php:341
-#: blocks/bookmark/block.js:41
+#: assets/common.js:11
 msgid "Bookmarked %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
 #: includes/class-micropub-compat.php:364
 #: includes/class-micropub-compat.php:379
+#: assets/common.js:22
 #: blocks/context/block.js:20
 #: blocks/context/block.js:95
 msgid "Bookmarked %s."
@@ -114,31 +115,31 @@ msgstr ""
 
 #. translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to.
 #: includes/class-micropub-compat.php:404
-#: blocks/reply/block.js:41
+#: assets/common.js:15
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the page being replied to.
 #: includes/class-micropub-compat.php:427
 #: includes/class-micropub-compat.php:442
+#: assets/common.js:26
 #: blocks/context/block.js:24
 #: blocks/context/block.js:99
-#: blocks/reply/block.js:29
 msgid "In reply to %s."
 msgstr ""
 
 #. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted.
 #: includes/class-micropub-compat.php:467
-#: blocks/repost/block.js:42
+#: assets/common.js:17
 msgid "Reposted %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "page" being reposted.
 #: includes/class-micropub-compat.php:490
 #: includes/class-micropub-compat.php:505
+#: assets/common.js:28
 #: blocks/context/block.js:26
 #: blocks/context/block.js:101
-#: blocks/repost/block.js:30
 msgid "Reposted %s."
 msgstr ""
 
@@ -404,7 +405,7 @@ msgstr ""
 
 #: includes/class-post-types.php:108
 #: blocks/context/block.js:72
-#: blocks/like/block.js:104
+#: blocks/like/block.js:66
 msgid "Like"
 msgstr ""
 
@@ -528,60 +529,55 @@ msgstr ""
 msgid "Invalid post ID."
 msgstr ""
 
-#. translators: %s: Link to the bookmarked page.
-#: blocks/bookmark/block.js:29
-msgid "Bookmark %s."
-msgstr ""
-
-#: blocks/bookmark/block.js:58
+#: blocks/bookmark/block.js:20
 msgid "Bookmark and annotate web pages or posts."
 msgstr ""
 
-#: blocks/bookmark/block.js:104
+#: blocks/bookmark/block.js:66
 #: blocks/context/block.js:71
 msgid "Bookmark"
 msgstr ""
 
-#: blocks/bookmark/block.js:109
-#: blocks/like/block.js:109
-#: blocks/reply/block.js:109
-#: blocks/repost/block.js:116
+#: blocks/bookmark/block.js:71
+#: blocks/like/block.js:71
+#: blocks/reply/block.js:71
+#: blocks/repost/block.js:71
 msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
+msgstr ""
+
+#: blocks/bookmark/block.js:75
+#: blocks/like/block.js:75
+#: blocks/reply/block.js:75
+#: blocks/repost/block.js:75
+msgid "Title"
+msgstr ""
+
+#: blocks/bookmark/block.js:85
+#: blocks/like/block.js:85
+#: blocks/reply/block.js:85
+#: blocks/repost/block.js:85
+msgid "Author"
+msgstr ""
+
+#: blocks/bookmark/block.js:107
+#: blocks/like/block.js:107
+#: blocks/reply/block.js:107
+#: blocks/repost/block.js:107
+msgid "Customize title"
 msgstr ""
 
 #: blocks/bookmark/block.js:113
 #: blocks/like/block.js:113
 #: blocks/reply/block.js:113
-#: blocks/repost/block.js:120
-msgid "Title"
-msgstr ""
-
-#: blocks/bookmark/block.js:123
-#: blocks/like/block.js:123
-#: blocks/reply/block.js:123
-#: blocks/repost/block.js:130
-msgid "Author"
-msgstr ""
-
-#: blocks/bookmark/block.js:145
-#: blocks/like/block.js:145
-#: blocks/reply/block.js:145
-#: blocks/repost/block.js:152
-msgid "Customize title"
-msgstr ""
-
-#: blocks/bookmark/block.js:151
-#: blocks/like/block.js:151
-#: blocks/reply/block.js:151
-#: blocks/repost/block.js:158
+#: blocks/repost/block.js:113
 msgid "Customize author"
 msgstr ""
 
-#: blocks/bookmark/block.js:158
+#: blocks/bookmark/block.js:120
 #: blocks/context/block.js:63
-#: blocks/like/block.js:158
-#: blocks/reply/block.js:158
-#: blocks/repost/block.js:165
+#: blocks/like/block.js:120
+#: blocks/reply/block.js:120
+#: blocks/repost/block.js:120
 msgid "URL"
 msgstr ""
 
@@ -594,12 +590,12 @@ msgid "Add a URL and post type, and have WordPress automatically generate a corr
 msgstr ""
 
 #: blocks/context/block.js:73
-#: blocks/reply/block.js:104
+#: blocks/reply/block.js:66
 msgid "Reply"
 msgstr ""
 
 #: blocks/context/block.js:74
-#: blocks/repost/block.js:111
+#: blocks/repost/block.js:66
 msgid "Repost"
 msgstr ""
 
@@ -608,15 +604,15 @@ msgstr ""
 msgid "Liked %s."
 msgstr ""
 
-#: blocks/like/block.js:58
-msgid "Use the Like block to let the world (and its author) know about your appreciation for a certain web page or post."
+#: blocks/like/block.js:20
+msgid "Show your appreciation for a certain web page or post."
 msgstr ""
 
-#: blocks/reply/block.js:58
+#: blocks/reply/block.js:20
 msgid "Reply to others’ (or your own) posts and pages."
 msgstr ""
 
-#: blocks/repost/block.js:65
+#: blocks/repost/block.js:20
 msgid "Use the Repost block to “reblog” another (short) post verbatim while still giving credit."
 msgstr ""
 

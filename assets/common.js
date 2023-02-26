@@ -7,13 +7,13 @@ var IndieBlocks = {
 		var sprintf = window.wp.i18n.sprintf;
 
 		var messagesWithByline = {
-			/* translators: %s: Link to the bookmarked page. */
+			/* translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page. */
 			'u-bookmark-of': __( 'Bookmarked %1$s by %2$s.', 'indieblocks' ),
-			/* translators: %s: Link to the "liked" page. */
+			/* translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page. */
 			'u-like-of': __( 'Likes %1$s by %2$s.', 'indieblocks' ),
-			/* translators: %s: Link to the page being replied to. */
+			/* translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to. */
 			'u-in-reply-to': __( 'In reply to %1$s by %2$s.', 'indieblocks' ),
-			/* translators: %s: Link to the "page" being reposted. */
+			/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted. */
 			'u-repost-of': __( 'Reposted %1$s by %2$s.', 'indieblocks' ),
 		};
 

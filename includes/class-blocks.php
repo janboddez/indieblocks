@@ -15,10 +15,18 @@ class Blocks {
 	 * Hooks and such.
 	 */
 	public static function register() {
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_scripts' ) );
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+	}
+
+	/**
+	 * Registers common JS.
+	 */
+	public static function register_scripts() {
+		wp_register_script( 'indieblocks-common', plugins_url( '/assets/common.js', dirname( __FILE__ ) ), array(), \IndieBlocks\IndieBlocks::PLUGIN_VERSION, true );
 	}
 
 	/**

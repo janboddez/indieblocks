@@ -33,6 +33,10 @@
 			"source": "text",
 			"selector": ".p-author",
 			"default": ""
+		},
+		"empty": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"example": {

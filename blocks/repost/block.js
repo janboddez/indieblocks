@@ -1,4 +1,4 @@
-( function ( blocks, element, blockEditor, components, data, apiFetch, i18n ) {
+( function ( blocks, element, blockEditor, components, data, apiFetch, i18n, IndieBlocks ) {
 	var createBlock = blocks.createBlock;
 
 	var el          = element.createElement;
@@ -69,57 +69,6 @@
 			var title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
 			var customAuthor = props.attributes.customAuthor;
 			var author       = props.attributes.author || '';
-
-			function isValidUrl( string ) {
-				try {
-					new URL( string );
-				} catch ( error ) {
-					return false;
-				}
-
-				return true;
-			}
-
-			/**
-			 * Calls a backend function that parses a URL for microformats and
-			 * the like.
-			 */
-			function updateMeta() {
-				if ( customTitle && customAuthor ) {
-					// We're using custom values for both title and author;
-					// nothing to do here.
-					return;
-				}
-
-				if ( ! isValidUrl( url ) ) {
-					return;
-				}
-
-				// Like a time-out.
-				var controller = new AbortController();
-				var timeoutId  = setTimeout( function() {
-					controller.abort();
-				}, 6000 );
-
-				apiFetch( {
-					path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
-					signal: controller.signal, // That time-out thingy.
-				} ).then( function( response ) {
-					if ( ! customTitle && ( response.name || '' === response.name ) ) {
-						// Got a, possibly empty, title.
-						props.setAttributes( { title: response.name } );
-					}
-
-					if ( ! customAuthor && ( response.author.name || '' === response.author.name ) ) {
-						// Got a, possibly empty, name.
-						props.setAttributes( { author: response.author.name } );
-					}
-
-					clearTimeout( timeoutId );
-				} ).catch( function( error ) {
-					// The request timed out or otherwise failed. Leave as is.
-				} );
-			}
 
 			function updateEmpty( empty ) {
 				props.setAttributes( { empty } );
@@ -218,10 +167,10 @@
 									onChange: ( value ) => { props.setAttributes( { url: value } ) },
 									onKeyDown: ( event ) => {
 										if ( 13 === event.keyCode ) {
-											updateMeta();
+											IndieBlocks.updateMeta( props, apiFetch );
 										}
 									},
-									onBlur: updateMeta,
+									onBlur: () => { IndieBlocks.updateMeta( props, apiFetch ) },
 								} ),
 							]
 						)
@@ -259,4 +208,4 @@
 			],
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.data, window.wp.apiFetch, window.wp.i18n, window.IndieBlocks );

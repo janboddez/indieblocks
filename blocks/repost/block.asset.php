@@ -9,5 +9,6 @@ return array(
 		'wp-components',
 		'wp-api-fetch',
 		'wp-i18n',
+		'indieblocks-common',
 	),
 );

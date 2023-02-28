@@ -440,8 +440,27 @@ class Theme_Mf2 {
 			$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 		}
 
+		$permalink = get_the_permalink( $post_ID );
+
+		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+			$content = '<div class="h-entry">' . get_the_content() . '</div>';
+
+			if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
+				$content = '<div class="e-content">' . $content . '</div>';
+			}
+
+			$parser = new Parser( $permalink );
+			$parser->parse( $content );
+
+			$referenced_url = $parser->get_referenced_url();
+
+			$permalink = ! empty( $referenced_url )
+				? $referenced_url
+				: $permalink;
+		}
+
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );

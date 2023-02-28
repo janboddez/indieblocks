@@ -139,18 +139,19 @@ class Options_Handler {
 	 */
 	public function sanitize_post_types_settings( $settings ) {
 		$options = array(
-			'enable_notes'       => isset( $settings['enable_notes'] ) ? true : false,
-			'notes_in_feed'      => isset( $settings['notes_in_feed'] ) ? true : false,
-			'notes_in_home'      => isset( $settings['notes_in_home'] ) ? true : false,
-			'default_taxonomies' => isset( $settings['default_taxonomies'] ) ? true : false,
-			'enable_likes'       => isset( $settings['enable_likes'] ) ? true : false,
-			'likes_in_feed'      => isset( $settings['likes_in_feed'] ) ? true : false,
-			'likes_in_home'      => isset( $settings['likes_in_home'] ) ? true : false,
-			'random_slugs'       => isset( $settings['random_slugs'] ) ? true : false,
-			'automatic_titles'   => isset( $settings['automatic_titles'] ) ? true : false,
-			'hide_titles'        => isset( $settings['hide_titles'] ) ? true : false,
-			'date_archives'      => isset( $settings['date_archives'] ) ? true : false,
-			'modified_feeds'     => isset( $settings['modified_feeds'] ) ? true : false,
+			'enable_notes'             => isset( $settings['enable_notes'] ) ? true : false,
+			'notes_in_feed'            => isset( $settings['notes_in_feed'] ) ? true : false,
+			'notes_in_home'            => isset( $settings['notes_in_home'] ) ? true : false,
+			'default_taxonomies'       => isset( $settings['default_taxonomies'] ) ? true : false,
+			'enable_likes'             => isset( $settings['enable_likes'] ) ? true : false,
+			'likes_in_feed'            => isset( $settings['likes_in_feed'] ) ? true : false,
+			'likes_in_home'            => isset( $settings['likes_in_home'] ) ? true : false,
+			'random_slugs'             => isset( $settings['random_slugs'] ) ? true : false,
+			'automatic_titles'         => isset( $settings['automatic_titles'] ) ? true : false,
+			'like_and_bookmark_titles' => isset( $settings['like_and_bookmark_titles'] ) ? true : false, // Whether to treat like and bookmark (and repost?) titles differently.
+			'hide_titles'              => isset( $settings['hide_titles'] ) ? true : false,
+			'date_archives'            => isset( $settings['date_archives'] ) ? true : false,
+			'modified_feeds'           => isset( $settings['modified_feeds'] ) ? true : false,
 		);
 
 		$permalink_format = '/%postname%/';
@@ -291,7 +292,7 @@ class Options_Handler {
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Autogenerate Titles', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[automatic_titles]" value="1" <?php checked( ! empty( $this->options['automatic_titles'] ) ); ?>/> <?php esc_html_e( 'Automatically generate titles', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( 'Autogenerate note and like titles. (Your theme should probably hide these, still.)', 'indieblocks' ); ?></p></td>
+							<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Have like and bookmark titles reflect linked (i.e., liked or bookmarked) pages instead', 'indieblocks' ); ?></label></p></td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Hide Titles', 'indieblocks' ); ?></th>

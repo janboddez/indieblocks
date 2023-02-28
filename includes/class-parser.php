@@ -151,4 +151,42 @@ class Parser {
 
 		return '';
 	}
+
+	/**
+	 * Returns the first of one or several referenced (liked or bookmarked or
+	 * reposted, in that order) URLs.
+	 *
+	 * @return string Referenced URL.
+	 */
+	public function get_referenced_url() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
+
+			if ( ! empty( $hentry['properties']['like-of'][0] ) && filter_var( $hentry['properties']['like-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['like-of'][0];
+			}
+
+			if ( ! empty( $hentry['properties']['like-of'][0]['value'] ) && filter_var( $hentry['properties']['like-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['like-of'][0]['value'];
+			}
+
+			if ( ! empty( $hentry['properties']['bookmark-of'][0] ) && filter_var( $hentry['properties']['bookmark-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['bookmark-of'][0];
+			}
+
+			if ( ! empty( $hentry['properties']['bookmark-of'][0]['value'] ) && filter_var( $hentry['properties']['bookmark-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['bookmark-of'][0]['value'];
+			}
+
+			if ( ! empty( $hentry['properties']['repost-of'][0] ) && filter_var( $hentry['properties']['repost-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['repost-of'][0];
+			}
+
+			if ( ! empty( $hentry['properties']['repost-of'][0]['value'] ) && filter_var( $hentry['properties']['repost-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $hentry['properties']['repost-of'][0]['value'];
+			}
+		}
+
+		return '';
+	}
 }

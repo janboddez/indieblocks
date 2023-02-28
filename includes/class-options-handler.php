@@ -17,28 +17,29 @@ class Options_Handler {
 	 * @var array $options Plugin options.
 	 */
 	private $options = array(
-		'enable_blocks'         => true,
-		'add_mf2'               => false,
-		'enable_notes'          => false,
-		'notes_in_home'         => false,
-		'notes_in_feed'         => true,
-		'default_taxonomies'    => false,
-		'enable_likes'          => false,
-		'likes_in_feed'         => false,
-		'likes_in_home'         => false,
-		'random_slugs'          => false,
-		'automatic_titles'      => false,
-		'hide_titles'           => false,
-		'date_archives'         => false,
-		'permalink_format'      => '/%postname%/',
-		'modified_feeds'        => false,
-		'webmention'            => false,
-		'webmention_post_types' => array(),
-		'cache_avatars'         => false,
-		'add_featured_images'   => false,
-		'location_functions'    => false,
-		'micropub'              => false,
-		'parse_markdown'        => false,
+		'enable_blocks'            => true,
+		'add_mf2'                  => false,
+		'enable_notes'             => false,
+		'notes_in_home'            => false,
+		'notes_in_feed'            => true,
+		'default_taxonomies'       => false,
+		'enable_likes'             => false,
+		'likes_in_feed'            => false,
+		'likes_in_home'            => false,
+		'random_slugs'             => false,
+		'automatic_titles'         => false,
+		'like_and_bookmark_titles' => false,
+		'hide_titles'              => false,
+		'date_archives'            => false,
+		'permalink_format'         => '/%postname%/',
+		'modified_feeds'           => false,
+		'webmention'               => false,
+		'webmention_post_types'    => array(),
+		'cache_avatars'            => false,
+		'add_featured_images'      => false,
+		'location_functions'       => false,
+		'micropub'                 => false,
+		'parse_markdown'           => false,
 	);
 
 	/**
@@ -54,10 +55,10 @@ class Options_Handler {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$options = get_option( 'indieblocks_settings', $this->options );
+		$options = get_option( 'indieblocks_settings', array() );
 
 		if ( is_array( $options ) ) {
-			$this->options = $options;
+			$this->options = array_merge( $this->options, $options );
 		}
 	}
 
@@ -122,10 +123,7 @@ class Options_Handler {
 			'add_mf2'       => isset( $settings['add_mf2'] ) ? true : false,
 		);
 
-		$this->options = array_merge(
-			$this->options,
-			$options
-		);
+		$this->options = array_merge( $this->options, $options );
 
 		// Updated settings.
 		return $this->options;
@@ -166,10 +164,7 @@ class Options_Handler {
 		unset( $options['post_types'] );
 		unset( $options['custom_menu_order'] );
 
-		$this->options = array_merge(
-			$this->options,
-			$options
-		);
+		$this->options = array_merge( $this->options, $options );
 
 		// Instruct IndieBlocks to flush permalinks during the next request.
 		set_transient( 'indieblocks_flush_permalinks', true );
@@ -202,10 +197,7 @@ class Options_Handler {
 
 		$options['webmention_post_types'] = $webmention_post_types;
 
-		$this->options = array_merge(
-			$this->options,
-			$options
-		);
+		$this->options = array_merge( $this->options, $options );
 
 		// Updated settings.
 		return $this->options;
@@ -225,10 +217,7 @@ class Options_Handler {
 			'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
 		);
 
-		$this->options = array_merge(
-			$this->options,
-			$options
-		);
+		$this->options = array_merge( $this->options, $options );
 
 		// Updated settings.
 		return $this->options;

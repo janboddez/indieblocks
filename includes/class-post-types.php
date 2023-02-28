@@ -195,18 +195,42 @@ class Post_Types {
 		}
 
 		/*
-		 * In all other cases, let's generate a post title from the post's
-		 * content.
-		 */
-
-		$title = wp_unslash( $data['post_content'] );
-
-		/*
+		 * In all other cases, let's generate a post title.
+		 *
 		 * Some default "filters." Use the `indieblocks_post_title` filter to
 		 * undo or extend.
 		 */
-		$title = apply_filters( 'the_content', $title );
-		$title = trim( wp_strip_all_tags( $title ) );
+		$content = wp_unslash( $data['post_content'] );
+		$content = apply_filters( 'the_content', $content );
+
+		$options = get_options();
+
+		if ( empty( $postarr['ID'] ) && ! empty( $options['like_and_bookmark_titles'] ) ) {
+			// Allow overriding the auto-generated title by automatically
+			// generating it _only_ when a post is first created.
+			$hentry = $content;
+
+			if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
+				$hentry = '<div class="e-content">' . $hentry . '</div>';
+			}
+
+			$hentry = '<div class="h-entry">' . $hentry . '</div>';
+
+			$parser = new Parser( '' ); // The post permalink is irrelevant here.
+			$parser->parse( $hentry );
+
+			$referenced_url = $parser->get_referenced_url();
+
+			if ( ! empty( $referenced_url ) ) {
+				$parser = new Parser( $referenced_url ); // The post permalink is irrelevant here.
+				$parser->parse();
+
+				$name    = $parser->get_name();
+				$content = ! empty( $name ) ? $name : $content; // The code below will use this to continue with.
+			}
+		}
+
+		$title = trim( wp_strip_all_tags( $content ) );
 
 		// Avoid double-encoded characters.
 		$title = html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );

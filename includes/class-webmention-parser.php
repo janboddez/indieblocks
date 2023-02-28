@@ -343,7 +343,13 @@ class Webmention_Parser {
 
 			if ( ! is_wp_error( $image ) ) {
 				$image->resize( 150, 150, true );
-				$image->save( $file_path );
+				$result = $image->save( $file_path );
+
+				if ( $file_path !== $result['path'] ) {
+					// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
+					unlink( $file_path ); // Delete "old" image.
+					$file_path = $result['path'];
+				};
 			} else {
 				error_log( '[IndieBlocks/Webmention] Could not reisize ' . $file_path . ': ' . $image->get_error_message() . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}

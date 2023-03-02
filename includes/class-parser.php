@@ -94,6 +94,8 @@ class Parser {
 			if ( ! empty( $hentry['properties']['name'][0] ) ) {
 				return $hentry['properties']['name'][0];
 			}
+
+			return '';
 		}
 
 		$title = $this->dom->getElementsByTagName( 'title' );
@@ -161,10 +163,10 @@ class Parser {
 	}
 
 	/**
-	 * Returns the first of one or several referenced (liked or bookmarked or
-	 * reposted, in that order) URLs.
+	 * Returns the URL, i.e., `href` value, of the first "like," or "bookmark,"
+	 * or "repost" link.
 	 *
-	 * @return string Referenced URL.
+	 * @return string Link URL.
 	 */
 	public function get_link_url() {
 		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
@@ -208,16 +210,16 @@ class Parser {
 		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
 			$hentry = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['like-of'][0]['name'][0] ) && is_string( $hentry['properties']['like-of'][0]['name'][0] ) ) {
-				return $hentry['properties']['like-of'][0]['name'][0];
+			if ( ! empty( $hentry['properties']['like-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['like-of'][0]['properties']['name'][0] ) ) {
+				return $hentry['properties']['like-of'][0]['properties']['name'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['bookmark-of'][0]['name'][0] ) && is_string( $hentry['properties']['bookmark-of'][0]['name'][0] ) ) {
-				return $hentry['properties']['bookmark-of'][0]['name'][0];
+			if ( ! empty( $hentry['properties']['bookmark-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['bookmark-of'][0]['properties']['name'][0] ) ) {
+				return $hentry['properties']['bookmark-of'][0]['properties']['name'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['repost-of'][0]['name'][0] ) && is_string( $hentry['properties']['repost-of'][0]['name'][0] ) ) {
-				return $hentry['properties']['repost-of'][0]['name'][0];
+			if ( ! empty( $hentry['properties']['repost-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['repost-of'][0]['properties']['name'][0] ) ) {
+				return $hentry['properties']['repost-of'][0]['properties']['name'][0];
 			}
 		}
 

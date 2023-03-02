@@ -225,48 +225,7 @@ class Micropub_Compat {
 	 * @return string            Rendered content.
 	 */
 	public static function render( $post_type, $url = '', $input = array() ) {
-		if ( ! empty( $url ) ) {
-			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				// Depending on the scenario, Micropub clients may add a page
-				// title in front of the URL.
-				$url = trim( $matches[0] );
-			}
-
-			// So that developers can, e.g., remove certain query strings.
-			$url          = apply_filters( 'indieblocks_micropub_url', $url );
-			$post_content = '';
-
-			switch ( $post_type ) {
-				case 'like':
-					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
-					/* translators: %s: URL of the "liked" page. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'bookmark':
-					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
-					/* translators: %s: URL of the bookmarked page. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'reply':
-					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
-					/* translators: %s: URL of the page being replied to. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-
-				case 'repost':
-					$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
-					/* translators: %s: URL of the "page" being reposted. */
-					$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
-						<!-- /wp:indieblocks/context -->' . PHP_EOL;
-					break;
-			}
-		}
-
+		// Determine the _actual_ content, if any.
 		if ( ! empty( $input['properties']['content'][0] ) ) {
 			$content = $input['properties']['content'][0];
 			$options = get_options();
@@ -278,17 +237,287 @@ class Micropub_Compat {
 
 			$content = wp_kses_post( $content );
 			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
+		}
 
-			if ( 'repost' === $post_type ) {
-				$post_content .= '<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content">' . $content . '</blockquote>
-					<!-- /wp:quote -->';
-			} else {
-				$post_content .= '<!-- wp:group {"className":"e-content"} -->
-					<div class="wp-block-group e-content"><!-- wp:freeform -->
-					' . $content . '
-					<!-- /wp:freeform --></div>
-					<!-- /wp:group -->';
+		if ( ! empty( $url ) ) {
+			// Could be we're looking at a note, e.g., a bookmark or reply, or
+			// like.
+			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
+				// Depending on the scenario, Micropub clients may add a page
+				// title in front of the URL.
+				$url = trim( $matches[0] );
+			}
+
+			// So that developers can, e.g., remove certain query strings.
+			$url = apply_filters( 'indieblocks_micropub_url', $url );
+
+			// Try to parse the web page at this URL, and use the newer block instead?
+			$parser = new Parser( $url );
+			$parser->parse();
+
+			$name   = sanitize_text_field( ! empty( $input['post_title'] ) ? $input['post_title'] : $parser->get_name() );
+			$author = sanitize_text_field( $parser->get_author() );
+
+			$post_content = '';
+
+			switch ( $post_type ) {
+				case 'like':
+					if ( '' !== $author ) {
+						// We're given an author name; use newer Like block.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/like -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/like {"empty":false} -->' . PHP_EOL;
+						}
+
+						$name = ( '' !== $name ? $name : esc_url( $url ) );
+
+						$post_content .= '<div class="wp-block-indieblocks-like"><div class="u-like-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page. */
+							__( 'Likes %1$s by %2$s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>',
+							'<span class="p-author">' . esc_html( $author ) . '</span>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/like -->' . PHP_EOL;
+					} elseif ( '' !== $name ) {
+						// We've got a post title; use the Reply block, but without byline.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/like -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/like {"empty":false} -->' . PHP_EOL;
+						}
+
+						$post_content .= '<div class="wp-block-indieblocks-like"><div class="u-like-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %s: Link to the "liked" page. */
+							__( 'Likes %s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/like -->' . PHP_EOL;
+					} else {
+						// Use the simpler Context block.
+						$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
+						/* translators: %s: Link to the "liked" page. */
+						$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Likes %s.', 'indieblocks' ), '<a class="u-like-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+							<!-- /wp:indieblocks/context -->' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<!-- wp:group {"className":"e-content"} -->
+							<div class="wp-block-group e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>
+							<!-- /wp:group -->';
+						}
+					}
+					break;
+
+				case 'bookmark':
+					if ( '' !== $author ) {
+						// We're given an author name; use newer Bookmark block.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/bookmark -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/bookmark {"empty":false} -->' . PHP_EOL;
+						}
+
+						$name = ( '' !== $name ? $name : esc_url( $url ) );
+
+						$post_content .= '<div class="wp-block-indieblocks-bookmark"><div class="u-bookmark-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page. */
+							__( 'Bookmarked %1$s by %2$s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>',
+							'<span class="p-author">' . esc_html( $author ) . '</span>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/bookmark -->' . PHP_EOL;
+					} elseif ( '' !== $name ) {
+						// We've got a post title; use the Bookmark block, but without byline.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/bookmark -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/bookmark {"empty":false} -->' . PHP_EOL;
+						}
+
+						$post_content .= '<div class="wp-block-indieblocks-bookmark"><div class="u-bookmark-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %s: Link to the bookmarked page. */
+							__( 'Bookmarked %s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/bookmark -->' . PHP_EOL;
+					} else {
+						// Use the simpler Context block.
+						$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
+						/* translators: %s: Link to the bookmarked page. */
+						$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Bookmarked %s.', 'indieblocks' ), '<a class="u-bookmark-of" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+							<!-- /wp:indieblocks/context -->' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<!-- wp:group {"className":"e-content"} -->
+							<div class="wp-block-group e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>
+							<!-- /wp:group -->';
+						}
+					}
+					break;
+
+				case 'reply':
+					if ( '' !== $author ) {
+						// We're given an author name; use newer Reply block.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/reply -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/reply {"empty":false} -->' . PHP_EOL;
+						}
+
+						$name = ( '' !== $name ? $name : esc_url( $url ) );
+
+						$post_content .= '<div class="wp-block-indieblocks-reply"><div class="u-in-reply-to h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to. */
+							__( 'In reply to %1$s by %2$s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>',
+							'<span class="p-author">' . esc_html( $author ) . '</span>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/reply -->' . PHP_EOL;
+					} elseif ( '' !== $name ) {
+						// We've got a post title; use the Reply block, but without byline.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/reply -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/reply {"empty":false} -->' . PHP_EOL;
+						}
+
+						$post_content .= '<div class="wp-block-indieblocks-reply"><div class="u-in-reply-to h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %s: Link to the page being replied to. */
+							__( 'In reply to %s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>'
+						);
+						$post_content .= '</i></p></div>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<div class="e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>';
+						}
+
+						$post_content .= '</div>
+							<!-- /wp:indieblocks/reply -->' . PHP_EOL;
+					} else {
+						// Use the simpler Context block.
+						$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
+						/* translators: %s: Link to the page being replied to. */
+						$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'In reply to %s.', 'indieblocks' ), '<a class="u-in-reply-to" href="' . esc_url( $url ) . '">' . esc_url( $url ) . '</a>' ) . '</i></div>
+							<!-- /wp:indieblocks/context -->' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<!-- wp:group {"className":"e-content"} -->
+							<div class="wp-block-group e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></div>
+							<!-- /wp:group -->';
+						}
+					}
+					break;
+
+				case 'repost':
+					if ( '' !== $author ) {
+						// We're given an author name; use newer Repost block.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/repost -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/repost {"empty":false} -->' . PHP_EOL;
+						}
+
+						$name = ( '' !== $name ? $name : esc_url( $url ) );
+
+						$post_content .= '<div class="wp-block-indieblocks-repost"><div class="u-repost-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted. */
+							__( 'Reposted %1$s by %2$s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>',
+							'<span class="p-author">' . esc_html( $author ) . '</span>'
+						);
+						$post_content .= '</i></p>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>';
+						}
+
+						$post_content .= '</div></div>
+							<!-- /wp:indieblocks/repost -->' . PHP_EOL;
+					} elseif ( '' !== $name ) {
+						// We've got a post title; use the Repost block, but without byline.
+						if ( empty( $content ) ) {
+							$post_content .= '<!-- wp:indieblocks/repost -->' . PHP_EOL;
+						} else {
+							$post_content .= '<!-- wp:indieblocks/repost {"empty":false} -->' . PHP_EOL;
+						}
+
+						$post_content .= '<div class="wp-block-indieblocks-repost"><div class="u-repost-of h-cite"><p><i>';
+						$post_content .= sprintf(
+							/* translators: %s: Link to the "page" being reposted. */
+							__( 'Reposted %s.', 'indieblocks' ),
+							'<a class="u-url' . ( esc_url( $url ) !== $name ? ' p-name' : '' ) . '" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>'
+						);
+						$post_content .= '</i></p>' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>';
+						}
+
+						$post_content .= '</div></div>
+							<!-- /wp:indieblocks/repost -->' . PHP_EOL;
+					} else {
+						// Use the simpler Context block.
+						$post_content .= '<!-- wp:indieblocks/context -->' . PHP_EOL;
+						/* translators: %s: Link to the "page" being reposted. */
+						$post_content .= '<div class="wp-block-indieblocks-context"><i>' . sprintf( __( 'Reposted %s.', 'indieblocks' ), '<a class="u-repost-of" href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>' ) . '</i></div>
+							<!-- /wp:indieblocks/context -->' . PHP_EOL;
+
+						if ( ! empty( $content ) ) {
+							$post_content .= '<!-- wp:quote {"className":"e-content"} -->
+								<blockquote class="wp-block-quote e-content"><!-- wp:freeform -->' . $content . '<!-- /wp:freeform --></blockquote>
+								<!-- /wp:quote -->';
+						}
+					}
+					break;
+
+				case 'note':
+					if ( ! empty( $content ) ) {
+						$post_content .= '<!-- wp:freeform -->' . $content . '<!-- /wp:freeform -->';
+					}
+					break;
 			}
 		}
 

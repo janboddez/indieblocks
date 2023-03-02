@@ -15,14 +15,34 @@ class Blocks {
 	 * Hooks and such.
 	 */
 	public static function register() {
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_scripts' ) );
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
-		// add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 	}
 
 	/**
-	 * Registers the "Note Context" block.
+	 * Registers common JS.
+	 */
+	public static function register_scripts() {
+		wp_register_script(
+			'indieblocks-common',
+			plugins_url( '/assets/common.js', dirname( __FILE__ ) ),
+			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
+			\IndieBlocks\IndieBlocks::PLUGIN_VERSION,
+			true
+		);
+
+		wp_set_script_translations(
+			'indieblocks-common',
+			'indieblocks',
+			dirname( __DIR__ ) . '/languages'
+		);
+	}
+
+	/**
+	 * Registers the different blocks.
 	 */
 	public static function register_blocks() {
 		register_block_type_from_metadata(
@@ -39,14 +59,16 @@ class Blocks {
 			dirname( __DIR__ ) . '/languages'
 		);
 
-		register_block_type( dirname( __DIR__ ) . '/blocks/context' );
+		foreach ( array( 'context', 'bookmark', 'like', 'reply', 'repost' ) as $block ) {
+			register_block_type( dirname( __DIR__ ) . "/blocks/$block" );
 
-		// This oughta happen automatically, but whatevs.
-		wp_set_script_translations(
-			generate_block_asset_handle( 'indieblocks/context', 'editorScript' ),
-			'indieblocks',
-			dirname( __DIR__ ) . '/languages'
-		);
+			// This oughta happen automatically, but whatevs.
+			wp_set_script_translations(
+				generate_block_asset_handle( "indieblocks/$block", 'editorScript' ),
+				'indieblocks',
+				dirname( __DIR__ ) . '/languages'
+			);
+		}
 	}
 
 	/**
@@ -76,33 +98,20 @@ class Blocks {
 	 * Registers Note and Like block templates.
 	 */
 	public static function register_block_templates() {
-		foreach ( array( 'indieblocks_like', 'indieblocks_note' ) as $post_type ) {
-			$post_type_object = get_post_type_object( $post_type );
+		$post_type_object = get_post_type_object( 'indieblocks_like' );
 
-			if ( ! $post_type_object ) {
-				// Post type not active.
-				continue;
-			}
-
-			$post_type_object->template = array(
-				array(
-					'indieblocks/context',
-					'indieblocks_like' === $post_type
-						? array( 'kind' => 'u-like-of' )
-						: array(),
-				),
-			);
-
-			if ( 'indieblocks_note' === $post_type ) {
-				$post_type_object->template[] = array(
-					'core/group',
-					array( 'className' => 'e-content' ),
-					array(
-						array( 'core/paragraph' ),
-					),
-				);
-			}
+		if ( ! $post_type_object ) {
+			// Post type not active.
+			return;
 		}
+
+		$post_type_object->template = array(
+			array(
+				'indieblocks/like',
+				array(),
+				array( array( 'core/paragraph' ) ),
+			),
+		);
 	}
 
 	/**
@@ -143,7 +152,8 @@ class Blocks {
 		if ( empty( $url ) ) {
 			return new \WP_Error(
 				'missing_url',
-				'Missing URL.'
+				'Missing URL.',
+				array( 'status' => 400 )
 			);
 		}
 
@@ -152,7 +162,8 @@ class Blocks {
 		if ( ! wp_http_validate_url( $url ) ) {
 			return new \WP_Error(
 				'invalid_url',
-				'Invalid URL.'
+				'Invalid URL.',
+				array( 'status' => 400 )
 			);
 		}
 
@@ -176,7 +187,7 @@ class Blocks {
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
-	 * @return string             Returns the filtered post content of the current post.
+	 * @return string               The filtered post content of the current post.
 	 */
 	public static function render_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {

@@ -290,7 +290,10 @@ class Options_Handler {
 							<td>
 								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
 								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor.', 'indieblocks' ); ?></p>
-								<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[unhide_like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like and bookmark titles', 'indieblocks' ); ?></label></p>
+								<div style="margin-inline-start: 1.25em; margin-block-start: 0.25em;">
+									<label><input type="checkbox" name="indieblocks_settings[unhide_like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like and bookmark titles', 'indieblocks' ); ?></label>
+									<p class="description"><?php _e( 'Do <em>not</em> hide not and bookmark titles, <em>and</em> have them link to the liked or bookmarked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
+								</div>
 							</td>
 						</tr>
 						<?php if ( get_option( 'permalink_structure' ) ) : ?>

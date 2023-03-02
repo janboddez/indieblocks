@@ -95,7 +95,7 @@ class Parser {
 				return $hentry['properties']['name'][0];
 			}
 
-			return '';
+			return ''; // If this thing supports microformats but does not have a name, assume a note.
 		}
 
 		$title = $this->dom->getElementsByTagName( 'title' );

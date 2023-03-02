@@ -430,10 +430,14 @@ class Theme_Mf2 {
 		$options = get_options();
 
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+			// Not a like or note.
 			$classes[] = 'p-name';
+		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) && '' !== get_post_meta( $post_ID, '_indieblocks_linked_url', true ) ) {
+				// Do not hide like, bookmark, and repost titles.
+				$classes[] = 'p-name';
 		} elseif ( ! empty( $options['hide_titles'] ) ) {
-			// Hide titles. Counting on core/the theme to provide the CSS.
-			$classes[] = 'screen-reader-text';
+				// Hide titles. Counting on core/the theme to provide the CSS.
+				$classes[] = 'screen-reader-text';
 		}
 
 		if ( isset( $attributes['level'] ) ) {

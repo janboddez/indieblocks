@@ -17,29 +17,30 @@ class Options_Handler {
 	 * @var array $options Plugin options.
 	 */
 	private $options = array(
-		'enable_blocks'            => true,
-		'add_mf2'                  => false,
-		'enable_notes'             => false,
-		'notes_in_home'            => false,
-		'notes_in_feed'            => true,
-		'default_taxonomies'       => false,
-		'enable_likes'             => false,
-		'likes_in_feed'            => false,
-		'likes_in_home'            => false,
-		'random_slugs'             => false,
-		'automatic_titles'         => false,
-		'like_and_bookmark_titles' => false,
-		'hide_titles'              => false,
-		'date_archives'            => false,
-		'permalink_format'         => '/%postname%/',
-		'modified_feeds'           => false,
-		'webmention'               => false,
-		'webmention_post_types'    => array(),
-		'cache_avatars'            => false,
-		'add_featured_images'      => false,
-		'location_functions'       => false,
-		'micropub'                 => false,
-		'parse_markdown'           => false,
+		'enable_blocks'                   => true,
+		'add_mf2'                         => false,
+		'enable_notes'                    => false,
+		'notes_in_home'                   => false,
+		'notes_in_feed'                   => true,
+		'default_taxonomies'              => false,
+		'enable_likes'                    => false,
+		'likes_in_feed'                   => false,
+		'likes_in_home'                   => false,
+		'random_slugs'                    => false,
+		'automatic_titles'                => false,
+		'like_and_bookmark_titles'        => false,
+		'hide_titles'                     => false,
+		'unhide_like_and_bookmark_titles' => false,
+		'date_archives'                   => false,
+		'permalink_format'                => '/%postname%/',
+		'modified_feeds'                  => false,
+		'webmention'                      => false,
+		'webmention_post_types'           => array(),
+		'cache_avatars'                   => false,
+		'add_featured_images'             => false,
+		'location_functions'              => false,
+		'micropub'                        => false,
+		'parse_markdown'                  => false,
 	);
 
 	/**
@@ -137,19 +138,20 @@ class Options_Handler {
 	 */
 	public function sanitize_post_types_settings( $settings ) {
 		$options = array(
-			'enable_notes'             => isset( $settings['enable_notes'] ) ? true : false,
-			'notes_in_feed'            => isset( $settings['notes_in_feed'] ) ? true : false,
-			'notes_in_home'            => isset( $settings['notes_in_home'] ) ? true : false,
-			'default_taxonomies'       => isset( $settings['default_taxonomies'] ) ? true : false,
-			'enable_likes'             => isset( $settings['enable_likes'] ) ? true : false,
-			'likes_in_feed'            => isset( $settings['likes_in_feed'] ) ? true : false,
-			'likes_in_home'            => isset( $settings['likes_in_home'] ) ? true : false,
-			'random_slugs'             => isset( $settings['random_slugs'] ) ? true : false,
-			'automatic_titles'         => isset( $settings['automatic_titles'] ) ? true : false,
-			'like_and_bookmark_titles' => isset( $settings['like_and_bookmark_titles'] ) ? true : false, // Whether to treat like and bookmark (and repost?) titles differently.
-			'hide_titles'              => isset( $settings['hide_titles'] ) ? true : false,
-			'date_archives'            => isset( $settings['date_archives'] ) ? true : false,
-			'modified_feeds'           => isset( $settings['modified_feeds'] ) ? true : false,
+			'enable_notes'                    => isset( $settings['enable_notes'] ) ? true : false,
+			'notes_in_feed'                   => isset( $settings['notes_in_feed'] ) ? true : false,
+			'notes_in_home'                   => isset( $settings['notes_in_home'] ) ? true : false,
+			'default_taxonomies'              => isset( $settings['default_taxonomies'] ) ? true : false,
+			'enable_likes'                    => isset( $settings['enable_likes'] ) ? true : false,
+			'likes_in_feed'                   => isset( $settings['likes_in_feed'] ) ? true : false,
+			'likes_in_home'                   => isset( $settings['likes_in_home'] ) ? true : false,
+			'random_slugs'                    => isset( $settings['random_slugs'] ) ? true : false,
+			'automatic_titles'                => isset( $settings['automatic_titles'] ) ? true : false,
+			'like_and_bookmark_titles'        => isset( $settings['like_and_bookmark_titles'] ) ? true : false,
+			'hide_titles'                     => isset( $settings['hide_titles'] ) ? true : false,
+			'unhide_like_and_bookmark_titles' => isset( $settings['unhide_like_and_bookmark_titles'] ) ? true : false,
+			'date_archives'                   => isset( $settings['date_archives'] ) ? true : false,
+			'modified_feeds'                  => isset( $settings['modified_feeds'] ) ? true : false,
 		);
 
 		$permalink_format = '/%postname%/';
@@ -281,12 +283,15 @@ class Options_Handler {
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Autogenerate Titles', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[automatic_titles]" value="1" <?php checked( ! empty( $this->options['automatic_titles'] ) ); ?>/> <?php esc_html_e( 'Automatically generate titles', 'indieblocks' ); ?></label>
-							<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Have like and bookmark titles reflect linked (i.e., liked or bookmarked) pages instead', 'indieblocks' ); ?></label></p></td>
+							<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Have like and bookmark titles reflect linked (i.e., liked or bookmarked) pages', 'indieblocks' ); ?></label></p></td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Hide Titles', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Attempts to hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor.', 'indieblocks' ); ?></p></td>
+							<td>
+								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor.', 'indieblocks' ); ?></p>
+								<p style="margin-inline-start: 1.25em;"><label><input type="checkbox" name="indieblocks_settings[unhide_like_and_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like and bookmark titles', 'indieblocks' ); ?></label></p>
+							</td>
 						</tr>
 						<?php if ( get_option( 'permalink_structure' ) ) : ?>
 							<tr valign="top">

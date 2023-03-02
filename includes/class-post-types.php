@@ -299,6 +299,8 @@ class Post_Types {
 
 		if ( ! empty( $linked_url ) ) {
 			update_post_meta( $post_id, '_indieblocks_linked_url', $linked_url );
+		} else {
+			delete_post_meta( $post_id, '_indieblocks_linked_url' );
 		}
 	}
 

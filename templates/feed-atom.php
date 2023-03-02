@@ -73,19 +73,20 @@ do_action( 'rss_tag_pre', 'atom' );
 		</author>
 
 		<?php
-		if ( 'indieblocks_note' !== get_post_type( get_the_ID() ) ) :
-			// Show titles for post types _other than_ notes.
+		$options = \IndieBlocks\get_options();
+
+		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) :
+			// Show titles for post types _other than_ notes and likes.
 			?>
 			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
 			<?php
-		elseif ( '' !== get_post_meta( get_the_ID(), 'mf2_bookmark-of', true ) && apply_filters( 'indieblocks_ignore_bookmark_titles', true ) ) :
-			// Some of these "notes," however, may really be bookmarks, for
-			// which we allow an exception.
+		elseif ( ! empty( $options['like_and_bookmark_titles'] ) && '' !== get_post_meta( get_the_ID(), '_indieblocks_linked_url', true ) ) :
+			// Do not hide like, bookmark, and repost titles.
 			?>
 			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
 			<?php
 		endif;
-		// No title is output for notes that aren't bookmarks.
+		// No title is ever output for notes that aren't likes, or bookmarks, or reposts.
 		?>
 		<link rel="alternate" type="<?php bloginfo_rss( 'html_type' ); ?>" href="<?php the_permalink_rss(); ?>" />
 

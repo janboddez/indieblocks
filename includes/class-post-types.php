@@ -46,6 +46,13 @@ class Post_Types {
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_title' ), 10, 2 );
 		}
 
+		if ( ! empty( $options['like_and_bookmark_titles'] ) ) {
+			// Add "linked page" meta to likes, bookmarks and reposts. Do this
+			// here rather than in the block editor, because of reasons.
+			add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+		}
+
 		if ( ! empty( $options['random_slugs'] ) ) {
 			// Generate a random slug for short-form posts.
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
@@ -205,9 +212,11 @@ class Post_Types {
 
 		$options = get_options();
 
-		if ( empty( $postarr['ID'] ) && ! empty( $options['like_and_bookmark_titles'] ) ) {
-			// Allow overriding the auto-generated title by automatically
-			// generating it _only_ when a post is first created.
+		if ( ! empty( $options['like_and_bookmark_titles'] ) ) {
+			// Ideally this would run only when a post is first inserted, but it
+			// looks like, since Gutenberg, this function is called multiple
+			// times, and that `content` is in fact empty the very first time.
+			/* @todo: Look for a more appropriate hook. */
 			$hentry = $content;
 
 			if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
@@ -216,17 +225,27 @@ class Post_Types {
 
 			$hentry = '<div class="h-entry">' . $hentry . '</div>';
 
-			$parser = new Parser( '' ); // The post permalink is irrelevant here.
+			$parser = new Parser();
 			$parser->parse( $hentry );
 
-			$referenced_url = $parser->get_referenced_url();
+			// When one of the newer "h-cite" blocks is in use, this'll return
+			// the link text, which **can** be overriden by authors.
+			$name = $parser->get_link_name();
 
-			if ( ! empty( $referenced_url ) ) {
-				$parser = new Parser( $referenced_url ); // The post permalink is irrelevant here.
-				$parser->parse();
+			if ( empty( $name ) ) {
+				$link_url = $parser->get_link_url();
 
-				$name    = $parser->get_name();
-				$content = ! empty( $name ) ? $name : $content; // The code below will use this to continue with.
+				if ( ! empty( $link_url ) ) {
+					$parser = new Parser( $link_url );
+					$parser->parse();
+
+					$name    = $parser->get_name(); // This could still be a nonsense name, which is why we want this to be overridable by authors!
+					$content = ! empty( $name )
+						? $name // The code below will use this to continue with.
+						: $content;
+				}
+			} else {
+				$content = $name; // The code below will use this to continue with.
 			}
 		}
 
@@ -250,6 +269,37 @@ class Post_Types {
 		$data['post_title'] = apply_filters( 'indieblocks_post_title', $title, $data['post_title'], $data['post_content'] );
 
 		return $data;
+	}
+
+	/**
+	 * Set linked meta for certain IndieWeb post types.
+	 *
+	 * @param  int     $post_id Post ID.
+	 * @param  WP_Post $post    Post object.
+	 */
+	public static function set_post_meta( $post_id, $post ) {
+		if ( ! in_array( $post->post_type, array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+			return;
+		}
+
+		$content = get_the_content( $post_id );
+
+		if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
+			$content = '<div class="e-content">' . $content . '</div>';
+		}
+
+		$content = '<div class="h-entry">' . $content . '</div>';
+
+		$parser = new Parser();
+		$parser->parse( $content );
+
+		// Grab the first like URL, or first bookmark URL, or first repost URL,
+		// if any.
+		$linked_url = $parser->get_link_url();
+
+		if ( ! empty( $linked_url ) ) {
+			update_post_meta( $post_id, '_indieblocks_linked_url', $linked_url );
+		}
 	}
 
 	/**

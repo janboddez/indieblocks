@@ -443,21 +443,9 @@ class Theme_Mf2 {
 		$permalink = get_the_permalink( $post_ID );
 
 		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
-			$content = get_the_content();
-
-			if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
-				$content = '<div class="e-content">' . $content . '</div>';
-			}
-
-			$content = '<div class="h-entry">' . $content . '</div>';
-
-			$parser = new Parser( $permalink );
-			$parser->parse( $content );
-
-			$referenced_url = $parser->get_referenced_url();
-
-			$permalink = ! empty( $referenced_url )
-				? $referenced_url
+			$linked_url = get_post_meta( $post_ID, '_indieblocks_linked_url', true );
+			$permalink  = ! empty( $linked_url )
+				? $linked_url
 				: $permalink;
 		}
 

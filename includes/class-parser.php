@@ -35,9 +35,9 @@ class Parser {
 	/**
 	 * Constructor.
 	 *
-	 * @param  string $url URL of the page we'll be parsing.
+	 * @param string|null $url URL of the page we'll be parsing.
 	 */
-	public function __construct( $url ) {
+	public function __construct( $url = null ) {
 
 		$this->url = $url;
 		$this->dom = new \DOMDocument();
@@ -49,20 +49,21 @@ class Parser {
 	 * @param string $content (Optional) HTML to be parsed instead.
 	 */
 	public function parse( $content = '' ) {
+		$hash = hash( 'sha256', esc_url_raw( $this->url ) );
+
 		if ( empty( $content ) ) {
 			// No `$content` was passed along.
-			$content = get_transient( 'indieblocks:html:' . hash( 'sha256', esc_url_raw( $this->url ) ) );
-
-			if ( empty( $content ) ) {
+			$content = get_transient( 'indieblocks:html:' . $hash );
+			if ( empty( $content ) && ! empty( $this->url ) ) {
 				// Download page.
 				$response = remote_get( $this->url );
-				$content  = wp_remote_retrieve_body( $response ); // Cache, even if empty.
-
-				set_transient( 'indieblocks:html:' . hash( 'sha256', esc_url_raw( $this->url ) ), $content, 3600 );
+				$content  = wp_remote_retrieve_body( $response );
+				set_transient( 'indieblocks:html:' . $hash, $content, 3600 ); // Cache, even if empty.
 			}
 		}
 
 		if ( empty( $content ) ) {
+			// Can't do anything without HTML.
 			return;
 		}
 
@@ -71,6 +72,13 @@ class Parser {
 		libxml_use_internal_errors( true );
 
 		$this->dom->loadHTML( $content );
+
+		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
+		if ( empty( $mf2 ) ) {
+			$mf2 = Mf2\parse( $content, $this->url );
+			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
+		}
+
 		$this->mf2 = Mf2\parse( $content, $this->url );
 	}
 
@@ -158,7 +166,7 @@ class Parser {
 	 *
 	 * @return string Referenced URL.
 	 */
-	public function get_referenced_url() {
+	public function get_link_url() {
 		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
 			$hentry = $this->mf2['items'][0];
 
@@ -184,6 +192,32 @@ class Parser {
 
 			if ( ! empty( $hentry['properties']['repost-of'][0]['value'] ) && filter_var( $hentry['properties']['repost-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
 				return $hentry['properties']['repost-of'][0]['value'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the name (i.e., the text content) of the first "like," or
+	 * "bookmark," or "repost" link.
+	 *
+	 * @return string Link name.
+	 */
+	public function get_link_name() {
+		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
+			$hentry = $this->mf2['items'][0];
+
+			if ( ! empty( $hentry['properties']['like-of'][0]['name'][0] ) && is_string( $hentry['properties']['like-of'][0]['name'][0] ) ) {
+				return $hentry['properties']['like-of'][0]['name'][0];
+			}
+
+			if ( ! empty( $hentry['properties']['bookmark-of'][0]['name'][0] ) && is_string( $hentry['properties']['bookmark-of'][0]['name'][0] ) ) {
+				return $hentry['properties']['bookmark-of'][0]['name'][0];
+			}
+
+			if ( ! empty( $hentry['properties']['repost-of'][0]['name'][0] ) && is_string( $hentry['properties']['repost-of'][0]['name'][0] ) ) {
+				return $hentry['properties']['repost-of'][0]['name'][0];
 			}
 		}
 

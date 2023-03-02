@@ -14,7 +14,7 @@ class IndieBlocks {
 	/**
 	 * Plugin version.
 	 */
-	const PLUGIN_VERSION = '0.4.0';
+	const PLUGIN_VERSION = '0.5.0';
 
 	/**
 	 * Options handler.

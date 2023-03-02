@@ -255,7 +255,7 @@ class Micropub_Compat {
 			$parser = new Parser( $url );
 			$parser->parse();
 
-			$name   = sanitize_text_field( $parser->get_name() );
+			$name   = sanitize_text_field( ! empty( $input['post_title'] ) ? $input['post_title'] : $parser->get_name() );
 			$author = sanitize_text_field( $parser->get_author() );
 
 			$post_content = '';

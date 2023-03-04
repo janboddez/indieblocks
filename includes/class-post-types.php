@@ -49,8 +49,13 @@ class Post_Types {
 		if ( ! empty( $options['like_and_bookmark_titles'] ) ) {
 			// Add "linked page" meta to likes, bookmarks and reposts. Do this
 			// here rather than in the block editor, because of reasons.
-			add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ), 10, 2 );
-			add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			if ( ! empty( $options['enable_notes'] ) ) {
+				add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			}
+
+			if ( ! empty( $options['enable_likes'] ) ) {
+				add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			}
 		}
 
 		if ( ! empty( $options['random_slugs'] ) ) {

@@ -51,6 +51,13 @@ class Webmention_Sender {
 		// Scan it for outgoing links.
 		$urls = static::find_outgoing_links( $html );
 
+		// Parse in targets that may have been there previously, but don't delete
+		// them, yet.
+		$history = get_post_meta( $post->ID, '_indieblocks_webmention_history', true );
+		if ( ! empty( $history ) && is_array( $history ) ) {
+			$urls = array_unique( array_merge( $urls, $history ) );
+		}
+
 		if ( empty( $urls ) || ! is_array( $urls ) ) {
 			// Nothing to do. Bail.
 			return;
@@ -69,6 +76,7 @@ class Webmention_Sender {
 
 			// Found an endpoint.
 			$schedule = true;
+			break; // No need to look up _all_ endpoints (even though they're normally cached) to determine whether to schedule mentions.
 		}
 
 		if ( $schedule ) {
@@ -104,6 +112,17 @@ class Webmention_Sender {
 
 		// Scan it for outgoing links, again, as things might have changed.
 		$urls = static::find_outgoing_links( $html );
+
+		// Parse in targets that may have been there previously.
+		$history = get_post_meta( $post->ID, '_indieblocks_webmention_history', true );
+
+		// Delete history. This also means that "historic" targets are excluded
+		// from retries! Note that we also retarget pages that threw an error or
+		// we otherwise failed to mention. Both are probably acceptable.
+		delete_post_meta( $post->ID, '_indieblocks_webmention_history' );
+		if ( ! empty( $history ) && is_array( $history ) ) {
+			$urls = array_unique( array_merge( $urls, $history ) );
+		}
 
 		if ( empty( $urls ) || ! is_array( $urls ) ) {
 			// One or more links must've been removed. Nothing to do. Bail.
@@ -412,8 +431,10 @@ class Webmention_Sender {
 			wp_die();
 		}
 
-		if ( '' !== get_post_meta( $post_id, '_indieblocks_webmention', true ) ) {
-			// Delete webmention history.
+		$history = get_post_meta( $post_id, '_indieblocks_webmention', true );
+
+		if ( '' !== $history && is_array( $history ) ) {
+			add_post_meta( $post_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
 			delete_post_meta( $post_id, '_indieblocks_webmention' );
 		}
 

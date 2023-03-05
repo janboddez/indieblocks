@@ -92,6 +92,24 @@ class Blocks {
 					<!-- /wp:group -->',
 			)
 		);
+
+		register_block_pattern(
+			'indieblocks/repost-starter-pattern',
+			array(
+				'title'       => __( 'Repost Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
+
+					<!-- wp:quote {"className":"e-content"} -->
+					<blockquote class="wp-block-quote e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></blockquote>
+					<!-- /wp:quote -->',
+			)
+		);
 	}
 
 	/**

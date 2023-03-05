@@ -20,6 +20,7 @@ class Theme_Mf2 {
 		add_filter( 'body_class', array( __CLASS__, 'add_body_class' ), 99 );
 		add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 99 );
 		add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 99 );
+		add_filter( 'post_thumbnail_html', array( __CLASS__, 'add_thumbnail_class' ) );
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
 		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 
@@ -102,6 +103,22 @@ class Theme_Mf2 {
 		$classes[] = 'h-cite';
 
 		return array_unique( $classes );
+	}
+
+	/**
+	 * Adds `u-featured` to featured images.
+	 *
+	 * @param  string $html Featured image HTML.
+	 * @return string       Updated HTML.
+	 */
+	public static function add_thumbnail_class( $html ) {
+		if ( preg_match( '~ class=("|\')~', $html, $matches ) ) {
+			$html = str_replace( " class={$matches[1]}", " class={$matches[1]}u-featured ", $html );
+		} else {
+			$html = str_replace( '<img ', '<img class="u-photo" ', $html );
+		}
+
+		return $html;
 	}
 
 	/**

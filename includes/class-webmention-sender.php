@@ -80,11 +80,22 @@ class Webmention_Sender {
 		}
 
 		if ( $schedule ) {
-			// Schedule sending out the actual webmentions.
-			error_log( "[Indieblocks/Webmention] Scheduling webmention for post {$post->ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			wp_schedule_single_event( time() + wp_rand( 0, 300 ), 'indieblocks_webmention_send', array( $post->ID ) );
+			$options = get_options();
 
-			add_post_meta( $post->ID, '_indieblocks_webmention', 'scheduled', true ); // Does not affect existing values.
+			if ( ! isset( $options['webmention_delay'] ) || intval( $options['webmention_delay'] ) > 0 ) {
+				$delay = empty( $options['webmention_delay'] )
+					? wp_rand( 0, 300 ) // As before.
+					: (int) $options['webmention_delay'];
+
+				// Schedule sending out the actual webmentions.
+				error_log( "[Indieblocks/Webmention] Scheduling webmention for post {$post->ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				wp_schedule_single_event( time() + $delay, 'indieblocks_webmention_send', array( $post->ID ) );
+
+				add_post_meta( $post->ID, '_indieblocks_webmention', 'scheduled', true ); // Does not affect existing values.
+			} else {
+				// Send inline (although retries will be scheduled as always).
+				static::send_webmention( $post->ID );
+			}
 		}
 	}
 

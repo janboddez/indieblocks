@@ -36,6 +36,7 @@ class Options_Handler {
 		'modified_feeds'                  => false,
 		'webmention'                      => false,
 		'webmention_post_types'           => array(),
+		'webmention_delay'                => 300,
 		'cache_avatars'                   => false,
 		'add_featured_images'             => false,
 		'location_functions'              => false,
@@ -183,8 +184,11 @@ class Options_Handler {
 	 */
 	public function sanitize_webmention_settings( $settings ) {
 		$options = array(
-			'webmention'    => isset( $settings['webmention'] ) ? true : false,
-			'cache_avatars' => isset( $settings['cache_avatars'] ) ? true : false,
+			'webmention'       => isset( $settings['webmention'] ) ? true : false,
+			'webmention_delay' => isset( $settings['webmention_delay'] ) && ctype_digit( $settings['webmention_delay'] )
+				? (int) $settings['webmention_delay']
+				: 0,
+			'cache_avatars'    => isset( $settings['cache_avatars'] ) ? true : false,
 		);
 
 		$webmention_post_types = array();
@@ -335,6 +339,11 @@ class Options_Handler {
 								<?php endforeach; ?>
 								<p class="description"><?php esc_html_e( 'The post types for which webmentions (outgoing and incoming) should be enabled.', 'indieblocks' ); ?></p>
 							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><label for="indieblocks_settings[webmention_delay]"><?php esc_html_e( 'Webmention Delay', 'indieblocks' ); ?></label></th>
+							<td><input type="number" style="width: 6em;" id="indieblocks_settings[webmention_delay]" name="indieblocks_settings[webmention_delay]" value="<?php echo esc_attr( isset( $this->options['webmention_delay'] ) ? $this->options['webmention_delay'] : 0 ); ?>" />
+							<p class="description"><?php esc_html_e( 'The time, in seconds, WordPress should delay sending webmentions after a post is first published.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Avatars', 'indieblocks' ); ?></th>

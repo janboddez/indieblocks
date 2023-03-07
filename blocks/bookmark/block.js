@@ -19,9 +19,9 @@
 	blocks.registerBlockType( 'indieblocks/bookmark', {
 		icon: el( 'svg', {
 				xmlns: 'http://www.w3.org/2000/svg',
-				viewBox: '0 0 20 20',
+				viewBox: '0 0 24 24',
 			}, el ( 'path', {
-				d: 'M7 4a2 2 0 0 0-2 2v11l5-3 5 3V6a2 2 0 0 0-2-2H7z',
+				d: 'M8.9 3.9a2 2 0 0 0-2 2v13.2l5.6-4 5.6 4V5.9a2 2 0 0 0-2-2H8.9z',
 			} )
 		),
 		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
@@ -71,9 +71,9 @@
 			var placeholderProps = {
 				icon: el( 'svg', {
 						xmlns: 'http://www.w3.org/2000/svg',
-						viewBox: '0 0 20 20',
+						viewBox: '0 0 24 24',
 					}, el ( 'path', {
-						d: 'M7 4a2 2 0 0 0-2 2v11l5-3 5 3V6a2 2 0 0 0-2-2H7z',
+						d: 'M8.9 3.9a2 2 0 0 0-2 2v13.2l5.6-4 5.6 4V5.9a2 2 0 0 0-2-2H8.9z',
 					} )
 				),
 				label: __( 'Bookmark', 'indieblocks' ),

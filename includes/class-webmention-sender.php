@@ -124,12 +124,11 @@ class Webmention_Sender {
 		// Scan it for outgoing links, again, as things might have changed.
 		$urls = static::find_outgoing_links( $html );
 
-		// Parse in targets that may have been there previously.
+		// Parse in (and then forget) targets that may have been there before.
+		// This also means that "historic" targets are excluded from retries!
+		// Note that we _also_ retarget pages that threw an error or we
+		// otherwise failed to reach previously. Both are probably acceptable.
 		$history = get_post_meta( $post->ID, '_indieblocks_webmention_history', true );
-
-		// Delete history. This also means that "historic" targets are excluded
-		// from retries! Note that we also retarget pages that threw an error or
-		// we otherwise failed to mention. Both are probably acceptable.
 		delete_post_meta( $post->ID, '_indieblocks_webmention_history' );
 		if ( ! empty( $history ) && is_array( $history ) ) {
 			$urls = array_unique( array_merge( $urls, $history ) );

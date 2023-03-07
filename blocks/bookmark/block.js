@@ -17,6 +17,13 @@
 	var sprintf = i18n.sprintf;
 
 	blocks.registerBlockType( 'indieblocks/bookmark', {
+		icon: el( 'svg', {
+				xmlns: 'http://www.w3.org/2000/svg',
+				viewBox: '0 0 20 20',
+			}, el ( 'path', {
+				d: 'M7 4a2 2 0 0 0-2 2v11l5-3 5 3V6a2 2 0 0 0-2-2H7z',
+			} )
+		),
 		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
 		edit: ( props ) => {
 			var url          = props.attributes.url;
@@ -62,7 +69,13 @@
 			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
-				icon: 'star-filled',
+				icon: el( 'svg', {
+						xmlns: 'http://www.w3.org/2000/svg',
+						viewBox: '0 0 20 20',
+					}, el ( 'path', {
+						d: 'M7 4a2 2 0 0 0-2 2v11l5-3 5 3V6a2 2 0 0 0-2-2H7z',
+					} )
+				),
 				label: __( 'Bookmark', 'indieblocks' ),
 				isColumnLayout: true,
 			};

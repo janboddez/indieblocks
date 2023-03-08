@@ -219,7 +219,7 @@ class Blocks {
 			)
 		);
 
-		$urls = apply_filters( 'indieblocks_syndication_links', $urls );
+		$urls = apply_filters( 'indieblocks_syndication_links', $urls, $block->context['postId'] );
 
 		if ( empty( $urls ) ) {
 			return '';

@@ -17,6 +17,13 @@
 	var sprintf = i18n.sprintf;
 
 	blocks.registerBlockType( 'indieblocks/repost', {
+		icon: el( 'svg', {
+				xmlns: 'http://www.w3.org/2000/svg',
+				viewBox: '0 0 24 24',
+			}, el ( 'path', {
+				d: 'M7.5 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6l2-2zM16.5 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2h-8l2-2h6z',
+			} )
+		),
 		description: __( 'Use the Repost block to “reblog” another (short) post verbatim while still giving credit.', 'indieblocks' ),
 		edit: ( props ) => {
 			var url          = props.attributes.url;
@@ -62,7 +69,13 @@
 			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
-				icon: 'update-alt',
+				icon: el( 'svg', {
+						xmlns: 'http://www.w3.org/2000/svg',
+						viewBox: '0 0 24 24',
+					}, el ( 'path', {
+						d: 'M7.5 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6l2-2zM16.5 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2h-8l2-2h6z',
+					} )
+				),
 				label: __( 'Repost', 'indieblocks' ),
 				isColumnLayout: true,
 			};

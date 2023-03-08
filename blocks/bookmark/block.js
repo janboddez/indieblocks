@@ -21,7 +21,7 @@
 				xmlns: 'http://www.w3.org/2000/svg',
 				viewBox: '0 0 24 24',
 			}, el ( 'path', {
-				d: 'M8.9 3.9a2 2 0 0 0-2 2v13.2l5.6-4 5.6 4V5.9a2 2 0 0 0-2-2H8.9z',
+				d: 'M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z',
 			} )
 		),
 		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
@@ -73,7 +73,7 @@
 						xmlns: 'http://www.w3.org/2000/svg',
 						viewBox: '0 0 24 24',
 					}, el ( 'path', {
-						d: 'M8.9 3.9a2 2 0 0 0-2 2v13.2l5.6-4 5.6 4V5.9a2 2 0 0 0-2-2H8.9z',
+						d: 'M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z',
 					} )
 				),
 				label: __( 'Bookmark', 'indieblocks' ),

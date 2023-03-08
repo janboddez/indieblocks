@@ -3,7 +3,6 @@
 	"title": "Repost",
 	"name": "indieblocks/repost",
 	"category": "text",
-	"icon": "update-alt",
 	"editorScript": "file:./block.js",
 	"editorStyle": "file:./editor.css",
 	"attributes": {

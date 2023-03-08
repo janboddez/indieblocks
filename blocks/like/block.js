@@ -62,7 +62,7 @@
 			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
-				icon: 'star-filled',
+				icon: 'heart',
 				label: __( 'Like', 'indieblocks' ),
 				isColumnLayout: true,
 			};

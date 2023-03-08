@@ -18,7 +18,7 @@
 		return sprintf( __( 'Also on %s', 'indieblocks' ), output.replace( /[,\s]+$/, '' ) );
 	}
 
-	blocks.registerBlockType( 'indieblocks/syndication-links', {
+	blocks.registerBlockType( 'indieblocks/syndication', {
 		edit: function ( props ) {
 			// We'd use `serverSideRender` but it doesn't support passing block
 			// context to PHP. I.e., rendering in JS better reflects what the

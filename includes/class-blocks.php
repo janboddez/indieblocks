@@ -46,7 +46,7 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		register_block_type_from_metadata(
-			dirname( __DIR__ ) . '/blocks/syndication-links',
+			dirname( __DIR__ ) . '/blocks/syndication',
 			array(
 				'render_callback' => array( __CLASS__, 'render_block' ),
 			)
@@ -54,7 +54,7 @@ class Blocks {
 
 		// This oughta happen automatically, but whatevs.
 		wp_set_script_translations(
-			generate_block_asset_handle( 'indieblocks/syndication-links', 'editorScript' ),
+			generate_block_asset_handle( 'indieblocks/syndication', 'editorScript' ),
 			'indieblocks',
 			dirname( __DIR__ ) . '/languages'
 		);
@@ -200,7 +200,7 @@ class Blocks {
 	}
 
 	/**
-	 * Renders the `indieblocks/syndication-links` block.
+	 * Renders the `indieblocks/syndication` block.
 	 *
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.

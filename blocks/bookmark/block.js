@@ -187,6 +187,13 @@
 						);
 					},
 				},
+				{
+					type: 'block',
+					blocks: [ 'indieblocks/like' ],
+					transform: ( attributes, innerBlocks ) => {
+						return createBlock( 'indieblocks/like', attributes, innerBlocks );
+					},
+				}
 			],
 		},
 	} );

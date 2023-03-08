@@ -174,6 +174,13 @@
 						);
 					},
 				},
+				{
+					type: 'block',
+					blocks: [ 'indieblocks/bookmark' ],
+					transform: ( attributes, innerBlocks ) => {
+						return createBlock( 'indieblocks/bookmark', attributes, innerBlocks );
+					},
+				}
 			],
 		},
 	} );

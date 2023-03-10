@@ -181,7 +181,6 @@ class Webmention {
 		}
 
 		if ( isset( $query->query_vars['count'] ) && true === $query->query_vars['count'] ) {
-			error_log( 'Waaai?' );
 			return;
 		}
 
@@ -216,8 +215,6 @@ class Webmention {
 			return $count;
 		}
 
-		return (int) $count;
-
 		global $wpdb;
 
 		$comments    = $wpdb->prefix . 'comments';
@@ -234,6 +231,10 @@ class Webmention {
 			$wpdb->prepare( $sql, $post_id, get_current_user_id() ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		);
 
-		return (int) $count;
+		if ( null === $count ) {
+			return 0;
+		}
+
+		return (string) $count; // Has to be a string!
 	}
 }

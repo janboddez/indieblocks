@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse, site editor
 Tested up to: 6.2
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -23,6 +23,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.6.0 =
+"Facepile" likes, bookmarks, and reposts (and the Reactions block1).
 = 0.5.0 =
 Add Bookmark, Like, Reply and Repost blocks. Additional title options.
 = 0.4.0 =

@@ -246,28 +246,25 @@ class Blocks {
 		$comments_query = new \WP_Comment_Query( $args );
 		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
 
-		$output = '';
+		if ( empty( $comments_query->comments ) ) {
+			return '';
+		}
 
-		foreach ( $comments_query->comments as $comment ) {
-			$avatar_url = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
+		// Enqueue front-end block styles.
+		wp_enqueue_style( 'indieblocks-reactions', plugins_url( '/assets/reactions.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
-			if ( empty( $avatar_url ) ) {
-				continue; // @todo: Set to default avatar instead.
-			}
+		// @todo: Limit comments. We'll fix this later.
+		$comments = array_slice( $comments_query->comments, 0, 25 );
+		$output   = '';
 
-			$upload_dir  = wp_upload_dir();
-			$avatar_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $avatar_url );
-
-			if ( ! is_file( $avatar_path ) ) {
-				continue; // @todo: Set to default avatar instead.
-			}
-
+		foreach ( $comments as $comment ) {
+			$avatar = get_avatar( $comment, 40 );
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 
 			if ( ! empty( $source ) ) {
-				$output .= '<div class="indieblocks-avatar"><a href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><img src="' . esc_url( $avatar_url ) . '" width="96" height="96" class="avatar avatar-96 photo" style="width: 32px; height: 32px; border-radius: 50%;"></a></div>';
+				$output .= '<span class="indieblocks-avatar"><a href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer">' . $avatar . '</a></span>';
 			} else {
-				$output .= '<div class="indieblocks-avatar"><img src="' . esc_url( $avatar_url ) . '" width="96" height="96" class="avatar avatar-96 photo"></div>';
+				$output .= '<span class="indieblocks-avatar">' . $avatar . '</span>';
 			}
 		}
 

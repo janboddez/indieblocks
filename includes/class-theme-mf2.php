@@ -130,7 +130,6 @@ class Theme_Mf2 {
 		remove_action( 'init', 'register_block_core_post_date' );
 		remove_action( 'init', 'register_block_core_post_excerpt' );
 		remove_action( 'init', 'register_block_core_post_title' );
-		remove_action( 'init', 'register_block_core_comments' );
 		remove_action( 'init', 'register_block_core_comment_author_name' );
 		remove_action( 'init', 'register_block_core_comment_content' );
 		remove_action( 'init', 'register_block_core_comment_date' );
@@ -177,13 +176,6 @@ class Theme_Mf2 {
 		);
 
 		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/comments',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_comments' ),
-			)
-		);
-
-		register_block_type_from_metadata(
 			ABSPATH . WPINC . '/blocks/comment-author-name',
 			array(
 				'render_callback' => array( __CLASS__, 'render_block_core_comment_author_name' ),
@@ -214,7 +206,6 @@ class Theme_Mf2 {
 		remove_action( 'init', 'gutenberg_register_block_core_post_date', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_post_excerpt', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_post_title', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_comments', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_comment_author_name', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_comment_content', 20 );
 		remove_action( 'init', 'gutenberg_register_block_core_comment_date', 20 );
@@ -721,14 +712,15 @@ class Theme_Mf2 {
 			return '';
 		}
 
-		$comment_args = array(
-			'post_id' => $post_id,
-			'count'   => true,
-			'status'  => 'approve',
-		);
+		// @codingStandardsIgnoreStart
+		// $comment_args = array(
+		// 	'post_id' => $post_id,
+		// 	'count'   => true,
+		// 	'status'  => 'approve',
+		// );
 		// Return early if there are no comments and comments are closed.
-		// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 		// if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
+		// @codingStandardsIgnoreEnd
 		if ( ! comments_open( $post_id ) && in_array( get_comments_number( $post_id ), array( 0, '0' ), true ) ) {
 			return '';
 		}

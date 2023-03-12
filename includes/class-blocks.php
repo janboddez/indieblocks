@@ -46,9 +46,23 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		register_block_type_from_metadata(
+			dirname( __DIR__ ) . '/blocks/reactions',
+			array(
+				'render_callback' => array( __CLASS__, 'render_reactions_block' ),
+			)
+		);
+
+		// This oughta happen automatically, but whatevs.
+		wp_set_script_translations(
+			generate_block_asset_handle( 'indieblocks/reactions', 'editorScript' ),
+			'indieblocks',
+			dirname( __DIR__ ) . '/languages'
+		);
+
+		register_block_type_from_metadata(
 			dirname( __DIR__ ) . '/blocks/syndication',
 			array(
-				'render_callback' => array( __CLASS__, 'render_block' ),
+				'render_callback' => array( __CLASS__, 'render_syndication_block' ),
 			)
 		);
 
@@ -200,6 +214,68 @@ class Blocks {
 	}
 
 	/**
+	 * Renders the `indieblocks/reactions` block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               The filtered post content of the current post.
+	 */
+	public static function render_reactions_block( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			return '';
+		}
+
+		$args = array(
+			'post_id'    => $block->context['postId'],
+			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'relation' => 'AND',
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'IN',
+					'value'   => array( 'bookmark', 'like', 'repost' ),
+				),
+			),
+		);
+
+		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		$comments_query = new \WP_Comment_Query( $args );
+		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+
+		if ( empty( $comments_query->comments ) ) {
+			return '';
+		}
+
+		// Enqueue front-end block styles.
+		wp_enqueue_style( 'indieblocks-reactions', plugins_url( '/assets/reactions.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+
+		// @todo: Limit comments. We'll fix this later.
+		$comments = array_slice( $comments_query->comments, 0, 25 );
+		$output   = '';
+
+		foreach ( $comments as $comment ) {
+			$avatar = get_avatar( $comment, 40 );
+			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
+
+			if ( ! empty( $source ) ) {
+				$output .= '<span class="indieblocks-avatar"><a href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer">' . $avatar . '</a></span>';
+			} else {
+				$output .= '<span class="indieblocks-avatar">' . $avatar . '</span>';
+			}
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return '<div ' . $wrapper_attributes . '>' .
+			rtrim( $output, ', ' ) .
+		'</div>';
+	}
+
+	/**
 	 * Renders the `indieblocks/syndication` block.
 	 *
 	 * @param  array    $attributes Block attributes.
@@ -207,7 +283,7 @@ class Blocks {
 	 * @param  WP_Block $block      Block instance.
 	 * @return string               The filtered post content of the current post.
 	 */
-	public static function render_block( $attributes, $content, $block ) {
+	public static function render_syndication_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
 			return '';
 		}

@@ -38,6 +38,7 @@ class Options_Handler {
 		'webmention_post_types'           => array(),
 		'webmention_delay'                => 300,
 		'cache_avatars'                   => false,
+		'webmention_facepile'             => false,
 		'add_featured_images'             => false,
 		'location_functions'              => false,
 		'micropub'                        => false,
@@ -184,11 +185,12 @@ class Options_Handler {
 	 */
 	public function sanitize_webmention_settings( $settings ) {
 		$options = array(
-			'webmention'       => isset( $settings['webmention'] ) ? true : false,
-			'webmention_delay' => isset( $settings['webmention_delay'] ) && ctype_digit( $settings['webmention_delay'] )
+			'webmention'          => isset( $settings['webmention'] ) ? true : false,
+			'webmention_delay'    => isset( $settings['webmention_delay'] ) && ctype_digit( $settings['webmention_delay'] )
 				? (int) $settings['webmention_delay']
 				: 0,
-			'cache_avatars'    => isset( $settings['cache_avatars'] ) ? true : false,
+			'webmention_facepile' => isset( $settings['webmention_facepile'] ) ? true : false,
+			'cache_avatars'       => isset( $settings['cache_avatars'] ) ? true : false,
 		);
 
 		$webmention_post_types = array();
@@ -349,6 +351,11 @@ class Options_Handler {
 							<th scope="row"><?php esc_html_e( 'Avatars', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[cache_avatars]" value="1" <?php checked( ! empty( $this->options['cache_avatars'] ) ); ?>/> <?php esc_html_e( 'Cache avatars', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Attempt to locally cache avatars. Uncheck to disable webmention avatars altogether.', 'indieblocks' ); ?></p></td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Facepile', 'indieblocks' ); ?></th>
+							<td><label><input type="checkbox" name="indieblocks_settings[webmention_facepile]" value="1" <?php checked( ! empty( $this->options['webmention_facepile'] ) ); ?>/> <?php esc_html_e( '&ldquo;Facepile&rdquo; bookmarks, likes, and reposts', 'indieblocks' ); ?></label>
+							<p class="description"><?php esc_html_e( '(Experimental) Display bookmarks, likes, and reposts separate from &ldquo;regular&rdquo; comments.', 'indieblocks' ); ?></p></td>
 						</tr>
 					</table>
 				<?php endif; ?>

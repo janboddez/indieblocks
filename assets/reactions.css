@@ -1,0 +1,8 @@
+.indieblocks-avatar {
+	display: inline-block;
+	margin-inline-end: -0.67em;
+}
+
+.indieblocks-avatar img {
+	border-radius: 50%;
+}

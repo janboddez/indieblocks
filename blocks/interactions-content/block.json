@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
-	"title": "Reactions",
-	"name": "indieblocks/reactions",
+	"title": "Interactions Content",
+	"name": "indieblocks/interactions-content",
 	"category": "theme",
 	"icon": "admin-comments",
 	"editorScript": "file:./block.js",

@@ -54,31 +54,29 @@
 			}
 
 			return el( 'div', useBlockProps(),
-				[
-					el( BlockControls ),
-					( props.isSelected || ! url || 'undefined' === url )
-						? el( Placeholder, placeholderProps,
-							[
-								el( TextControl, {
-									label: __( 'URL', 'indieblocks' ),
-									value: url,
-									onChange: ( value ) => { props.setAttributes( { url: value } ) },
-								} ),
-								el( RadioControl, {
-									label: __( 'Type', 'indieblocks' ),
-									selected: kind,
-									options: [
-										{ label: __( 'Bookmark', 'indieblocks' ), value: 'u-bookmark-of' },
-										{ label: __( 'Like', 'indieblocks' ), value: 'u-like-of' },
-										{ label: __( 'Reply', 'indieblocks' ), value: 'u-in-reply-to' },
-										{ label: __( 'Repost', 'indieblocks' ), value: 'u-repost-of' },
-									],
-									onChange: ( value ) => { props.setAttributes( { kind: value } ) },
-								} ),
-							]
-						)
-						: render( {}, url, kind )
-				]
+				el( BlockControls ),
+				( props.isSelected || ! url || 'undefined' === url )
+					? el( Placeholder, placeholderProps,
+						[
+							el( TextControl, {
+								label: __( 'URL', 'indieblocks' ),
+								value: url,
+								onChange: ( value ) => { props.setAttributes( { url: value } ) },
+							} ),
+							el( RadioControl, {
+								label: __( 'Type', 'indieblocks' ),
+								selected: kind,
+								options: [
+									{ label: __( 'Bookmark', 'indieblocks' ), value: 'u-bookmark-of' },
+									{ label: __( 'Like', 'indieblocks' ), value: 'u-like-of' },
+									{ label: __( 'Reply', 'indieblocks' ), value: 'u-in-reply-to' },
+									{ label: __( 'Repost', 'indieblocks' ), value: 'u-repost-of' },
+								],
+								onChange: ( value ) => { props.setAttributes( { kind: value } ) },
+							} ),
+						]
+					)
+					: render( {}, url, kind )
 			);
 		},
 		save: function ( props ) {

@@ -38,14 +38,12 @@
 			}
 
 			return el( 'div', useBlockProps(),
-				[
-					el( BlockControls ),
-					urls.length
-						? element.RawHTML( { children: render( urls ) } )
-						: props.context.postId
-							? __( 'No syndication links', 'indieblocks' )
-							: __( 'Syndication Links', 'indieblocks' ),
-				]
+				el( BlockControls ),
+				urls.length
+					? element.RawHTML( { children: render( urls ) } )
+					: props.context.postId
+						? __( 'No syndication links', 'indieblocks' )
+						: __( 'Syndication Links', 'indieblocks' ),
 			);
 		},
 	} );

@@ -45,38 +45,27 @@ class Blocks {
 	 * Registers the different blocks.
 	 */
 	public static function register_blocks() {
-		register_block_type_from_metadata(
-			dirname( __DIR__ ) . '/blocks/reactions',
-			array(
-				'render_callback' => array( __CLASS__, 'render_reactions_block' ),
-			)
-		);
+		// (Semi-)dynamic blocks; these have a render callback.
+		foreach ( array( 'interactions', 'interactions-content', 'syndication' ) as $block ) {
+			register_block_type_from_metadata(
+				dirname( __DIR__ ) . "/blocks/$block",
+				array(
+					'render_callback' => array( __CLASS__, 'render_' . str_replace( '-', '_', $block ) . '_block' ),
+				)
+			);
 
-		// This oughta happen automatically, but whatevs.
-		wp_set_script_translations(
-			generate_block_asset_handle( 'indieblocks/reactions', 'editorScript' ),
-			'indieblocks',
-			dirname( __DIR__ ) . '/languages'
-		);
+			// This oughta happen automatically, but whatevs.
+			wp_set_script_translations(
+				generate_block_asset_handle( "indieblocks/$block", 'editorScript' ),
+				'indieblocks',
+				dirname( __DIR__ ) . '/languages'
+			);
+		}
 
-		register_block_type_from_metadata(
-			dirname( __DIR__ ) . '/blocks/syndication',
-			array(
-				'render_callback' => array( __CLASS__, 'render_syndication_block' ),
-			)
-		);
-
-		// This oughta happen automatically, but whatevs.
-		wp_set_script_translations(
-			generate_block_asset_handle( 'indieblocks/syndication', 'editorScript' ),
-			'indieblocks',
-			dirname( __DIR__ ) . '/languages'
-		);
-
+		// Static blocks.
 		foreach ( array( 'context', 'bookmark', 'like', 'reply', 'repost' ) as $block ) {
 			register_block_type( dirname( __DIR__ ) . "/blocks/$block" );
 
-			// This oughta happen automatically, but whatevs.
 			wp_set_script_translations(
 				generate_block_asset_handle( "indieblocks/$block", 'editorScript' ),
 				'indieblocks',
@@ -214,14 +203,55 @@ class Blocks {
 	}
 
 	/**
-	 * Renders the `indieblocks/reactions` block.
+	 * Renders the `indieblocks/interactions` block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Output HTML.
+	 */
+	public static function render_interactions_block( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			return '';
+		}
+
+		// @todo: Cache this query because we'll be reusing it in a sec.
+		$args = array(
+			'post_id'    => $block->context['postId'],
+			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'relation' => 'AND',
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'IN',
+					'value'   => array( 'bookmark', 'like', 'repost' ),
+				),
+			),
+		);
+
+		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		$comments_query = new \WP_Comment_Query( $args );
+		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+
+		if ( empty( $comments_query->comments ) ) {
+			return '';
+		}
+
+		return $block->render( array( 'dynamic' => false ) );
+	}
+
+	/**
+	 * Renders the `indieblocks/interactions-content` block.
 	 *
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
 	 * @return string               The filtered post content of the current post.
 	 */
-	public static function render_reactions_block( $attributes, $content, $block ) {
+	public static function render_interactions_content_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
 			return '';
 		}
@@ -251,7 +281,7 @@ class Blocks {
 		}
 
 		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-reactions', plugins_url( '/assets/reactions.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+		wp_enqueue_style( 'indieblocks-interactions', plugins_url( '/assets/interactions.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
 		// @todo: Limit comments. We'll fix this later.
 		$comments = array_slice( $comments_query->comments, 0, 25 );

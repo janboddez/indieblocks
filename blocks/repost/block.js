@@ -105,51 +105,47 @@
 			}
 
 			return el( 'div', useBlockProps(),
-				[
-					el( blockEditor.BlockControls ),
-					( props.isSelected || ! url || 'undefined' === url )
-						? el( components.Placeholder, placeholderProps,
-							[
-								el( blockEditor.InspectorControls, { key: 'inspector' },
-									el( components.PanelBody, {
-											title: __( 'Title and Author' ),
-											initialOpen: true,
-										},
-										el( TextControl, titleProps ),
-										el( CheckboxControl, {
-											label: __( 'Customize title', 'indieblocks' ),
-											checked: customTitle,
-											onChange: ( value ) => { props.setAttributes( { customTitle: value } ) },
-										} ),
-										el( TextControl, authorProps ),
-										el( CheckboxControl, {
-											label: __( 'Customize author', 'indieblocks' ),
-											checked: customAuthor,
-											onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
-										} ),
-									),
-								),
-								el( TextControl, {
-									label: __( 'URL', 'indieblocks' ),
-									value: url,
-									onChange: ( value ) => { props.setAttributes( { url: value } ) },
-									onKeyDown: ( event ) => {
-										if ( 13 === event.keyCode ) {
-											IndieBlocks.updateMeta( props );
-										}
-									},
-									onBlur: () => { IndieBlocks.updateMeta( props ) },
+				el( blockEditor.BlockControls ),
+				( props.isSelected || ! url || 'undefined' === url )
+					? el( components.Placeholder, placeholderProps,
+						el( blockEditor.InspectorControls, { key: 'inspector' },
+							el( components.PanelBody, {
+									title: __( 'Title and Author' ),
+									initialOpen: true,
+								},
+								el( TextControl, titleProps ),
+								el( CheckboxControl, {
+									label: __( 'Customize title', 'indieblocks' ),
+									checked: customTitle,
+									onChange: ( value ) => { props.setAttributes( { customTitle: value } ) },
 								} ),
-							]
-						)
-						: IndieBlocks.hCite( 'u-repost-of', props.attributes ),
-					el( 'blockquote', { className: 'wp-block-quote e-content' },
-						el( InnerBlocks, {
-							template: [ [ 'core/paragraph' ] ],
-							templateLock: false,
-						} ), // Always **show** (editable) `InnerBlocks`.
-					),
-				]
+								el( TextControl, authorProps ),
+								el( CheckboxControl, {
+									label: __( 'Customize author', 'indieblocks' ),
+									checked: customAuthor,
+									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
+								} ),
+							),
+						),
+						el( TextControl, {
+							label: __( 'URL', 'indieblocks' ),
+							value: url,
+							onChange: ( value ) => { props.setAttributes( { url: value } ) },
+							onKeyDown: ( event ) => {
+								if ( 13 === event.keyCode ) {
+									IndieBlocks.updateMeta( props );
+								}
+							},
+							onBlur: () => { IndieBlocks.updateMeta( props ) },
+						} ),
+					)
+					: IndieBlocks.hCite( 'u-repost-of', props.attributes ),
+				el( 'blockquote', { className: 'wp-block-quote e-content' },
+					el( InnerBlocks, {
+						template: [ [ 'core/paragraph' ] ],
+						templateLock: false,
+					} ), // Always **show** (editable) `InnerBlocks`.
+				),
 			);
 		},
 		save: ( props ) => el( 'div', useBlockProps.save(),

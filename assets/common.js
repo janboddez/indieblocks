@@ -29,41 +29,39 @@ var IndieBlocks = {
 		};
 
 		return el( 'div', { className: className + ' h-cite' },
-			[
-				el( 'p', {}, // Adding paragraphs this time around.
-					el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
-						( ! attributes.author || 'undefined' === attributes.author )
-							? interpolate(
-							    sprintf( messages[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
-								{
-									a: el( 'a', {
-										className: attributes.title && attributes.url !== attributes.title
-											? 'u-url p-name' // No title means no `p-name`.
-											: 'u-url',
-										href: attributes.url,
-									} ),
-								}
-							)
-							: interpolate(
-								sprintf( messagesWithByline[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
-								{
-									a: el( 'a', {
-										className: attributes.title && attributes.url !== attributes.title
-											? 'u-url p-name'
-											: 'u-url',
-										href: attributes.url,
-									} ),
-									span: el( 'span', { className: 'p-author' } ),
-								}
-							)
-					),
+			el( 'p', {}, // Adding paragraphs this time around.
+				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
+					( ! attributes.author || 'undefined' === attributes.author )
+						? interpolate(
+							sprintf( messages[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
+							{
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name' // No title means no `p-name`.
+										: 'u-url',
+									href: attributes.url,
+								} ),
+							}
+						)
+						: interpolate(
+							sprintf( messagesWithByline[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
+							{
+								a: el( 'a', {
+									className: attributes.title && attributes.url !== attributes.title
+										? 'u-url p-name'
+										: 'u-url',
+									href: attributes.url,
+								} ),
+								span: el( 'span', { className: 'p-author' } ),
+							}
+						)
 				),
-				'u-repost-of' === className && innerBlocks && ! attributes.empty
-					? el( 'blockquote', { className: 'wp-block-quote e-content' },
-						el( innerBlocks )
-					)
-					: null,
-			]
+			),
+			'u-repost-of' === className && innerBlocks && ! attributes.empty
+				? el( 'blockquote', { className: 'wp-block-quote e-content' },
+					el( innerBlocks )
+				)
+				: null,
 		);
 	},
 	/**

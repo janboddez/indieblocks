@@ -6,7 +6,6 @@ return array(
 		'wp-blocks',
 		'wp-element',
 		'wp-block-editor',
-		'wp-core-data',
 		'wp-i18n',
 	),
 );

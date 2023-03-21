@@ -65,12 +65,7 @@ class Location {
 				document.querySelector( '[name="indieblocks_lat"]' ).value = position.coords.latitude;
 				document.querySelector( '[name="indieblocks_lon"]' ).value = position.coords.longitude;
 
-				<?php
-				$post_time = get_post_time( 'U', true );
-
-				if ( false === $post_time || time() - $post_time < HOUR_IN_SECONDS ) :
-					// If the post is new or under an hour old, tick the checkbox.
-					?>
+				<?php if ( static::is_recent() ) : // If the post is less than one hour old. ?>
 					document.querySelector( '[name="indieblocks_loc_enabled"]' ).checked = true;
 				<?php endif; ?>
 			} );
@@ -186,7 +181,7 @@ class Location {
 		}
 
 		// Adds weather data.
-		if ( '' === get_post_meta( $post->ID, 'weather', true ) ) {
+		if ( static::is_recent( $post ) && '' === get_post_meta( $post->ID, 'weather', true ) ) {
 			// Let's do weather information, too.
 			$weather = static::get_weather( $lat, $lon );
 
@@ -413,5 +408,17 @@ class Location {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Whether a post is new or under one hour old.
+	 *
+	 * @param  int|WP_Post $post The post (or `null`, which means `global $post`).
+	 * @return bool              True if the post is unpublished or less than one hour old.
+	 */
+	protected static function is_recent( $post = null ) {
+		$post_time = get_post_time( 'U', true, $post );
+
+		return false === $post_time || time() - $post_time < HOUR_IN_SECONDS;
 	}
 }

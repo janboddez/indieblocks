@@ -59,14 +59,20 @@ class Location {
 		?>
 		<script type="text/javascript">
 		if ( document.querySelector( '[name="indieblocks_lat"]' ) && '' === document.querySelector( '[name="indieblocks_lat"]' ).value && document.querySelector( '[name="indieblocks_lon"]' ) && '' === document.querySelector( '[name="indieblocks_lon"]' ).value ) {
-			// If the "Latitude" field is empty, ask the browser for location information.
+			// If the "Latitude" and "Longitude" fields are empty, ask the
+			// browser for location information.
 			navigator.geolocation.getCurrentPosition( function( position ) {
 				document.querySelector( '[name="indieblocks_lat"]' ).value = position.coords.latitude;
 				document.querySelector( '[name="indieblocks_lon"]' ).value = position.coords.longitude;
 
-				// If the fields were empty, and after being given location
-				// permission, enable the checkbox.
-				document.querySelector( '[name="indieblocks_loc_enabled"]' ).checked = true;
+				<?php
+				$post_time = get_post_time( 'U', true );
+
+				if ( false === $post_time || time() - $post_time < HOUR_IN_SECONDS ) :
+					// If the post is new or under an hour old, tick the checkbox.
+					?>
+					document.querySelector( '[name="indieblocks_loc_enabled"]' ).checked = true;
+				<?php endif; ?>
 			} );
 		}
 		</script>

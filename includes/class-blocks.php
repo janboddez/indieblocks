@@ -291,17 +291,18 @@ class Blocks {
 			$avatar = get_avatar( $comment, 40 );
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 
+			// @todo: Replace `u-comment` with `u-like-of`, etc.?
 			if ( ! empty( $source ) ) {
-				$output .= '<span class="indieblocks-avatar"><a href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer">' . $avatar . '</a></span>';
+				$output .= '<li class="u-comment h-cite"><a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . "</span></a></li>\n";
 			} else {
-				$output .= '<span class="indieblocks-avatar">' . $avatar . '</span>';
+				$output .= '<li class="u-comment h-cite"><span class="p-author h-card">' . $avatar . "</span></li>\n";
 			}
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes();
 
 		return '<div ' . $wrapper_attributes . '>' .
-			rtrim( $output, ', ' ) .
+			'<ul>' . trim( $output ) . '</ul>' .
 		'</div>';
 	}
 

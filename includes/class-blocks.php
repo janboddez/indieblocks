@@ -46,7 +46,7 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		// (Semi-)dynamic blocks; these have a render callback.
-		foreach ( array( 'interactions', 'interactions-content', 'syndication' ) as $block ) {
+		foreach ( array( 'facepile', 'facepile-content', 'syndication' ) as $block ) {
 			register_block_type_from_metadata(
 				dirname( __DIR__ ) . "/blocks/$block",
 				array(
@@ -203,40 +203,21 @@ class Blocks {
 	}
 
 	/**
-	 * Renders the `indieblocks/interactions` block.
+	 * Renders the `indieblocks/facepile` block.
 	 *
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
 	 * @return string               Output HTML.
 	 */
-	public static function render_interactions_block( $attributes, $content, $block ) {
+	public static function render_facepile_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
 			return '';
 		}
 
-		// @todo: Cache this query because we'll be reusing it in a sec.
-		$args = array(
-			'post_id'    => $block->context['postId'],
-			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				'relation' => 'AND',
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'EXISTS',
-				),
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'IN',
-					'value'   => array( 'bookmark', 'like', 'repost' ),
-				),
-			),
-		);
+		$facepile_comments = static::get_facepile_comments( $block->context['postId'] );
 
-		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
-		$comments_query = new \WP_Comment_Query( $args );
-		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
-
-		if ( empty( $comments_query->comments ) ) {
+		if ( empty( $facepile_comments ) ) {
 			return '';
 		}
 
@@ -244,50 +225,33 @@ class Blocks {
 	}
 
 	/**
-	 * Renders the `indieblocks/interactions-content` block.
+	 * Renders the `indieblocks/facepile-content` block.
 	 *
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
-	 * @return string               The filtered post content of the current post.
+	 * @return string               Facepile HTML, or an empty string.
 	 */
-	public static function render_interactions_content_block( $attributes, $content, $block ) {
+	public static function render_facepile_content_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
 			return '';
 		}
 
-		$args = array(
-			'post_id'    => $block->context['postId'],
-			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				'relation' => 'AND',
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'EXISTS',
-				),
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'IN',
-					'value'   => array( 'bookmark', 'like', 'repost' ),
-				),
-			),
-		);
+		$facepile_comments = static::get_facepile_comments( $block->context['postId'] );
 
-		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
-		$comments_query = new \WP_Comment_Query( $args );
-		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
-
-		if ( empty( $comments_query->comments ) ) {
+		if ( empty( $facepile_comments ) ) {
 			return '';
 		}
 
 		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-interactions', plugins_url( '/assets/interactions.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
 		// @todo: Limit comments. We'll fix this later.
-		$comments = array_slice( $comments_query->comments, 0, 25 );
-		$output   = '';
+		$facepile_comments = array_slice( $facepile_comments, 0, 25 );
 
-		foreach ( $comments as $comment ) {
+		$output = '';
+
+		foreach ( $facepile_comments as $comment ) {
 			$avatar = get_avatar( $comment, 40 );
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 
@@ -342,5 +306,42 @@ class Blocks {
 		return '<div ' . $wrapper_attributes . '>' .
 			rtrim( $output, ', ' ) .
 		'</div>';
+	}
+
+	/**
+	 * Queries for a post's "facepile" comments.
+	 *
+	 * @param  int $post_id Post ID.
+	 * @return array        Facepile comments.
+	 */
+	protected static function get_facepile_comments( $post_id ) {
+		$facepile_comments = get_transient( "indieblocks:facepile-comments:$post_id" );
+
+		if ( false !== $facepile_comments ) {
+			return $facepile_comments;
+		}
+
+		$args = array(
+			'post_id'    => $post_id,
+			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'relation' => 'AND',
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'indieblocks_webmention_kind',
+					'compare' => 'IN',
+					'value'   => apply_filters( 'indieblocks_facepile_kind', array( 'bookmark', 'like', 'repost' ), $post_id ),
+				),
+			),
+		);
+
+		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		$comment_query = new \WP_Comment_Query( $args );
+		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+
+		set_transient( "indieblocks:facepile-comments:$post_id", $comment_query->comments, 10 );
+		return $comment_query->comments;
 	}
 }

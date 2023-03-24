@@ -687,8 +687,9 @@ class Theme_Mf2 {
 		$classes   = trim( implode( ' ', $classes ) );
 
 		return sprintf(
-			'<img src="%s" width="%d" height="%d" class="%s" %s/>',
+			'<img src="%s" alt="%s" width="%d" height="%d" class="%s" %s/>',
 			esc_url( $url ),
+			esc_attr( get_comment_author( $comment ) ),
 			$width,
 			$height,
 			$classes,

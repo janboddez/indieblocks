@@ -11,8 +11,6 @@ This plugin aims to provide a basis for:
 ## How
 IndieBlocks provides a number of blocks that can be used to add microformats to posts without having to tweak HTML. It also adds a number of "short-form" Custom Post Types. (Both are optional, like, well, all of IndieBlocks features.)
 
-Because we generally prefer core blocks over custom solutions, and, for certain "IndieWeb post types," a single custom block doesn't cut it, a number of so-called "block patterns" are provided as well.
-
 IndieBlocks also hooks into the existing Micropub plugin, so that Micropub posts are given the correct post type, and, when applicable, "microformats" blocks.
 
 If you're running a "block theme," it will attempt to add "microformats2" to it. (If your theme already supports microformats2, just leave this part disabled.)

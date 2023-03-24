@@ -28,7 +28,7 @@ class Blocks {
 	public static function register_scripts() {
 		wp_register_script(
 			'indieblocks-common',
-			plugins_url( '/assets/common.js', dirname( __FILE__ ) ),
+			plugins_url( '/assets/common.js', __DIR__ ),
 			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
 			\IndieBlocks\IndieBlocks::PLUGIN_VERSION,
 			true
@@ -38,6 +38,14 @@ class Blocks {
 			'indieblocks-common',
 			'indieblocks',
 			dirname( __DIR__ ) . '/languages'
+		);
+
+		wp_localize_script(
+			'indieblocks-common',
+			'indieblocks_common_obj',
+			array(
+				'assets_url' => plugins_url( '/assets/', __DIR__ ),
+			)
 		);
 	}
 
@@ -316,7 +324,7 @@ class Blocks {
 	 * @return array        Facepile comments.
 	 */
 	protected static function get_facepile_comments( $post_id ) {
-		$facepile_comments = get_transient( "indieblocks:facepile-comments:$post_id" );
+		$facepile_comments = wp_cache_get( "indieblocks:facepile-comments:$post_id" );
 
 		if ( false !== $facepile_comments ) {
 			return $facepile_comments;
@@ -342,7 +350,9 @@ class Blocks {
 		$comment_query = new \WP_Comment_Query( $args );
 		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
 
-		set_transient( "indieblocks:facepile-comments:$post_id", $comment_query->comments, 10 );
+		$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $comment_query->comments, $post_id );
+
+		wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
 		return $comment_query->comments;
 	}
 }

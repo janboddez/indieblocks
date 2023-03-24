@@ -5,6 +5,7 @@
 	"category": "theme",
 	"icon": "admin-comments",
 	"editorScript": "file:./block.js",
+	"editorStyle": "file:./editor.css",
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

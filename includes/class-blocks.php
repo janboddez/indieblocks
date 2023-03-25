@@ -254,8 +254,9 @@ class Blocks {
 		// Enqueue front-end block styles.
 		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
-		// @todo: Limit comments. We'll fix this later.
-		$facepile_comments = array_slice( $facepile_comments, 0, 25 );
+		// Limit comments. Might provide a proper option later.
+		$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25 );
+		$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num, $block->context['postId'] );
 
 		$output = '';
 
@@ -298,6 +299,7 @@ class Blocks {
 			)
 		);
 
+		// Allow developers to parse in other plugins' links.
 		$urls = apply_filters( 'indieblocks_syndication_links', $urls, $block->context['postId'] );
 
 		if ( empty( $urls ) ) {

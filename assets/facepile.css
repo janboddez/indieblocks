@@ -1,8 +1,23 @@
-.indieblocks-avatar {
-	display: inline-block;
-	margin-inline-end: -0.67em;
+.wp-block-indieblocks-facepile-content ul {
+	list-style: none;
+	padding: 0;
+	display: flex;
 }
 
-.indieblocks-avatar img {
+.wp-block-indieblocks-facepile-content li {
+	display: inline-block;
+	margin-inline-end: -20px;
+}
+
+.wp-block-indieblocks-facepile-content li:hover {
+	margin-inline-end: -8px;
+}
+
+.wp-block-indieblocks-facepile-content a {
+	display: block;
+}
+
+.wp-block-indieblocks-facepile-content img {
+	display: block;
 	border-radius: 50%;
 }

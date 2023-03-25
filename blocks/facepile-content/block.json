@@ -6,6 +6,20 @@
 	"icon": "admin-comments",
 	"editorScript": "file:./block.js",
 	"editorStyle": "file:./editor.css",
+	"attributes": {
+		"bookmark": {
+			"type": "boolean",
+			"default": true
+		},
+		"like": {
+			"type": "boolean",
+			"default": true
+		},
+		"repost": {
+			"type": "boolean",
+			"default": true
+		}
+	},
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

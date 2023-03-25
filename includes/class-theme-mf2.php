@@ -647,7 +647,7 @@ class Theme_Mf2 {
 	 * Quick 'n' dirty way to display webmention avatars.
 	 *
 	 * Note that the core blocks used by block themes call author and avatar
-	 * blocks separately, which is why these typically don't sit inside the
+	 * blocks separately, which is why these typically _don't_ sit inside the
 	 * author `h-card`.
 	 *
 	 * @param  string|null $avatar  Default HTML.

@@ -263,12 +263,20 @@ class Blocks {
 		foreach ( $facepile_comments as $comment ) {
 			$avatar = get_avatar( $comment, 40 );
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
+			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
 
-			// @todo: Replace `u-comment` with `u-like-of`, etc.?
+			$classes = array(
+				'bookmark' => 'p-bookmark',
+				'like'     => 'p-like',
+				'repost'   => 'p-repost',
+			);
+
+			$class = esc_attr( $classes[ $kind ] );
+
 			if ( ! empty( $source ) ) {
-				$output .= '<li class="u-comment h-cite"><a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . "</span></a></li>\n";
+				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"><a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . "</span></a></li>\n";
 			} else {
-				$output .= '<li class="u-comment h-cite"><span class="p-author h-card">' . $avatar . "</span></li>\n";
+				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"><span class="p-author h-card">' . $avatar . "</span></li>\n";
 			}
 		}
 
@@ -322,8 +330,9 @@ class Blocks {
 	/**
 	 * Queries for a post's "facepile" comments.
 	 *
-	 * @param  int $post_id Post ID.
-	 * @return array        Facepile comments.
+	 * @param  int   $post_id Post ID.
+	 * @param  array $kinds   Array of mention types, or kinds.
+	 * @return array          Facepile comments.
 	 */
 	protected static function get_facepile_comments( $post_id ) {
 		$facepile_comments = wp_cache_get( "indieblocks:facepile-comments:$post_id" );
@@ -343,7 +352,7 @@ class Blocks {
 				array(
 					'key'     => 'indieblocks_webmention_kind',
 					'compare' => 'IN',
-					'value'   => apply_filters( 'indieblocks_facepile_kind', array( 'bookmark', 'like', 'repost' ), $post_id ),
+					'value'   => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
 				),
 			),
 		);
@@ -354,6 +363,7 @@ class Blocks {
 
 		$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $comment_query->comments, $post_id );
 
+		// Cache for the duration of the request (and then some)?
 		wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
 		return $comment_query->comments;
 	}

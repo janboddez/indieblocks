@@ -202,6 +202,9 @@ class Webmention {
 	/**
 	 * Returns a post's comment count, sans bookmarks, likes and reposts.
 	 *
+	 * Reason we override the comment count is our `pre_get_comments` filter
+	 * screws up counts!
+	 *
 	 * @param  int $count   Comment count.
 	 * @param  int $post_id Post ID.
 	 * @return int          Comment count, excluding bookmarks, likes and reposts.

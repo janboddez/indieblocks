@@ -24,7 +24,7 @@ More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/
 
 == Changelog ==
 = 0.6.0 =
-"Facepile" likes, bookmarks, and reposts (and the Reactions block1).
+"Facepile" Webmention likes, bookmarks, and reposts.
 = 0.5.0 =
 Add Bookmark, Like, Reply and Repost blocks. Additional title options.
 = 0.4.0 =

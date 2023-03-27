@@ -61,6 +61,9 @@ class Theme_Mf2 {
 		if ( is_home() || is_archive() || is_search() ) {
 			$classes[] = 'h-feed';
 		} elseif ( is_singular() ) {
+			// Ideally, we could recognize reviews and recipes, too (but I'm afraid we can't just use `Parser::get_type()`).
+			// We might get away with looking for `p-rating` or `p-ingredient`
+			// or so.
 			$classes[] = 'h-entry';
 		}
 

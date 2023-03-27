@@ -231,8 +231,12 @@ class Micropub_Compat {
 			$options = get_options();
 
 			if ( ! empty( $options['parse_markdown'] ) ) {
-				// @todo: Filter all notes and likes, not just those posted via Micropub, and store Markdown in `post_content_filtered`, kind of like Jetpack does it.
+				// @todo: Store Markdown in `post_content_filtered`? Exceept we can't, not from this hook.
 				$content = Michelf\MarkdownExtra::defaultTransform( $content );
+				// Probably better, for POSSE'ing and whatnot, to convert the
+				// post's content back to "Markdown." So that, rather than drop
+				// elements like `blockquote`, we get, e.g., `> `, etc. So, let
+				// those plugins deal with it.
 			}
 
 			$content = wp_kses_post( $content );
@@ -240,8 +244,7 @@ class Micropub_Compat {
 		}
 
 		if ( ! empty( $url ) ) {
-			// Could be we're looking at a note, e.g., a bookmark or reply, or
-			// like.
+			// Could be we're looking at a bookmark, reply, repost or like.
 			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
 				// Depending on the scenario, Micropub clients may add a page
 				// title in front of the URL.

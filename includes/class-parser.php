@@ -38,7 +38,6 @@ class Parser {
 	 * @param string|null $url URL of the page we'll be parsing.
 	 */
 	public function __construct( $url = null ) {
-
 		$this->url = $url;
 		$this->dom = new \DOMDocument();
 	}
@@ -54,6 +53,7 @@ class Parser {
 		if ( empty( $content ) ) {
 			// No `$content` was passed along.
 			$content = get_transient( 'indieblocks:html:' . $hash );
+
 			if ( empty( $content ) && ! empty( $this->url ) ) {
 				// Download page.
 				$response = remote_get( $this->url );
@@ -68,12 +68,11 @@ class Parser {
 		}
 
 		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
-
 		libxml_use_internal_errors( true );
-
 		$this->dom->loadHTML( $content );
 
 		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
+
 		if ( empty( $mf2 ) ) {
 			$mf2 = Mf2\parse( $content, $this->url );
 			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
@@ -88,11 +87,11 @@ class Parser {
 	 * @return string Current page's name or title.
 	 */
 	public function get_name() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['name'][0] ) ) {
-				return $hentry['properties']['name'][0];
+			if ( ! empty( $post['properties']['name'][0] ) ) {
+				return $post['properties']['name'][0];
 			}
 
 			return ''; // If this thing supports microformats but does not have a name, assume a note.
@@ -113,15 +112,15 @@ class Parser {
 	 * @return string Page author.
 	 */
 	public function get_author() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['author'][0] ) && is_string( $hentry['properties']['author'][0] ) ) {
-				return $hentry['properties']['author'][0];
+			if ( ! empty( $post['properties']['author'][0] ) && is_string( $post['properties']['author'][0] ) ) {
+				return $post['properties']['author'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['author'][0]['properties']['name'][0] ) ) {
-				return $hentry['properties']['author'][0]['properties']['name'][0];
+			if ( ! empty( $post['properties']['author'][0]['properties']['name'][0] ) ) {
+				return $post['properties']['author'][0]['properties']['name'][0];
 			}
 		}
 
@@ -134,11 +133,11 @@ class Parser {
 	 * @return string Author URL.
 	 */
 	public function get_author_url() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['author'][0]['properties']['url'][0] ) ) {
-				return $hentry['properties']['author'][0]['properties']['url'][0];
+			if ( ! empty( $post['properties']['author'][0]['properties']['url'][0] ) ) {
+				return $post['properties']['author'][0]['properties']['url'][0];
 			}
 		}
 
@@ -146,16 +145,16 @@ class Parser {
 	}
 
 	/**
-	 * Returns the author's avatar, if it can find one.
+	 * Returns the author's avatar, we can find one.
 	 *
 	 * @return string Avatar URL.
 	 */
 	public function get_avatar() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['author'][0]['properties']['photo'][0] ) ) {
-				return $hentry['properties']['author'][0]['properties']['photo'][0];
+			if ( ! empty( $post['properties']['author'][0]['properties']['photo'][0] ) ) {
+				return $post['properties']['author'][0]['properties']['photo'][0];
 			}
 		}
 
@@ -163,37 +162,37 @@ class Parser {
 	}
 
 	/**
-	 * Returns the URL, i.e., `href` value, of the first "like," or "bookmark,"
-	 * or "repost" link.
+	 * Returns the URL, i.e., `href` value, of the current page's first "like,"
+	 * "bookmark," or "repost" link.
 	 *
 	 * @return string Link URL.
 	 */
 	public function get_link_url() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['repost-of'][0] ) && filter_var( $hentry['properties']['repost-of'][0], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['repost-of'][0];
+			if ( ! empty( $post['properties']['repost-of'][0] ) && filter_var( $post['properties']['repost-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['repost-of'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['repost-of'][0]['value'] ) && filter_var( $hentry['properties']['repost-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['repost-of'][0]['value'];
+			if ( ! empty( $post['properties']['repost-of'][0]['value'] ) && filter_var( $post['properties']['repost-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['repost-of'][0]['value'];
 			}
 
-			if ( ! empty( $hentry['properties']['like-of'][0] ) && filter_var( $hentry['properties']['like-of'][0], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['like-of'][0];
+			if ( ! empty( $post['properties']['like-of'][0] ) && filter_var( $post['properties']['like-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['like-of'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['like-of'][0]['value'] ) && filter_var( $hentry['properties']['like-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['like-of'][0]['value'];
+			if ( ! empty( $post['properties']['like-of'][0]['value'] ) && filter_var( $post['properties']['like-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['like-of'][0]['value'];
 			}
 
-			if ( ! empty( $hentry['properties']['bookmark-of'][0] ) && filter_var( $hentry['properties']['bookmark-of'][0], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['bookmark-of'][0];
+			if ( ! empty( $post['properties']['bookmark-of'][0] ) && filter_var( $post['properties']['bookmark-of'][0], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['bookmark-of'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['bookmark-of'][0]['value'] ) && filter_var( $hentry['properties']['bookmark-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
-				return $hentry['properties']['bookmark-of'][0]['value'];
+			if ( ! empty( $post['properties']['bookmark-of'][0]['value'] ) && filter_var( $post['properties']['bookmark-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
+				return $post['properties']['bookmark-of'][0]['value'];
 			}
 		}
 
@@ -201,26 +200,104 @@ class Parser {
 	}
 
 	/**
-	 * Returns the name (i.e., the text content) of the first "like," or
-	 * "bookmark," or "repost" link.
+	 * Returns the name (i.e., the text content) of the current page's first
+	 * "like," "bookmark," or "repost" link.
 	 *
 	 * @return string Link name.
 	 */
 	public function get_link_name() {
-		if ( ! empty( $this->mf2['items'][0]['type'][0] ) && 'h-entry' === $this->mf2['items'][0]['type'][0] ) {
-			$hentry = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
 
-			if ( ! empty( $hentry['properties']['repost-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['repost-of'][0]['properties']['name'][0] ) ) {
-				return $hentry['properties']['repost-of'][0]['properties']['name'][0];
+			if ( ! empty( $post['properties']['repost-of'][0]['properties']['name'][0] ) && is_string( $post['properties']['repost-of'][0]['properties']['name'][0] ) ) {
+				return $post['properties']['repost-of'][0]['properties']['name'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['like-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['like-of'][0]['properties']['name'][0] ) ) {
-				return $hentry['properties']['like-of'][0]['properties']['name'][0];
+			if ( ! empty( $post['properties']['like-of'][0]['properties']['name'][0] ) && is_string( $post['properties']['like-of'][0]['properties']['name'][0] ) ) {
+				return $post['properties']['like-of'][0]['properties']['name'][0];
 			}
 
-			if ( ! empty( $hentry['properties']['bookmark-of'][0]['properties']['name'][0] ) && is_string( $hentry['properties']['bookmark-of'][0]['properties']['name'][0] ) ) {
-				return $hentry['properties']['bookmark-of'][0]['properties']['name'][0];
+			if ( ! empty( $post['properties']['bookmark-of'][0]['properties']['name'][0] ) && is_string( $post['properties']['bookmark-of'][0]['properties']['name'][0] ) ) {
+				return $post['properties']['bookmark-of'][0]['properties']['name'][0];
 			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the current page's "IndieWeb post type."
+	 *
+	 * @return string Post type.
+	 */
+	public function get_type() {
+		if ( ! empty( $this->mf2['items'][0] ) ) {
+			$post = $this->mf2['items'][0];
+
+			if ( ! empty( $post['type'][0] ) && in_array( $post['type'][0], array( 'event', 'recipe', 'review' ), true ) ) {
+				return $post['type'];
+			}
+
+			if ( ! empty( $post['properties']['repost-of'] ) ) {
+				return 'repost';
+			}
+
+			if ( ! empty( $post['properties']['in-reply-to'] ) ) {
+				return 'reply';
+			}
+
+			if ( ! empty( $post['properties']['like-of'] ) ) {
+				return 'like';
+			}
+
+			if ( ! empty( $post['properties']['bookmark-of'] ) ) {
+				return 'bookmark';
+			}
+
+			if ( ! empty( $post['properties']['follow-of'] ) ) {
+				return 'follow';
+			}
+
+			if ( ! empty( $post['properties']['checkin'] ) ) {
+				return 'checkin';
+			}
+
+			if ( ! empty( $post['properties']['video'] ) ) {
+				return 'video';
+			}
+
+			if ( ! empty( $post['properties']['video'] ) ) {
+				return 'audio';
+			}
+
+			if ( ! empty( $post['properties']['photo'] ) ) {
+				return 'photo';
+			}
+
+			$name = ! empty( $post['properties']['name'] )
+				? trim( $post['properties']['name'] )
+				: '';
+
+			if ( empty( $name ) ) {
+				return 'note';
+			}
+
+			$content = '';
+
+			if ( ! empty( $post['properties']['content']['text'] ) ) {
+				$content = $post['properties']['content']['text'];
+			} elseif ( ! empty( $post['properties']['summary'] ) ) {
+				$content = $post['properties']['summary'];
+			}
+
+			$name    = preg_replace( '~\s+~', ' ', $name );
+			$content = preg_replace( '~\s+~', ' ', $content );
+
+			if ( 0 !== strpos( $content, $name ) ) {
+				return 'article';
+			}
+
+			return 'note';
 		}
 
 		return '';

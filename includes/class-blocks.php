@@ -376,6 +376,6 @@ class Blocks {
 
 		// Cache for the duration of the request (and then some)?
 		wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
-		return $comment_query->comments;
+		return $facepile_comments;
 	}
 }

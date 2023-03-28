@@ -270,13 +270,25 @@ class Blocks {
 				'like'     => 'p-like',
 				'repost'   => 'p-repost',
 			);
+			$class   = isset( $classes[ $kind ] ) ? esc_attr( $classes[ $kind ] ) : '';
 
-			$class = esc_attr( $classes[ $kind ] );
+			$titles = array(
+				'bookmark' => '&hellip; bookmarked this!',
+				'like'     => '&hellip; liked this!',
+				'repost'   => '&hellip; reposted this!',
+			);
+			$title  = isset( $titles[ $kind ] ) ? esc_attr( $titles[ $kind ] ) : '';
 
 			if ( ! empty( $source ) ) {
-				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"><a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . "</span></a></li>\n";
+				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
+				'<a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . '</span>' .
+				( ! empty( $kind ) ? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />' : '' ) .
+				"</a></li>\n";
 			} else {
-				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"><span class="p-author h-card">' . $avatar . "</span></li>\n";
+				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
+				'<span class="p-author h-card">' . $avatar . '</span>' .
+				( ! empty( $kind ) ? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />' : '' ) .
+				"</li>\n";
 			}
 		}
 
@@ -330,9 +342,8 @@ class Blocks {
 	/**
 	 * Queries for a post's "facepile" comments.
 	 *
-	 * @param  int   $post_id Post ID.
-	 * @param  array $kinds   Array of mention types, or kinds.
-	 * @return array          Facepile comments.
+	 * @param  int $post_id Post ID.
+	 * @return array        Facepile comments.
 	 */
 	protected static function get_facepile_comments( $post_id ) {
 		$facepile_comments = wp_cache_get( "indieblocks:facepile-comments:$post_id" );

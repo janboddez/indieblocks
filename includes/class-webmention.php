@@ -226,7 +226,7 @@ class Webmention {
 		$sql = "SELECT COUNT(c.comment_ID) FROM $comments AS c
 			LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
 			WHERE c.comment_post_ID = %d
-			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d))
+			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))			
 			AND (m.meta_key IS NULL OR m.meta_value NOT IN ('bookmark', 'like', 'repost'))";
 
 		/* @todo: Add caching. */

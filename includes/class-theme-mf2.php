@@ -18,7 +18,7 @@ class Theme_Mf2 {
 		add_filter( 'term_links-category', array( __CLASS__, 'add_term_link_class' ) );
 		add_filter( 'term_links-post_tag', array( __CLASS__, 'add_term_link_class' ) );
 		add_filter( 'body_class', array( __CLASS__, 'add_body_class' ), 99 );
-		add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 99 );
+		add_filter( 'post_class', array( __CLASS__, 'add_post_class' ), 99, 3 );
 		add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 99 );
 		add_filter( 'post_thumbnail_html', array( __CLASS__, 'add_thumbnail_class' ) );
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
@@ -61,10 +61,25 @@ class Theme_Mf2 {
 		if ( is_home() || is_archive() || is_search() ) {
 			$classes[] = 'h-feed';
 		} elseif ( is_singular() ) {
-			// Ideally, we could recognize reviews and recipes, too (but I'm afraid we can't just use `Parser::get_type()`).
-			// We might get away with looking for `p-rating` or `p-ingredient`
-			// or so.
-			$classes[] = 'h-entry';
+			global $wp_query;
+
+			$class = 'h-entry';
+			$post  = $wp_query->get_queried_object();
+
+			if ( ! empty( $post->post_content ) ) {
+				if ( preg_match( '~class=("|\')([^"\']*?)p-ingredient([^"\']*?)("|\')~', $post->post_content ) ) {
+					// Decent chance this is a recipe.
+					$class = 'h-review';
+				} elseif ( preg_match( '~class=("|\')([^"\']*?)p-rating([^"\']*?)("|\')~', $post->post_content ) ) {
+					// Decent chance this is a review.
+					$class = 'h-review';
+				} elseif ( preg_match( '~class=("|\')([^"\']*?)dt-start([^"\']*?)("|\')~', $post->post_content ) ) {
+					// This could be an event.
+					$class = 'h-event';
+				}
+			}
+
+			$classes[] = $class;
 		}
 
 		return $classes;
@@ -73,10 +88,12 @@ class Theme_Mf2 {
 	/**
 	 * Adds `h-entry` to individual posts (on, e.g., archive pages).
 	 *
-	 * @param  array $classes Array of class names.
-	 * @return array          The filtered array.
+	 * @param  array $classes   An array of post class names.
+	 * @param  array $css_class An array of additional class names added to the post.
+	 * @param  int   $post_id   The post ID.
+	 * @return array            The filtered array.
 	 */
-	public static function add_post_class( $classes ) {
+	public static function add_post_class( $classes, $css_class, $post_id ) {
 		if ( in_array( 'h-entry', $classes, true ) ) {
 			return $classes;
 		}
@@ -84,9 +101,27 @@ class Theme_Mf2 {
 		if ( is_admin() || is_singular() ) {
 			// Single posts get `h-entry` added to `body` instead.
 			return $classes;
+
+			// @todo: What about a single page that lists a number of posts? Shouldn't those get an `h-entry` class, too?
 		}
 
-		$classes[] = 'h-entry';
+		$class = 'h-entry';
+		$post  = get_post( $post_id );
+
+		if ( ! empty( $post->post_content ) ) {
+			if ( preg_match( '~class=("|\')([^"\']*?)p-ingredient([^"\']*?)("|\')~', $post->post_content ) ) {
+				// Decent chance this is a recipe.
+				$class = 'h-recipe';
+			} elseif ( preg_match( '~class=("|\')([^"\']*?)p-rating([^"\']*?)("|\')~', $post->post_content ) ) {
+				// Decent chance this is a review.
+				$class = 'h-review';
+			} elseif ( preg_match( '~class=("|\')([^"\']*?)dt-start([^"\']*?)("|\')~', $post->post_content ) ) {
+				// This could be an event.
+				$class = 'h-event';
+			}
+		}
+
+		$classes[] = $class;
 
 		return $classes;
 	}
@@ -115,8 +150,8 @@ class Theme_Mf2 {
 	 * @return string       Updated HTML.
 	 */
 	public static function add_thumbnail_class( $html ) {
-		if ( preg_match( '~ class=("|\')~', $html, $matches ) ) {
-			$html = str_replace( " class={$matches[1]}", " class={$matches[1]}u-featured ", $html );
+		if ( preg_match( '~class=("|\')~', $html, $matches ) ) {
+			$html = str_replace( "class={$matches[1]}", "class={$matches[1]} u-featured", $html );
 		} else {
 			$html = str_replace( '<img ', '<img class="u-photo" ', $html );
 		}
@@ -267,8 +302,8 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Adds `e-content` to the post content block (but only if `$content` doesn't
-	 * already include such a class.
+	 * Adds `e-content` to the post content block (but only if `$content`
+	 * doesn't already include an element with such a class.
 	 *
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
@@ -323,7 +358,7 @@ class Theme_Mf2 {
 
 		$classes = array( 'entry-content' );
 
-		if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
+		if ( ! preg_match( '~class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
 			$classes[] = 'e-content';
 		}
 

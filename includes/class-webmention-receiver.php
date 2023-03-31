@@ -203,7 +203,7 @@ class Webmention_Receiver {
 			$commentdata = array(
 				'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
 				'comment_author'       => $host,
-				'comment_author_email' => 'someone@example.org',
+				'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
 				'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
 				'comment_author_IP'    => $webmention->ip,
 				'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),

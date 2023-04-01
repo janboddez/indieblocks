@@ -54,12 +54,8 @@ class Theme_Mf2 {
 	 * @return array          The filtered array.
 	 */
 	public static function add_body_class( $classes ) {
-		if ( in_array( 'h-feed', $classes, true ) ) {
-			return $classes;
-		}
-
 		if ( is_home() || is_archive() || is_search() ) {
-			$classes[] = 'h-feed';
+			$class = 'h-feed';
 		} elseif ( is_singular() ) {
 			global $wp_query;
 
@@ -78,11 +74,11 @@ class Theme_Mf2 {
 					$class = 'h-event';
 				}
 			}
-
-			$classes[] = $class;
 		}
 
-		return $classes;
+		$classes[] = apply_filters( 'indieblocks_body_class', $class );
+
+		return array_unique( $classes );
 	}
 
 	/**
@@ -94,10 +90,6 @@ class Theme_Mf2 {
 	 * @return array            The filtered array.
 	 */
 	public static function add_post_class( $classes, $css_class, $post_id ) {
-		if ( in_array( 'h-entry', $classes, true ) ) {
-			return $classes;
-		}
-
 		if ( is_admin() || is_singular() ) {
 			// Single posts get `h-entry` added to `body` instead.
 			return $classes;
@@ -121,9 +113,9 @@ class Theme_Mf2 {
 			}
 		}
 
-		$classes[] = $class;
+		$classes[] = apply_filters( 'indieblocks_post_class', $class );
 
-		return $classes;
+		return array_unique( $classes );
 	}
 
 	/**

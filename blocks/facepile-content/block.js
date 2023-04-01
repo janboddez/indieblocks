@@ -1,5 +1,5 @@
 ( function ( blocks, element, blockEditor, i18n ) {
-	var el       = element.createElement;
+	var el = element.createElement;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
@@ -17,21 +17,25 @@
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var html = `<ul>
-				<li><span><img src="` + indieblocks_common_obj.assets_url + 'mystery-man.jpg' + `" class="avatar avatar-40 photo" width="40" height="40"></span></li>
-				<li><span><img src="` + indieblocks_common_obj.assets_url + 'mystery-man.jpg' + `" class="avatar avatar-40 photo" width="40" height="40"></span></li>
-				<li><span><img src="` + indieblocks_common_obj.assets_url + 'mystery-man.jpg' + `" class="avatar avatar-40 photo" width="40" height="40"></span></li>
-			</ul>`;
-
 			var bookmark = props.attributes.bookmark;
 			var like     = props.attributes.like;
 			var repost   = props.attributes.repost;
 
+			var imgProps = {
+				src: indieblocks_common_obj.assets_url + 'mystery-man.jpg',
+				className: 'avatar avatar-40 photo',
+				width: 40,
+				height: 40,
+				alt: '',
+			};
+
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
-				wp.element.RawHTML( { // Will wrap `html` in an empty `div`, but so be it.
-					children: html
-				} )
+				el( 'ul', {},
+					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) ),
+					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) ),
+					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) )
+				)
 			);
 		}
 	} );

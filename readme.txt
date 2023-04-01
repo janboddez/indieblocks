@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse, site editor
 Tested up to: 6.2
-Stable tag: 0.6.1
+Stable tag: 0.6.2
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

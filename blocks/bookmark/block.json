@@ -3,6 +3,7 @@
 	"title": "Bookmark",
 	"name": "indieblocks/bookmark",
 	"category": "text",
+	"icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#000000' d='M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z'/></svg>",
 	"editorScript": "file:./block.js",
 	"editorStyle": "file:./editor.css",
 	"attributes": {

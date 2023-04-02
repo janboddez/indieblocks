@@ -4,8 +4,9 @@
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var ToggleControl = components.ToggleControl;
+	// var ColorPicker   = components.ColorPicker;
 	// var NumberControl   = components.__experimentalNumberControl;
+	var ToggleControl = components.ToggleControl;
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
@@ -21,6 +22,7 @@
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
 			var avatarSize = props.attributes.avatarSize || 40;
+			var color      = props.attributes.color || '#000';
 			var icons      = props.attributes.icons;
 
 			var imgProps = {
@@ -47,7 +49,12 @@
 							label: __( 'Show icons', 'indieblocks' ),
 							checked: icons,
 							onChange: ( value ) => { props.setAttributes( { icons: value } ) },
-						} )
+						} ),
+						// el( ColorPicker, {
+						// 	label: __( 'Icon color', 'indieblocks' ),
+						// 	color: color,
+						// 	onChange: ( value ) => { props.setAttributes( { color: value } ) },
+						// } ),
 					)
 				),
 				el( 'ul', {},

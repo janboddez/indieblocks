@@ -4,7 +4,7 @@
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var CheckboxControl = components.CheckboxControl;
+	var ToggleControl = components.ToggleControl;
 	// var NumberControl   = components.__experimentalNumberControl;
 
 	var __      = i18n.__;
@@ -43,7 +43,7 @@
 						// 	value: avatarSize,
 						// 	onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						// } ),
-						el( CheckboxControl, {
+						el( ToggleControl, {
 							label: __( 'Show icons', 'indieblocks' ),
 							checked: icons,
 							onChange: ( value ) => { props.setAttributes( { icons: value } ) },

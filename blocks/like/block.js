@@ -8,8 +8,8 @@
 	var InnerBlocks   = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var CheckboxControl = components.CheckboxControl;
-	var TextControl     = components.TextControl;
+	var ToggleControl = components.ToggleControl;
+	var TextControl   = components.TextControl;
 
 	var useSelect = data.useSelect;
 
@@ -101,13 +101,13 @@
 									initialOpen: true,
 								},
 								el( TextControl, titleProps ),
-								el( CheckboxControl, {
+								el( ToggleControl, {
 									label: __( 'Customize title', 'indieblocks' ),
 									checked: customTitle,
 									onChange: ( value ) => { props.setAttributes( { customTitle: value } ) },
 								} ),
 								el( TextControl, authorProps ),
-								el( CheckboxControl, {
+								el( ToggleControl, {
 									label: __( 'Customize author', 'indieblocks' ),
 									checked: customAuthor,
 									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },

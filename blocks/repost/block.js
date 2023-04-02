@@ -124,8 +124,8 @@
 									label: __( 'Customize author', 'indieblocks' ),
 									checked: customAuthor,
 									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
-								} ),
-							),
+								} )
+							)
 						),
 						el( TextControl, {
 							label: __( 'URL', 'indieblocks' ),
@@ -137,15 +137,15 @@
 								}
 							},
 							onBlur: () => { IndieBlocks.updateMeta( props ) },
-						} ),
+						} )
 					)
 					: IndieBlocks.hCite( 'u-repost-of', props.attributes ),
 				el( 'blockquote', { className: 'wp-block-quote e-content' },
 					el( InnerBlocks, {
 						template: [ [ 'core/paragraph' ] ],
 						templateLock: false,
-					} ), // Always **show** (editable) `InnerBlocks`.
-				),
+					} ) // Always **show** (editable) `InnerBlocks`.
+				)
 			);
 		},
 		save: ( props ) => el( 'div', useBlockProps.save(),

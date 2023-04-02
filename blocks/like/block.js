@@ -111,8 +111,8 @@
 									label: __( 'Customize author', 'indieblocks' ),
 									checked: customAuthor,
 									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
-								} ),
-							),
+								} )
+							)
 						),
 						el( TextControl, {
 							label: __( 'URL', 'indieblocks' ),
@@ -130,7 +130,7 @@
 				el( InnerBlocks, {
 					template: [ [ 'core/paragraph' ] ],
 					templateLock: false,
-				} ), // Always **show** (editable) `InnerBlocks`.
+				} ) // Always **show** (editable) `InnerBlocks`.
 			);
 		},
 		save: ( props ) => el( 'div', useBlockProps.save(),

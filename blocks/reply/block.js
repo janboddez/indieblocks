@@ -95,44 +95,42 @@
 				el( blockEditor.BlockControls ),
 				( props.isSelected || ! url || 'undefined' === url )
 					? el( components.Placeholder, placeholderProps,
-						[
-							el( blockEditor.InspectorControls, { key: 'inspector' },
-								el( components.PanelBody, {
-										title: __( 'Title and Author' ),
-										initialOpen: true,
-									},
-									el( TextControl, titleProps ),
-									el( ToggleControl, {
-										label: __( 'Customize title', 'indieblocks' ),
-										checked: customTitle,
-										onChange: ( value ) => { props.setAttributes( { customTitle: value } ) },
-									} ),
-									el( TextControl, authorProps ),
-									el( ToggleControl, {
-										label: __( 'Customize author', 'indieblocks' ),
-										checked: customAuthor,
-										onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
-									} ),
-								),
-							),
-							el( TextControl, {
-								label: __( 'URL', 'indieblocks' ),
-								value: url,
-								onChange: ( value ) => { props.setAttributes( { url: value } ) },
-								onKeyDown: ( event ) => {
-									if ( 13 === event.keyCode ) {
-										IndieBlocks.updateMeta( props );
-									}
+						el( blockEditor.InspectorControls, { key: 'inspector' },
+							el( components.PanelBody, {
+									title: __( 'Title and Author' ),
+									initialOpen: true,
 								},
-								onBlur: () => { IndieBlocks.updateMeta( props ) },
-							} ),
-						]
+								el( TextControl, titleProps ),
+								el( ToggleControl, {
+									label: __( 'Customize title', 'indieblocks' ),
+									checked: customTitle,
+									onChange: ( value ) => { props.setAttributes( { customTitle: value } ) },
+								} ),
+								el( TextControl, authorProps ),
+								el( ToggleControl, {
+									label: __( 'Customize author', 'indieblocks' ),
+									checked: customAuthor,
+									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
+								} ),
+							),
+						),
+						el( TextControl, {
+							label: __( 'URL', 'indieblocks' ),
+							value: url,
+							onChange: ( value ) => { props.setAttributes( { url: value } ) },
+							onKeyDown: ( event ) => {
+								if ( 13 === event.keyCode ) {
+									IndieBlocks.updateMeta( props );
+								}
+							},
+							onBlur: () => { IndieBlocks.updateMeta( props ) },
+						} )
 					)
 					: IndieBlocks.hCite( 'u-in-reply-to', props.attributes ),
 				el( InnerBlocks, {
 					template: [ [ 'core/paragraph' ] ],
 					templateLock: false,
-				} ), // Always **show** (editable) `InnerBlocks`.
+				} ) // Always **show** (editable) `InnerBlocks`.
 			);
 		},
 		save: ( props ) => el( 'div', useBlockProps.save(),

@@ -124,8 +124,8 @@
 									label: __( 'Customize author', 'indieblocks' ),
 									checked: customAuthor,
 									onChange: ( value ) => { props.setAttributes( { customAuthor: value } ) },
-								} ),
-							),
+								} )
+							)
 						),
 						el( TextControl, {
 							label: __( 'URL', 'indieblocks' ),
@@ -137,13 +137,13 @@
 								}
 							},
 							onBlur: () => { IndieBlocks.updateMeta( props ) },
-						} ),
+						} )
 					)
 					: IndieBlocks.hCite( 'u-bookmark-of', props.attributes ),
 				el( InnerBlocks, {
 					template: [ [ 'core/paragraph' ] ],
 					templateLock: false,
-				} ), // Always **show** (editable) `InnerBlocks`.
+				} ) // Always **show** (editable) `InnerBlocks`.
 			);
 		},
 		save: ( props ) => el( 'div', useBlockProps.save(),

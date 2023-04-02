@@ -224,10 +224,18 @@ class Webmention_Receiver {
 			// Disable comment flooding check.
 			remove_action( 'check_comment_flood', 'check_comment_flood_db' );
 
-			// Insert new comment.
+			// Update or insert comment.
 			if ( $update ) {
-				$commentdata['comment_ID']       = $comment_id;
-				$commentdata['comment_approved'] = '0'; // Force re-approval, for now. To do: We should do this only if the content has changed.
+				$commentdata['comment_ID'] = $comment_id;
+
+				$comment  = get_comment( $comment_id );
+				$original = preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) );
+
+				$commentdata['comment_approved'] = '0';
+
+				if ( ! empty( $commentdata['comment_content'] ) && preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) ) === $original ) {
+					$commentdata['comment_approved'] = '1';
+				}
 
 				error_log( "[Indieblocks/Webmention] Updating comment {$comment_id}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				$result = wp_update_comment( $commentdata, true );
@@ -236,8 +244,6 @@ class Webmention_Receiver {
 				$result = wp_new_comment( $commentdata, true );
 			}
 
-			// Default status. "Complete" means "done processing," rather than
-			// 'success'.
 			$status = $update ? 'updated' : 'created';
 
 			if ( is_wp_error( $result ) ) {

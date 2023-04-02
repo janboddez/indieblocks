@@ -1,8 +1,11 @@
-( function ( blocks, element, blockEditor, i18n ) {
+( function ( blocks, element, blockEditor, components, i18n ) {
 	var el = element.createElement;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
+
+	var CheckboxControl = components.CheckboxControl;
+	// var NumberControl   = components.__experimentalNumberControl;
 
 	var __      = i18n.__;
 	var sprintf = i18n.sprintf;
@@ -17,26 +20,62 @@
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var bookmark = props.attributes.bookmark;
-			var like     = props.attributes.like;
-			var repost   = props.attributes.repost;
+			var avatarSize = props.attributes.avatarSize || 40;
+			var icons      = props.attributes.icons;
 
 			var imgProps = {
 				src: indieblocks_common_obj.assets_url + 'mystery-man.jpg',
-				className: 'avatar avatar-40 photo',
-				width: 40,
-				height: 40,
+				className: 'avatar avatar-' + avatarSize + ' photo',
+				width: avatarSize,
+				height: avatarSize,
 				alt: '',
 			};
 
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
+				el( blockEditor.InspectorControls, { key: 'inspector' },
+					el( components.PanelBody, {
+							title: __( 'Avatars', 'indieblocks' ),
+							initialOpen: true,
+						},
+						// el( NumberControl, {
+						// 	label: __( 'Avatar size', 'indieblocks' ),
+						// 	value: avatarSize,
+						// 	onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
+						// } ),
+						el( CheckboxControl, {
+							label: __( 'Show icons', 'indieblocks' ),
+							checked: icons,
+							onChange: ( value ) => { props.setAttributes( { icons: value } ) },
+						} )
+					)
+				),
 				el( 'ul', {},
-					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) ),
-					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) ),
-					el( 'li', {}, el( 'span', {},	el( 'img', imgProps ) ) )
+					el( 'li', {}, el( 'span', {}, el( 'img', imgProps ) ) ),
+					el( 'li', {}, el( 'span', {},
+						el( 'img', imgProps ),
+						icons
+							? el( 'img', {
+								src: indieblocks_common_obj.assets_url + 'bookmark.svg',
+								className: 'icon',
+								width: 16,
+								height: 16,
+							} )
+							: null
+					) ),
+					el( 'li', {}, el( 'span', {},
+						el( 'img', imgProps ),
+						icons
+							? el( 'img', {
+								src: indieblocks_common_obj.assets_url + 'like.svg',
+								className: 'icon',
+								width: 16,
+								height: 16,
+							} )
+							: null
+					) )
 				)
 			);
 		}
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.i18n );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.i18n );

@@ -7,18 +7,27 @@
 
 .wp-block-indieblocks-facepile-content li {
 	display: inline-block;
-	margin-inline-end: -20px;
+	margin-inline-end: -16px;
+	position: relative;
 }
 
 .wp-block-indieblocks-facepile-content li:hover {
-	margin-inline-end: -8px;
+	margin-inline-end: -2px;
 }
 
 .wp-block-indieblocks-facepile-content a {
 	display: block;
+	position: relative;
 }
 
-.wp-block-indieblocks-facepile-content img {
+.wp-block-indieblocks-facepile-content .avatar {
 	display: block;
 	border-radius: 50%;
+}
+
+.wp-block-indieblocks-facepile-content .icon {
+	display: block;
+	position: absolute;
+	right: 0;
+	bottom: 0;
 }

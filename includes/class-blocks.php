@@ -282,12 +282,18 @@ class Blocks {
 			if ( ! empty( $source ) ) {
 				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . '</span>' .
-				( ! empty( $kind ) ? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />' : '' ) .
+				( ! empty( $attributes['icons'] ) && ! empty( $kind )
+					? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />'
+					: ''
+				) .
 				"</a></li>\n";
 			} else {
 				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<span class="p-author h-card">' . $avatar . '</span>' .
-				( ! empty( $kind ) ? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />' : '' ) .
+				( ! empty( $attributes['icons'] ) && ! empty( $kind )
+					? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />'
+					: ''
+				) .
 				"</li>\n";
 			}
 		}

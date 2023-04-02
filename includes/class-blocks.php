@@ -262,6 +262,20 @@ class Blocks {
 
 		foreach ( $facepile_comments as $comment ) {
 			$avatar = get_avatar( $comment, 40 );
+
+			if ( empty( $avatar ) ) {
+				continue;
+			}
+
+			// Add author name as `alt` text.
+			if ( preg_match( '~ alt=("|\'){2}~', $avatar, $matches ) ) {
+				$avatar = str_replace(
+					" alt={$matches[1]}{$matches[1]}",
+					" alt={$matches[1]}" . esc_attr( get_comment_author( $comment ) ) . "{$matches[1]}",
+					$avatar
+				);
+			}
+
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
 

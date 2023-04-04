@@ -5,7 +5,7 @@
 	var useBlockProps = blockEditor.useBlockProps;
 
 	// var ColorPicker = components.ColorPicker;
-	var NumberControl = components.__experimentalNumberControl;
+	var RangeControl  = components.RangeControl;
 	var ToggleControl = components.ToggleControl;
 
 	var __      = i18n.__;
@@ -21,7 +21,7 @@
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var avatarSize = props.attributes.avatarSize || 36;
+			var avatarSize = props.attributes.avatarSize || 2;
 			var color      = props.attributes.color || '#000';
 			var icons      = props.attributes.icons;
 
@@ -55,9 +55,11 @@
 							title: __( 'Avatars', 'indieblocks' ),
 							initialOpen: true,
 						},
-						el( NumberControl, {
+						el( RangeControl, {
 							label: __( 'Avatar size', 'indieblocks' ),
 							value: avatarSize,
+							min: 1,
+							max: 4,
 							onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						} ),
 						el( ToggleControl, {
@@ -72,7 +74,7 @@
 						// } ),
 					)
 				),
-				el( 'ul', { style: { fontSize: avatarSize + 'px' } },
+				el( 'ul', { className: 'indieblocks-avatar-size-' + avatarSize },
 					el( 'li', {}, el( 'span', {},
 						el( 'img', imgProps ),
 						icons

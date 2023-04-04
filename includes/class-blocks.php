@@ -315,7 +315,7 @@ class Blocks {
 
 		if ( ! empty( $attributes['avatarSize'] ) ) {
 			$avatar_size    = esc_attr( (int) $attributes['avatarSize'] );
-			$opening_ul_tag = "<ul style='font-size: {$avatar_size}px;'>";
+			$opening_ul_tag = "<ul class='indieblocks-avatar-size-{$avatar_size}'>";
 		} else {
 			$opening_ul_tag = '<ul>';
 		}

@@ -8,7 +8,7 @@
 	"attributes": {
 		"avatarSize": {
 			"type": "integer",
-			"default": 36
+			"default": 2
 		},
 		"color": {
 			"type": "string",

@@ -87,17 +87,10 @@ class Webmention_Parser {
 
 		// Update comment datetime.
 		if ( ! empty( $hentry['properties']['published'][0] ) ) {
-			$host = wp_parse_url( $source, PHP_URL_HOST );
-
-			if ( false !== stripos( $host, 'brid-gy.appspot.com' ) ) {
-				// Bridgy, we know, uses GMT.
-				$commentdata['comment_date']     = get_date_from_gmt( date( 'Y-m-d H:i:s', strtotime( $hentry['properties']['published'][0] ) ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-				$commentdata['comment_date_gmt'] = date( 'Y-m-d H:i:s', strtotime( $hentry['properties']['published'][0] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-			} else {
-				// Most WordPress sites do not.
-				$commentdata['comment_date']     = date( 'Y-m-d H:i:s', strtotime( $hentry['properties']['published'][0] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-				$commentdata['comment_date_gmt'] = get_gmt_from_date( date( 'Y-m-d H:i:s', strtotime( $hentry['properties']['published'][0] ) ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-			}
+			$commentdata['comment_date'] = get_date_from_gmt(
+				gmdate( 'Y-m-d H:i:s', strtotime( $hentry['properties']['published'][0] ) ),
+				'Y-m-d H:i:s'
+			);
 		}
 
 		// Update source URL.

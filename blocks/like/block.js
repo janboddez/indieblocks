@@ -18,6 +18,13 @@
 
 	blocks.registerBlockType( 'indieblocks/like', {
 		description: __( 'Show your appreciation for a certain web page or post.', 'indieblocks' ),
+		icon: el( 'svg', {
+				xmlns: 'http://www.w3.org/2000/svg',
+				viewBox: '0 0 24 24',
+			}, el ( 'path', {
+				d: 'M7.785 5.49a4.536 4.536 0 0 0-4.535 4.537C3.25 14.564 9 17.25 12 19.75c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.128-4.215 2.76-.675-1.632-2.334-2.76-4.215-2.76z',
+			} )
+		),
 		edit: ( props ) => {
 			var url          = props.attributes.url;
 			var customTitle  = props.attributes.customTitle;
@@ -62,7 +69,13 @@
 			}, [ innerBlocks, updateEmpty ] );
 
 			var placeholderProps = {
-				icon: 'heart',
+				icon: el( 'svg', {
+						xmlns: 'http://www.w3.org/2000/svg',
+						viewBox: '0 0 24 24',
+					}, el ( 'path', {
+						d: 'M7.785 5.49a4.536 4.536 0 0 0-4.535 4.537C3.25 14.564 9 17.25 12 19.75c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.128-4.215 2.76-.675-1.632-2.334-2.76-4.215-2.76z',
+					} )
+				),
 				label: __( 'Like', 'indieblocks' ),
 				isColumnLayout: true,
 			};

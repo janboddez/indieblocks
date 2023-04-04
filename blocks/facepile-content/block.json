@@ -8,7 +8,7 @@
 	"attributes": {
 		"avatarSize": {
 			"type": "integer",
-			"default": 40
+			"default": 36
 		},
 		"color": {
 			"type": "string",
@@ -29,19 +29,6 @@
 				"background": true,
 				"text": true,
 				"link": true
-			}
-		},
-		"typography": {
-			"fontSize": true,
-			"lineHeight": true,
-			"__experimentalFontFamily": true,
-			"__experimentalFontWeight": true,
-			"__experimentalFontStyle": true,
-			"__experimentalTextTransform": true,
-			"__experimentalTextDecoration": true,
-			"__experimentalLetterSpacing": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
 			}
 		}
 	}

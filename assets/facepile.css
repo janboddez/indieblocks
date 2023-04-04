@@ -1,18 +1,21 @@
 .wp-block-indieblocks-facepile-content ul {
 	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	font-size: 36px;
 	margin: 0;
 	padding: 0;
-	display: flex;
+	padding-inline-end: 1.5em;
 }
 
 .wp-block-indieblocks-facepile-content li {
 	display: inline-block;
-	margin-inline-end: -16px;
+	margin-inline-end: -0.35em;
 	position: relative;
 }
 
 .wp-block-indieblocks-facepile-content li:hover {
-	margin-inline-end: -2px;
+	margin-inline-end: -0.05em;
 }
 
 .wp-block-indieblocks-facepile-content a {
@@ -22,14 +25,18 @@
 
 .wp-block-indieblocks-facepile-content .avatar {
 	display: block;
+	width: 1em;
+	height: 1em;
 	border-radius: 50%;
 }
 
 .wp-block-indieblocks-facepile-content .icon {
 	display: block;
-	width: 24px;
-	height: 24px;
+	width: 0.5em;
+	height: 0.5em;
 	position: absolute;
-	right: -4px;
-	bottom: -4px;
+	right: -2px;
+	bottom: -2px;
+	background: #fff;
+	border-radius: 50%;
 }

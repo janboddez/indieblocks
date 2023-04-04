@@ -313,10 +313,17 @@ class Blocks {
 			}
 		}
 
+		if ( ! empty( $attributes['avatarSize'] ) ) {
+			$avatar_size    = esc_attr( (int) $attributes['avatarSize'] );
+			$opening_ul_tag = "<ul style='font-size: {$avatar_size}px;'>";
+		} else {
+			$opening_ul_tag = '<ul>';
+		}
+
 		$wrapper_attributes = get_block_wrapper_attributes();
 
 		return '<div ' . $wrapper_attributes . '>' .
-			'<ul>' . trim( $output ) . '</ul>' .
+			$opening_ul_tag . trim( $output ) . '</ul>' .
 		'</div>';
 	}
 

@@ -27,7 +27,9 @@
 
 .wp-block-indieblocks-facepile-content .icon {
 	display: block;
+	width: 24px;
+	height: 24px;
 	position: absolute;
-	right: 0;
-	bottom: 0;
+	right: -4px;
+	bottom: -4px;
 }

@@ -1,0 +1,13 @@
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<symbol id="indieblocks-icon-bookmark" viewBox="0 0 24 24">
+	<path d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
+</symbol>
+<symbol id="indieblocks-icon-like" viewBox="0 0 24 24">
+	<path d="M7.784 4.99A4.536 4.536 0 0 0 3.25 9.529c0 4.537 4.863 5.833 8.75 9.722 3.887-3.889 8.75-5.185 8.75-9.722a4.536 4.536 0 0 0-4.534-4.537c-1.881 0-3.541 1.148-4.216 2.78-.675-1.632-2.335-2.78-4.216-2.78z"/>
+</symbol>
+<symbol id="indieblocks-icon-repost" viewBox="0 0 24 24">
+	<path d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
+</symbol>
+</defs>
+</svg>

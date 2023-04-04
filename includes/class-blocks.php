@@ -20,6 +20,7 @@ class Blocks {
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		add_action( 'wp_footer', array( __CLASS__, 'print_icons' ), 999 );
 	}
 
 	/**
@@ -297,7 +298,7 @@ class Blocks {
 				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . '</span>' .
 				( ! empty( $attributes['icons'] ) && ! empty( $kind )
-					? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />'
+					? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
 					: ''
 				) .
 				"</a></li>\n";
@@ -305,7 +306,7 @@ class Blocks {
 				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<span class="p-author h-card">' . $avatar . '</span>' .
 				( ! empty( $attributes['icons'] ) && ! empty( $kind )
-					? '<img class="icon" src="' . plugins_url( "/assets/$kind.svg", __DIR__ ) . '" width="16" height="16" alt="" />'
+					? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
 					: ''
 				) .
 				"</li>\n";
@@ -397,5 +398,17 @@ class Blocks {
 		// Cache for the duration of the request (and then some)?
 		wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
 		return $facepile_comments;
+	}
+
+	/**
+	 * Outputs bookmark, like, and repost icons so they can be used anywhere on
+	 * the page.
+	 */
+	public static function print_icons() {
+		$icons = dirname( __DIR__ ) . '/assets/webmention-icons.svg';
+
+		if ( is_readable( $icons ) ) {
+			require_once $icons;
+		}
 	}
 }

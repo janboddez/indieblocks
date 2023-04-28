@@ -1,6 +1,6 @@
 === IndieBlocks ===
 Contributors: janboddez
-Tags: blocks, gutenberg, indieweb, notes, likes, microblogging, micropub, fse, site editor
+Tags: blocks, gutenberg, indieweb, notes, likes, microblog, microblogging, micropub, fse, site editor, webmention, syndication
 Tested up to: 6.2
 Stable tag: 0.6.2
 License: GNU General Public License v3.0
@@ -9,11 +9,14 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Use blocks, and, optionally, "short-form" post types to easily "IndieWebify" your WordPress site.
 
 == Description ==
-IndieBlocks currently registers a single block, "Context," which takes a URL and "type," and outputs correctly microformatted HTML. More blocks are on the way.
+IndieBlocks registers several blocks (Bookmark, Like, Reply, and Repost, as well as the older Context block) that take a URL and output the corresponding microformatted HTML.
+It also registers several "theme" blocks (Facepile, and Syndication), to be used in (block) theme templates.
 
-In combination with a microformats-compatible theme, these help ensure Microformats clients are able to determine a post's type.
+In combination with a microformats-compatible theme, these help ensure microformats clients are able to determine a post's type.
 
 It also comes with "short-form" (Note and Like) custom post types, and a (somewhat experimental) option to add microformats to (all!) *block-based* themes.
+
+These microformats, in combination with the Webmention protocol, allow for rich _cross-site_ conversations. IndieBlocks comes with its own Webmention implementation, but a separate plugin can be used, too.
 
 == Installation ==
 Upload this plugin's ZIP file via the Plugins > Add New > "Upload Plugin" button.

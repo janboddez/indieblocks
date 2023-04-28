@@ -76,7 +76,9 @@ class Theme_Mf2 {
 			}
 		}
 
-		$classes[] = apply_filters( 'indieblocks_body_class', $class );
+		if ( ! empty( $class ) ) {
+			$classes[] = apply_filters( 'indieblocks_body_class', $class );
+		}
 
 		return array_unique( $classes );
 	}

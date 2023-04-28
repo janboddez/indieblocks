@@ -143,9 +143,9 @@ class Theme_Mf2 {
 	 */
 	public static function add_thumbnail_class( $html ) {
 		if ( preg_match( '~class=("|\')~', $html, $matches ) ) {
-			$html = str_replace( "class={$matches[1]}", "class={$matches[1]} u-featured", $html );
+			$html = str_replace( "class={$matches[1]}", "class={$matches[1]}u-featured ", $html );
 		} else {
-			$html = str_replace( '<img ', '<img class="u-photo" ', $html );
+			$html = str_replace( '<img ', '<img class="u-featured" ', $html );
 		}
 
 		return $html;

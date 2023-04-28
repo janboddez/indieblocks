@@ -15,8 +15,7 @@
 			"default": "#000"
 		},
 		"icons": {
-			"type": "boolean",
-			"default": true
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

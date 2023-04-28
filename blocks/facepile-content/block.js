@@ -27,7 +27,7 @@
 
 			var imgProps = {
 				src: indieblocks_common_obj.assets_url + 'mystery-man.jpg',
-				className: 'avatar avatar-' + avatarSize + ' photo',
+				className: 'avatar photo',
 				width: avatarSize,
 				height: avatarSize,
 				alt: '',

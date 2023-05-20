@@ -255,7 +255,8 @@ class Location {
 				return array();
 			}
 
-			$response = remote_get( "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid=" . OPEN_WEATHER_MAP_API_KEY . '&units=metric', true );
+			// As of version 0.7, we no longer pass along `units=metric`, and temperatures are converted on display.
+			$response = remote_get( "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid=" . OPEN_WEATHER_MAP_API_KEY, true );
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
 				error_log( "Failed to retrieve weather data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log

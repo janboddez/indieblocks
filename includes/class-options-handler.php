@@ -41,6 +41,7 @@ class Options_Handler {
 		'webmention_facepile'             => false,
 		'add_featured_images'             => false,
 		'location_functions'              => false,
+		'weather_units'                   => 'metric',
 		'micropub'                        => false,
 		'parse_markdown'                  => false,
 	);
@@ -221,6 +222,9 @@ class Options_Handler {
 		$options = array(
 			'add_featured_images' => isset( $settings['add_featured_images'] ) ? true : false,
 			'location_functions'  => isset( $settings['location_functions'] ) ? true : false,
+			'weather_units'       => isset( $settings['weather_units'] ) && in_array( $settings['weather_units'], array( 'metric', 'imperial' ), true )
+				? $settings['weather_units']
+				: 'metric',
 			'micropub'            => isset( $settings['micropub'] ) ? true : false,
 			'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
 		);
@@ -372,6 +376,13 @@ class Options_Handler {
 							<td><label><input type="checkbox" name="indieblocks_settings[location_functions]" value="1" <?php checked( ! empty( $this->options['location_functions'] ) ); ?>/> <?php esc_html_e( 'Enable location functions', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts.', 'indieblocks' ); ?></p></td>
 						</tr>
+						<!--
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Weather Units', 'indieblocks' ); ?></th>
+							<td><label><input type="radio" name="indieblocks_settings[weather_units]" value="metric" <?php checked( empty( $this->options['weather_units'] ) || 'metric' === $this->options['weather_units'] ); ?>/> <?php esc_html_e( 'Metric', 'indieblocks' ); ?></label><br />
+							<label><input type="radio" name="indieblocks_settings[weather_units]" value="imperial" <?php checked( ! empty( $this->options['weather_units'] ) && 'imperial' === $this->options['weather_units'] ); ?>/> <?php esc_html_e( 'Imperial', 'indieblocks' ); ?></label></td>
+						</tr>
+						//-->
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Micropub', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[micropub]" value="1" <?php checked( ! empty( $this->options['micropub'] ) ); ?>/> <?php esc_html_e( 'Deeper Micropub integration', 'indieblocks' ); ?></label>

@@ -235,38 +235,40 @@ class Post_Types {
 
 			// When one of the newer "h-cite" blocks is in use, this'll return
 			// the link text, which **can** be overriden by authors.
-			$name = $parser->get_link_name();
+			$link_name = $parser->get_link_name();
 
-			if ( empty( $name ) ) {
+			if ( empty( $link_name ) ) {
+				// Let's try and actually parse the linked page.
 				$link_url = $parser->get_link_url();
 
 				if ( ! empty( $link_url ) ) {
-					$parser = new Parser( $link_url );
+					$parser = new Parser( esc_url_raw( $link_url ) );
 					$parser->parse();
 
-					$name    = $parser->get_name(); // This could still be a nonsense name, which is why we want this to be overridable by authors!
-					$content = ! empty( $name )
-						? $name // The code below will use this to continue with.
-						: $content;
+					$link_name = $parser->get_name(); // This could still be a nonsense name, which is why we want this to be overridable by authors!
 				}
-			} else {
-				$content = $name; // The code below will use this to continue with.
 			}
 		}
 
-		$title = trim( wp_strip_all_tags( $content ) );
+		if ( ! empty( $link_name ) ) {
+			// If a "linked" title was found, use that.
+			$title = sanitize_text_field( $link_name );
 
-		// Avoid double-encoded characters.
-		$title = html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );
+			// Avoid double-encoded characters.
+			$title = html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );
+		} else {
+			// Set title to a truncated copy of the content.
+			$title = sanitize_text_field( $content );
 
-		// Collapse lines and remove excess whitespace.
-		$title = preg_replace( '/\s+/', ' ', $title );
+			// Avoid double-encoded characters.
+			$title = html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );
 
-		// Shorten.
-		$title = wp_trim_words( $title, 8, ' ...' );
-		// Prevent duplicate ellipses.
-		$title = str_replace( '... ...', '...', $title );
-		$title = str_replace( '… ...', '...', $title );
+			// Shorten.
+			$title = wp_trim_words( $title, 8, ' ...' );
+			// Prevent duplicate ellipses.
+			$title = str_replace( '... ...', '...', $title );
+			$title = str_replace( '… ...', '...', $title );
+		}
 
 		$title = wp_slash( $title );
 
@@ -303,7 +305,7 @@ class Post_Types {
 		$linked_url = $parser->get_link_url();
 
 		if ( ! empty( $linked_url ) ) {
-			update_post_meta( $post_id, '_indieblocks_linked_url', $linked_url );
+			update_post_meta( $post_id, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
 		} else {
 			delete_post_meta( $post_id, '_indieblocks_linked_url' );
 		}

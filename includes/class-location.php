@@ -22,6 +22,9 @@ class Location {
 		// Look up a location name (and weather info).
 		add_action( 'transition_post_status', array( __CLASS__, 'set_location' ), 12, 3 );
 		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
+
+		// Register for REST API use.
+		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
 	}
 
 	/**
@@ -409,6 +412,35 @@ class Location {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Registers (block-related) REST API endpoints.
+	 *
+	 * @todo: (Eventually) also add an "author" endpoint. Or have the single endpoint return both title and author information.
+	 */
+	public static function register_meta() {
+		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
+
+		foreach ( $post_types as $post_type ) {
+			register_post_meta(
+				$post_type,
+				'geo_address',
+				array(
+					'single'            => true,
+					'show_in_rest'      => true,
+					'type'              => 'string',
+					'auth_callback'     => function() {
+						return current_user_can( 'edit_posts' );
+					},
+					'sanitize_callback' => function( $meta_value ) {
+						return ! empty( $meta_value )
+							? sanitize_text_field( $meta_value )
+							: null;
+					},
+				)
+			);
+		}
 	}
 
 	/**

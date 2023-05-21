@@ -55,7 +55,7 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		// (Semi-)dynamic blocks; these have a render callback.
-		foreach ( array( 'facepile', 'facepile-content', 'syndication' ) as $block ) {
+		foreach ( array( 'facepile', 'facepile-content', 'location', 'syndication' ) as $block ) {
 			register_block_type_from_metadata(
 				dirname( __DIR__ ) . "/blocks/$block",
 				array(
@@ -171,7 +171,7 @@ class Blocks {
 	}
 
 	/**
-	 * Returns certain metadata.
+	 * Returns certain metadata for a specific URL.
 	 *
 	 * @param  \WP_REST_Request $request   WP REST API request.
 	 * @return \WP_REST_Response|\WP_Error Response.
@@ -324,6 +324,35 @@ class Blocks {
 
 		return '<div ' . $wrapper_attributes . '>' .
 			$opening_ul_tag . trim( $output ) . '</ul>' .
+		'</div>';
+	}
+
+	/**
+	 * Renders the `indieblocks/location` block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Output HTML.
+	 */
+	public static function render_location_block( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			return '';
+		}
+
+		$location = get_post_meta( $block->context['postId'], 'geo_address', true );
+
+		if ( empty( $location ) ) {
+			return '';
+		}
+
+		$output = '<span class="h-geo"><span class="p-name">' . esc_html( $location ) . '</span></span>';
+		$output = apply_filters( 'indieblocks_location_html', $output, $block->context['postId'] );
+
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return '<div ' . $wrapper_attributes . '>' .
+			$output .
 		'</div>';
 	}
 

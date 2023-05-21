@@ -5,20 +5,31 @@
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var ToggleControl = components.ToggleControl;
-
 	var __ = i18n.__;
 
 	blocks.registerBlockType( 'indieblocks/location', {
 		edit: function ( props ) {
-			var [ meta ]       = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
+			var [ meta ]    = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
+			var [ options ] = coreData.useEntityProp( 'root', 'site', 'indieblocks_settings' );
+
 			var includeWeather = props.attributes.includeWeather;
-			var temperature    = includeWeather && meta._indieblocks_weather && meta._indieblocks_weather.description && meta._indieblocks_weather.temperature
+			var temp           = includeWeather && meta._indieblocks_weather && meta._indieblocks_weather.description && meta._indieblocks_weather.temperature
 				? meta._indieblocks_weather.temperature
 				: null;
+			var tempUnit;
 
-			temperature = temperature > 100 ? temperature - 273.15 : temperature; // Either degrees Celsius or Kelvin.
-			// @todo: Get user preferences and convert to Fahrenheit if needed.
+			if ( temp ) {
+				temp = temp > 100 ? temp - 273.15 : temp; // Either degrees Celsius or Kelvin.
+
+				if ( ! options.weather_units || 'metric' === options.weather_units ) {
+					tempUnit = ' °C';
+				} else {
+					temp     = 32 + temp * 9 / 5;
+					tempUnit = ' °F'
+				}
+
+				temp = Math.round( temp )
+			}
 
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
@@ -27,7 +38,7 @@
 							title: __( 'Location', 'indieblocks' ),
 							initialOpen: true,
 						},
-						el( ToggleControl, {
+						el( components.ToggleControl, {
 							label: __( 'Display weather information', 'indieblocks' ),
 							checked: includeWeather,
 							onChange: ( value ) => { props.setAttributes( { includeWeather: value } ) },
@@ -36,8 +47,8 @@
 				),
 				'undefined' !== typeof meta && meta.geo_address
 					? el( 'span', { className: 'h-geo' },
-						temperature
-							? interpolate( '<a>' + meta.geo_address + '</a> <b>•</b> <c>' + Math.round( meta._indieblocks_weather.temperature ) + ' °C, ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {
+						temp
+							? interpolate( '<a>' + meta.geo_address + '</a> <b>•</b> <c>' + temp + tempUnit + ', ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {
 								a: el( 'span', { className: 'p-name' } ),
 								b: el( 'span', { className: 'sep',  'aria-hidden': 'true' } ),
 								c: el( 'span', {} )

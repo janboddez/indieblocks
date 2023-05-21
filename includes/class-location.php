@@ -57,22 +57,41 @@ class Location {
 
 	/**
 	 * Asks browser for location coordinates.
+	 *
+	 * @todo: Move to, you know, an actual JS file.
 	 */
 	public static function add_script() {
 		?>
 		<script type="text/javascript">
-		if ( document.querySelector( '[name="indieblocks_lat"]' ) && '' === document.querySelector( '[name="indieblocks_lat"]' ).value && document.querySelector( '[name="indieblocks_lon"]' ) && '' === document.querySelector( '[name="indieblocks_lon"]' ).value ) {
-			// If the "Latitude" and "Longitude" fields are empty, ask the
-			// browser for location information.
-			navigator.geolocation.getCurrentPosition( function( position ) {
-				document.querySelector( '[name="indieblocks_lat"]' ).value = position.coords.latitude;
-				document.querySelector( '[name="indieblocks_lon"]' ).value = position.coords.longitude;
+		var indieblocks_loc = document.querySelector( '[name="indieblocks_loc_enabled"]' );
 
-				<?php if ( static::is_recent() ) : // If the post is less than one hour old. ?>
-					document.querySelector( '[name="indieblocks_loc_enabled"]' ).checked = true;
-				<?php endif; ?>
-			}, function( error ) {
-				// Do nothing.
+		function indieblocks_update_location() {
+			var indieblocks_lat = document.querySelector( '[name="indieblocks_lat"]' );
+			var indieblocks_lon = document.querySelector( '[name="indieblocks_lon"]' );
+
+			if ( indieblocks_lat && '' === indieblocks_lat.value && indieblocks_lon && '' === indieblocks_lon.value ) {
+				// If the "Latitude" and "Longitude" fields are empty, ask the
+				// browser for location information.
+				navigator.geolocation.getCurrentPosition( function( position ) {
+					indieblocks_lat.value = position.coords.latitude;
+					indieblocks_lon.value = position.coords.longitude;
+
+					<?php if ( static::is_recent() ) : // If the post is less than one hour old. ?>
+						indieblocks_loc.checked = true; // Auto-enable.
+					<?php endif; ?>
+				}, function( error ) {
+					// Do nothing.
+				} );
+			}
+		}
+
+		indieblocks_update_location();
+
+		if ( indieblocks_loc ) {
+			indieblocks_loc.addEventListener( 'click', function( event ) {
+				if ( indieblocks_loc.checked ) {
+					indieblocks_update_location();
+				}
 			} );
 		}
 		</script>

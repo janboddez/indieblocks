@@ -5,6 +5,12 @@
 	"category": "theme",
 	"icon": "location",
 	"editorScript": "file:./block.js",
+	"attributes": {
+		"includeWeather": {
+			"type": "boolean",
+			"default": false
+		}
+    },
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

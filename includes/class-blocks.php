@@ -346,8 +346,22 @@ class Blocks {
 			return '';
 		}
 
-		$output = '<span class="h-geo"><span class="p-name">' . esc_html( $location ) . '</span></span>';
-		$output = apply_filters( 'indieblocks_location_html', $output, $block->context['postId'] );
+		$output = '<span class="p-name">' . esc_html( $location ) . '</span>';
+
+		if ( ! empty( $attributes['includeWeather'] ) ) {
+			$weather = get_post_meta( $block->context['postId'], '_indieblocks_weather', true );
+		}
+
+		if ( ! empty( $weather['description'] ) && ! empty( $weather['temperature'] ) ) {
+			$temperature = $weather['temperature'];
+			$temperature = $temperature > 100 ? $temperature - 273.15 : $temperature; // Older versions supported only degress Celsius, newer versions only Kelvin.
+			$temperature = number_format( round( $temperature ) );
+			// @todo: Convert units. This is just a test.
+
+			$output .= ' <span class="sep" aria-hidden="true">•</span> <span class="indieblocks-weather">' . esc_html( $temperature ) . ' °C, ' . esc_html( strtolower( $weather['description'] ) ) . '</span>';
+		}
+
+		$output = apply_filters( 'indieblocks_location_html', '<span class="h-geo">' . $output . '</span>', $block->context['postId'] );
 
 		$wrapper_attributes = get_block_wrapper_attributes();
 

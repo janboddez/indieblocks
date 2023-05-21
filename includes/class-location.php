@@ -71,6 +71,8 @@ class Location {
 				<?php if ( static::is_recent() ) : // If the post is less than one hour old. ?>
 					document.querySelector( '[name="indieblocks_loc_enabled"]' ).checked = true;
 				<?php endif; ?>
+			}, function( error ) {
+				// Do nothing.
 			} );
 		}
 		</script>
@@ -184,12 +186,12 @@ class Location {
 		}
 
 		// Adds weather data.
-		if ( static::is_recent( $post ) && '' === get_post_meta( $post->ID, 'weather', true ) ) {
+		if ( static::is_recent( $post ) && '' === get_post_meta( $post->ID, '_indieblocks_weather', true ) ) {
 			// Let's do weather information, too.
 			$weather = static::get_weather( $lat, $lon );
 
 			if ( ! empty( $weather ) ) {
-				update_post_meta( $post->ID, 'weather', $weather ); // Will be an associated array.
+				update_post_meta( $post->ID, '_indieblocks_weather', $weather ); // Will be an associated array.
 			}
 		}
 	}
@@ -427,16 +429,26 @@ class Location {
 				$post_type,
 				'geo_address',
 				array(
-					'single'            => true,
-					'show_in_rest'      => true,
-					'type'              => 'string',
-					'auth_callback'     => function() {
+					'single'       => true,
+					'show_in_rest' => true,
+					'type'         => 'string',
+				)
+			);
+
+			register_post_meta(
+				$post_type,
+				'_indieblocks_weather',
+				array(
+					'single'        => true,
+					'show_in_rest'  => array(
+						'prepare_callback' => function( $value ) {
+							// `return $value` would've sufficed, too. The funny thing is WP doesn't actually fetch and unserialize `$value` if this isn't here.
+							return maybe_unserialize( $value );
+						},
+					),
+					'type'          => 'object',
+					'auth_callback' => function() {
 						return current_user_can( 'edit_posts' );
-					},
-					'sanitize_callback' => function( $meta_value ) {
-						return ! empty( $meta_value )
-							? sanitize_text_field( $meta_value )
-							: null;
 					},
 				)
 			);

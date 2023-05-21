@@ -376,13 +376,11 @@ class Options_Handler {
 							<td><label><input type="checkbox" name="indieblocks_settings[location_functions]" value="1" <?php checked( ! empty( $this->options['location_functions'] ) ); ?>/> <?php esc_html_e( 'Enable location functions', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts.', 'indieblocks' ); ?></p></td>
 						</tr>
-						<!--
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Weather Units', 'indieblocks' ); ?></th>
 							<td><label><input type="radio" name="indieblocks_settings[weather_units]" value="metric" <?php checked( empty( $this->options['weather_units'] ) || 'metric' === $this->options['weather_units'] ); ?>/> <?php esc_html_e( 'Metric', 'indieblocks' ); ?></label><br />
 							<label><input type="radio" name="indieblocks_settings[weather_units]" value="imperial" <?php checked( ! empty( $this->options['weather_units'] ) && 'imperial' === $this->options['weather_units'] ); ?>/> <?php esc_html_e( 'Imperial', 'indieblocks' ); ?></label></td>
 						</tr>
-						//-->
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Micropub', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[micropub]" value="1" <?php checked( ! empty( $this->options['micropub'] ) ); ?>/> <?php esc_html_e( 'Deeper Micropub integration', 'indieblocks' ); ?></label>

@@ -353,12 +353,22 @@ class Blocks {
 		}
 
 		if ( ! empty( $weather['description'] ) && ! empty( $weather['temperature'] ) ) {
-			$temperature = $weather['temperature'];
-			$temperature = $temperature > 100 ? $temperature - 273.15 : $temperature; // Older versions supported only degress Celsius, newer versions only Kelvin.
-			$temperature = number_format( round( $temperature ) );
-			// @todo: Convert units. This is just a test.
+			$temp = $weather['temperature'];
+			$temp = $temp > 100 // Older plugin versions supported only degress Celsius, newer versions only Kelvin.
+				? $temp - 273.15
+				: $temp;
 
-			$output .= ' <span class="sep" aria-hidden="true">•</span> <span class="indieblocks-weather">' . esc_html( $temperature ) . ' °C, ' . esc_html( strtolower( $weather['description'] ) ) . '</span>';
+			$options = get_options();
+
+			if ( empty( $options['weather_units'] ) || 'metric' === $options['weather_units'] ) {
+				$temp_unit = '&nbsp;°C';
+			} else {
+				$temp      = 32 + $temp * 9 / 5;
+				$temp_unit = '&nbsp;°F';
+			}
+			$temp = number_format( round( $temp ) ); // Round.
+
+			$output .= ' <span class="sep" aria-hidden="true">•</span> <span class="indieblocks-weather">' . esc_html( $temp . $temp_unit ) . ', ' . esc_html( strtolower( $weather['description'] ) ) . '</span>';
 		}
 
 		$output = apply_filters( 'indieblocks_location_html', '<span class="h-geo">' . $output . '</span>', $block->context['postId'] );

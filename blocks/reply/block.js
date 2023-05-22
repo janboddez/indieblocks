@@ -1,9 +1,8 @@
 ( function ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) {
 	var createBlock = blocks.createBlock;
 
-	var el          = element.createElement;
-	var interpolate = element.createInterpolateElement;
-	var useEffect   = element.useEffect;
+	var el        = element.createElement;
+	var useEffect = element.useEffect;
 
 	var InnerBlocks   = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;

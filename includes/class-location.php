@@ -441,58 +441,6 @@ class Location {
 	 * @todo: (Eventually) also add an "author" endpoint. Or have the single endpoint return both title and author information.
 	 */
 	public static function register_meta() {
-		/* @todo: Not define these in two separate places! */
-		register_setting(
-			'indieblocks-settings-group',
-			'indieblocks_settings',
-			array(
-				'type'          => 'object',
-				'show_in_rest'  => array(
-					'schema' => array(
-						'type'                 => 'object',
-						'properties'           => array(
-							'add_featured_images'      => array( 'type' => 'boolean' ),
-							'add_mf2'                  => array( 'type' => 'boolean' ),
-							'automatic_titles'         => array( 'type' => 'boolean' ),
-							'cache_avatars'            => array( 'type' => 'boolean' ),
-							'custom_menu_order'        => array( 'type' => 'boolean' ),
-							'date_archives'            => array( 'type' => 'boolean' ),
-							'default_taxonomies'       => array( 'type' => 'boolean' ),
-							'enable_blocks'            => array( 'type' => 'boolean' ),
-							'enable_likes'             => array( 'type' => 'boolean' ),
-							'enable_notes'             => array( 'type' => 'boolean' ),
-							'hide_titles'              => array( 'type' => 'boolean' ),
-							'like_and_bookmark_titles' => array( 'type' => 'boolean' ),
-							'likes_in_feed'            => array( 'type' => 'boolean' ),
-							'likes_in_home'            => array( 'type' => 'boolean' ),
-							'location_functions'       => array( 'type' => 'boolean' ),
-							'notes_in_feed'            => array( 'type' => 'boolean' ),
-							'notes_in_home'            => array( 'type' => 'boolean' ),
-							'micropub'                 => array( 'type' => 'boolean' ),
-							'modified_feeds'           => array( 'type' => 'boolean' ),
-							'parse_markdown'           => array( 'type' => 'boolean' ),
-							'permalink_format'         => array( 'type' => 'string' ),
-							'random_slugs'             => array( 'type' => 'boolean' ),
-							'unhide_like_and_bookmark_titles' => array( 'type' => 'boolean' ),
-							'weather_units'            => array( 'type' => 'string' ),
-							'webmention'               => array( 'type' => 'boolean' ),
-							'webmention_delay'         => array( 'type' => 'integer' ),
-							'webmention_post_types'    => array(
-								'type'  => 'array',
-								'items' => array( 'type' => 'string' ),
-							),
-							'webmention_facepile'      => array( 'type' => 'boolean' ),
-						),
-						'additionalProperties' => array( 'type' => 'boolean' ), // To account for potential very old settings.
-						// @todo: Simply remove outdated settings, by somehow comparing database options to this schema.
-					),
-				),
-				'auth_callback' => function() {
-					return current_user_can( 'edit_posts' );
-				},
-			)
-		);
-
 		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
 
 		foreach ( $post_types as $post_type ) {

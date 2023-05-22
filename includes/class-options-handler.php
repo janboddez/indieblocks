@@ -12,39 +12,125 @@ namespace IndieBlocks;
  */
 class Options_Handler {
 	/**
+	 * Plugin option schema.
+	 */
+	const SCHEMA = array(
+		'enable_blocks'                   => array(
+			'type'    => 'boolean',
+			'default' => true,
+		),
+		'add_mf2'                         => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'enable_notes'                    => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'notes_in_home'                   => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'notes_in_feed'                   => array(
+			'type'    => 'boolean',
+			'default' => true,
+		),
+		'default_taxonomies'              => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'enable_likes'                    => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'likes_in_feed'                   => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'likes_in_home'                   => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'random_slugs'                    => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'automatic_titles'                => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'like_and_bookmark_titles'        => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'hide_titles'                     => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'unhide_like_and_bookmark_titles' => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'date_archives'                   => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'permalink_format'                => array(
+			'type'    => 'string',
+			'default' => '/%postname%/',
+		),
+		'modified_feeds'                  => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'webmention'                      => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'webmention_post_types'           => array(
+			'type'  => 'array',
+			'items' => array( 'type' => 'string' ),
+		),
+		'webmention_delay'                => array(
+			'type'    => 'integer',
+			'default' => 300,
+		),
+		'cache_avatars'                   => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'webmention_facepile'             => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'add_featured_images'             => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'location_functions'              => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'weather_units'                   => array(
+			'type'    => 'string',
+			'default' => 'metric',
+		),
+		'micropub'                        => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'parse_markdown'                  => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+	);
+
+	/**
 	 * Plugin options.
 	 *
 	 * @var array $options Plugin options.
 	 */
-	private $options = array(
-		'enable_blocks'                   => true,
-		'add_mf2'                         => false,
-		'enable_notes'                    => false,
-		'notes_in_home'                   => false,
-		'notes_in_feed'                   => true,
-		'default_taxonomies'              => false,
-		'enable_likes'                    => false,
-		'likes_in_feed'                   => false,
-		'likes_in_home'                   => false,
-		'random_slugs'                    => false,
-		'automatic_titles'                => false,
-		'like_and_bookmark_titles'        => false,
-		'hide_titles'                     => false,
-		'unhide_like_and_bookmark_titles' => false,
-		'date_archives'                   => false,
-		'permalink_format'                => '/%postname%/',
-		'modified_feeds'                  => false,
-		'webmention'                      => false,
-		'webmention_post_types'           => array(),
-		'webmention_delay'                => 300,
-		'cache_avatars'                   => false,
-		'webmention_facepile'             => false,
-		'add_featured_images'             => false,
-		'location_functions'              => false,
-		'weather_units'                   => 'metric',
-		'micropub'                        => false,
-		'parse_markdown'                  => false,
-	);
+	private $options = array();
 
 	/**
 	 * Valid permalink options (for IndieBlocks' CPTs).
@@ -59,11 +145,15 @@ class Options_Handler {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$options = get_option( 'indieblocks_settings', array() );
+		$options = get_option( 'indieblocks_settings' );
 
-		if ( is_array( $options ) ) {
-			$this->options = array_merge( $this->options, $options );
-		}
+		// Ensure `$this->options` is an array, and that all keys get a value.
+		$this->options = array_merge(
+			array_column( self::SCHEMA, 'default' ),
+			is_array( $options )
+				? $options
+				: array()
+		); // Note that this affects only `$this->options` as used by this plugin, and not, e.g., whatever shows in the REST API.
 	}
 
 	/**
@@ -72,6 +162,7 @@ class Options_Handler {
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'create_menu' ) );
 		add_action( 'init', array( $this, 'flush_permalinks' ), 9 );
+		add_action( 'rest_api_init', array( $this, 'add_settings' ) );
 	}
 
 	/**
@@ -107,11 +198,24 @@ class Options_Handler {
 		add_option( 'indieblocks_settings', $this->options );
 
 		$active_tab = $this->get_active_tab();
+		$schema     = self::SCHEMA;
+		foreach ( $schema as &$row ) {
+			unset( $row['default'] );
+		}
 
 		register_setting(
 			'indieblocks-settings-group',
 			'indieblocks_settings',
-			array( 'sanitize_callback' => array( $this, "sanitize_{$active_tab}_settings" ) )
+			array(
+				'sanitize_callback' => array( $this, "sanitize_{$active_tab}_settings" ), // @todo: What about potential (future) conflicts with Gutenberg here?
+				'type'              => 'object',
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'       => 'object',
+						'properties' => $schema,
+					),
+				),
+			)
 		);
 	}
 

@@ -28,7 +28,7 @@ More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/
 
 == Changelog ==
 = 0.7.0 =
-Store temperatures in Kelvin rather than degrees Celsius. Update `masterminds/html5` to version 2.8.0.
+Store temperatures in Kelvin rather than degrees Celsius. Update `masterminds/html5` to version 2.8.0. Add Location block.
 = 0.6.0 =
 "Facepile" Webmention likes, bookmarks, and reposts.
 = 0.5.0 =

@@ -13,7 +13,7 @@
 			var [ options ] = coreData.useEntityProp( 'root', 'site', 'indieblocks_settings' );
 
 			var includeWeather = props.attributes.includeWeather;
-			var temp           = includeWeather && meta._indieblocks_weather && meta._indieblocks_weather.description && meta._indieblocks_weather.temperature
+			var temp           = includeWeather && meta.hasOwnProperty( '_indieblocks_weather' ) && meta._indieblocks_weather.hasOwnProperty( 'temperature' )
 				? meta._indieblocks_weather.temperature
 				: null;
 			var tempUnit;
@@ -45,7 +45,7 @@
 						} )
 					)
 				),
-				'undefined' !== typeof meta && meta.geo_address
+				meta.hasOwnProperty( 'geo_address' ) && meta.geo_address.length
 					? el( 'span', { className: 'h-geo' },
 						temp
 							? interpolate( '<a>' + meta.geo_address + '</a> <b>•</b> <c>' + temp + tempUnit + ', ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {

@@ -2,6 +2,8 @@
 /**
  * Where Gutenberg blocks are registered.
  *
+ * @todo: Move block registration and render functions to their respective folders?
+ *
  * @package IndieBlocks
  */
 
@@ -25,6 +27,10 @@ class Blocks {
 
 	/**
 	 * Registers common JS.
+	 *
+	 * `common.js` (to avoid too much code duplication) is required by the
+	 * Bookmark, Like, Reply, and Repost blocks, and itself requires the
+	 * `wp-element`, `wp-i18n`, `wp-api-fetch` assets.
 	 */
 	public static function register_scripts() {
 		wp_register_script(
@@ -125,7 +131,10 @@ class Blocks {
 	}
 
 	/**
-	 * Registers Note and Like block templates.
+	 * Registers the Like block template.
+	 *
+	 * I.e., a new like (the custom post type) will start with an (empty) Like
+	 * block.
 	 */
 	public static function register_block_templates() {
 		$post_type_object = get_post_type_object( 'indieblocks_like' );
@@ -146,8 +155,6 @@ class Blocks {
 
 	/**
 	 * Registers (block-related) REST API endpoints.
-	 *
-	 * @todo: (Eventually) also add an "author" endpoint. Or have the single endpoint return both title and author information.
 	 */
 	public static function register_api_endpoints() {
 		register_rest_route(
@@ -202,10 +209,10 @@ class Blocks {
 
 		return new \WP_REST_Response(
 			array(
-				'name'   => $parser->get_name(),
+				'name'   => sanitize_text_field( $parser->get_name() ),
 				'author' => array(
-					'name' => $parser->get_author(),
-					'url'  => $parser->get_author_url(),
+					'name' => sanitize_text_field( $parser->get_author() ),
+					'url'  => esc_url_raw( $parser->get_author_url() ), // Not currently used by any block.
 				),
 			)
 		);

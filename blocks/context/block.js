@@ -2,8 +2,8 @@
 	var createBlock    = blocks.createBlock;
 	var getSaveContent = blocks.getSaveContent;
 
-	var el            = element.createElement;
-	var interpolateEl = element.createInterpolateElement;
+	var el          = element.createElement;
+	var interpolate = element.createInterpolateElement;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
@@ -31,7 +31,7 @@
 			( ! url || 'undefined' === url )
 				? null // Return nothing.
 				: el( 'i', {},
-					interpolateEl( sprintf( messages[ kind ], '<a>' + encodeURI( url ) + '</a>' ), {
+					interpolate( sprintf( messages[ kind ], '<a>' + encodeURI( url ) + '</a>' ), {
 						a: el( 'a', { className: kind, href: encodeURI( url ) } ),
 					} )
 				)
@@ -101,7 +101,7 @@
 
 					return el( 'div', useBlockProps.save(),
 						el( 'i', {},
-							interpolateEl( sprintf( messages[ kind ], '<a>' + url + '</a>' ), {
+							interpolate( sprintf( messages[ kind ], '<a>' + url + '</a>' ), {
 								a: el( 'a', { className: kind, href: url } ),
 							} )
 						)

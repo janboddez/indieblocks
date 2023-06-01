@@ -90,7 +90,7 @@ class Post_Types {
 				'show_in_nav_menus' => true,
 				'rewrite'           => array(
 					'slug'       => __( 'notes', 'indieblocks' ),
-					'with_front' => false,
+					'with_front' => ! empty( $options['permalink_format'] ) && 0 === strpos( $options['permalink_format'], '/%front%' ) ? true : false,
 				),
 				'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'comments', 'wpcom-markdown' ),
 				'menu_icon'         => 'dashicons-format-status',
@@ -132,7 +132,7 @@ class Post_Types {
 				'show_in_nav_menus' => true,
 				'rewrite'           => array(
 					'slug'       => __( 'likes', 'indieblocks' ),
-					'with_front' => false,
+					'with_front' => ! empty( $options['permalink_format'] ) && 0 === strpos( $options['permalink_format'], '/%front%' ) ? true : false,
 				),
 				'supports'          => array( 'author', 'title', 'editor', 'custom-fields', 'wpcom-markdown' ),
 				'menu_icon'         => 'dashicons-heart',
@@ -417,6 +417,7 @@ class Post_Types {
 			if ( ! empty( $options['enable_likes'] ) ) {
 				$post_types[] = 'indieblocks_like';
 			}
+
 			foreach ( $post_types as $post_type ) {
 				$post_type = get_post_type_object( $post_type );
 
@@ -426,8 +427,8 @@ class Post_Types {
 
 				// CPTs don't actually use `postname`.
 				$permalink_format = str_replace(
-					'%postname%',
-					"%{$post_type->name}%",
+					array( '/%front%', '%postname%' ),
+					array( '', "%{$post_type->name}%" ),
 					$options['permalink_format']
 				);
 
@@ -435,9 +436,8 @@ class Post_Types {
 				// @todo: Use `add_rewrite_tag()`?
 				add_permastruct(
 					$post_type->name,
-					// @todo: Make this configurable, and replace the slash with WP's install path.
-					'/' . $post_type->rewrite['slug'] . $permalink_format,
-					array( 'with_front' => false )
+					$post_type->rewrite['slug'] . $permalink_format,
+					array( 'with_front' => ! empty( $options['permalink_format'] ) && 0 === strpos( $options['permalink_format'], '/%front%' ) ? true : false )
 				);
 			}
 		}
@@ -470,41 +470,51 @@ class Post_Types {
 				return;
 			}
 
+			$post_type_front = $post_type->rewrite['slug'];
+
+			if ( 0 === strpos( $options['permalink_format'], '/%front%' ) ) {
+				global $wp_rewrite;
+
+				if ( ! empty( $wp_rewrite->front ) ) {
+					$post_type_front = trim( $wp_rewrite->front, '/' ) . '/' . $post_type_front;
+				}
+			}
+
 			// Day.
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/page/([0-9]{1,})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/page/([0-9]{1,})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]&monthnum=$matches[2]&day=$matches[3]&paged=$matches[4]',
 				'top'
 			);
 
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]&monthnum=$matches[2]&day=$matches[3]',
 				'top'
 			);
 
 			// Month.
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/([0-9]{1,2})/page/([0-9]{1,})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/([0-9]{1,2})/page/([0-9]{1,})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]&monthnum=$matches[2]&paged=$matches[3]',
 				'top'
 			);
 
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/([0-9]{1,2})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/([0-9]{1,2})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]&monthnum=$matches[2]',
 				'top'
 			);
 
 			// Year.
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/page/([0-9]{1,})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/page/([0-9]{1,})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]&paged=$matches[2]',
 				'top'
 			);
 
 			add_rewrite_rule(
-				'^' . $post_type->rewrite['slug'] . '/([0-9]{4})/?$',
+				'^' . $post_type_front . '/([0-9]{4})/?$',
 				'index.php?post_type=' . $post_type->name . '&year=$matches[1]',
 				'top'
 			);

@@ -263,7 +263,7 @@ class Options_Handler {
 
 		$permalink_format = '/%postname%/';
 
-		if ( isset( $settings['permalink_format'] ) && in_array( $settings['permalink_format'], self::PERMALINK_FORMATS, true ) ) {
+		if ( isset( $settings['permalink_format'] ) && in_array( $settings['permalink_format'], static::get_permalink_formats(), true ) ) {
 			$permalink_format = $settings['permalink_format'];
 		}
 
@@ -419,7 +419,7 @@ class Options_Handler {
 							<tr valign="top">
 								<th scope="row"><?php esc_html_e( 'Permalink Format', 'indieblocks' ); ?></th>
 								<td>
-									<?php foreach ( self::PERMALINK_FORMATS as $i => $format ) : ?>
+									<?php foreach ( static::get_permalink_formats() as $i => $format ) : ?>
 										<?php echo ( 0 !== $i ? '<br />' : '' ); ?><label><input type="radio" name="indieblocks_settings[permalink_format]" value="<?php echo esc_attr( $format ); ?>" <?php checked( isset( $this->options['permalink_format'] ) ? $this->options['permalink_format'] : '/%postname%/', $format ); ?> /> <code><?php echo esc_html( $this->get_example_permalink( $format ) ); ?></code></label>
 									<?php endforeach; ?>
 									<p class="description"><?php esc_html_e( '(Experimental) Set a custom note and like permalink format.', 'indieblocks' ); ?></p>
@@ -566,36 +566,73 @@ class Options_Handler {
 	 * @return string         Example permalink.
 	 */
 	private function get_example_permalink( $format ) {
-		$example_front = __( 'notes', 'indieblocks' );
+		$example_front = __( 'notes', 'indieblocks' ); // Just a default.
 
 		if ( ! empty( $this->options['enable_notes'] ) ) {
 			$post_type = get_post_type_object( 'indieblocks_note' );
 
 			if ( ! empty( $post_type->rewrite['slug'] ) ) {
-				$example_front = $post_type->rewrite['slug'];
+				$example_front = $post_type->rewrite['slug']; // Actual notes slug.
 			}
 		} elseif ( ! empty( $this->options['enable_likes'] ) ) {
 			$post_type = get_post_type_object( 'indieblocks_like' );
 
 			if ( ! empty( $post_type->rewrite['slug'] ) ) {
-				$example_front = $post_type->rewrite['slug'];
+				$example_front = $post_type->rewrite['slug']; // If notes are disabled but likes are enabled, use the likes slug.
 			}
 		}
 
-		return '/' . $example_front . str_replace(
+		if ( 0 === strpos( $format, '/%front%' ) ) {
+			global $wp_rewrite;
+
+			if ( ! empty( $wp_rewrite->front ) ) {
+				$example_front = trim( $wp_rewrite->front, '/' ) . '/' . $example_front;
+			}
+
+			$format = str_replace( '/%front%', '', $format );
+		}
+
+		$example_front = '/' . ltrim( $example_front, '/' ) . str_replace(
 			array( '%year%', '%monthnum%', '%day%', '%postname%' ),
 			array( date( 'Y' ), date( 'm' ), date( 'd' ), __( 'sample-post', 'indieblocks' ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			$format
 		);
+
+		$permalink_structure = get_option( 'permalink_structure' );
+
+		if ( is_string( $permalink_structure ) && '/' !== substr( $permalink_structure, -1 ) ) {
+			$example_front = substr( $example_front, 0, -1 );
+		}
+
+		return $example_front;
 	}
 
 	/**
 	 * Returns post types we may want to enable Webmention for.
 	 */
-	private function get_post_types() {
+	protected function get_post_types() {
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		unset( $post_types['attachment'] );
 
 		return $post_types;
+	}
+
+	/**
+	 * Returns post types we may want to enable Webmention for.
+	 */
+	protected function get_permalink_formats() {
+		global $wp_rewrite;
+
+		if ( empty( $wp_rewrite->front ) || '/' === $wp_rewrite->front ) {
+			return self::PERMALINK_FORMATS;
+		}
+
+		$permalink_formats = self::PERMALINK_FORMATS;
+
+		foreach ( self::PERMALINK_FORMATS as $format ) {
+			$permalink_formats[] = '/%front%' . $format;
+		}
+
+		return $permalink_formats;
 	}
 }

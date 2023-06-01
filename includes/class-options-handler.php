@@ -586,7 +586,7 @@ class Options_Handler {
 			global $wp_rewrite;
 
 			if ( ! empty( $wp_rewrite->front ) ) {
-				$example_front = trim( $wp_rewrite->front, '/' ) . '/' . $example_front;
+				$example_front = trim( $wp_rewrite->front, '/' ) . "/$example_front";
 			}
 
 			$format = str_replace( '/%front%', '', $format );
@@ -601,6 +601,7 @@ class Options_Handler {
 		$permalink_structure = get_option( 'permalink_structure' );
 
 		if ( is_string( $permalink_structure ) && '/' !== substr( $permalink_structure, -1 ) ) {
+			// If permalinks were set up without trailing slash, hide it.
 			$example_front = substr( $example_front, 0, -1 );
 		}
 
@@ -614,21 +615,23 @@ class Options_Handler {
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		unset( $post_types['attachment'] );
 
-		return $post_types;
+		return array_values( $post_types );
 	}
 
 	/**
-	 * Returns post types we may want to enable Webmention for.
+	 * Returns those permalink formats we consider valid.
 	 */
 	protected function get_permalink_formats() {
 		global $wp_rewrite;
 
 		if ( empty( $wp_rewrite->front ) || '/' === $wp_rewrite->front ) {
+			// Nothing to do.
 			return self::PERMALINK_FORMATS;
 		}
 
 		$permalink_formats = self::PERMALINK_FORMATS;
 
+		// Parse-in the "permalink-fronted" variants.
 		foreach ( self::PERMALINK_FORMATS as $format ) {
 			$permalink_formats[] = '/%front%' . $format;
 		}

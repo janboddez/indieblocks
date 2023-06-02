@@ -33,6 +33,15 @@ function flush_permalinks() {
 }
 
 /**
+ * Writes to WordPress' debug log.
+ *
+ * @param mixed $item Thing to log.
+ */
+function debug_log( $item ) {
+	error_log( print_r( $item, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+}
+
+/**
  * Wrapper around `wp_remote_get()`.
  *
  * @param  string $url          URL to fetch.

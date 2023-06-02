@@ -701,6 +701,11 @@ class Theme_Mf2 {
 
 		$url = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
 
+		if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
+			// Mention created by the Webmention plugin.
+			$url = get_comment_meta( $comment->comment_ID, 'avatar', true ); // This may be an external URL.
+		}
+
 		if ( empty( $url ) ) {
 			return null;
 		}

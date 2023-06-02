@@ -23,6 +23,12 @@ class Blocks {
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'print_icons' ), 999 );
+
+		$options = get_options();
+		if ( ! empty( $options['webmention_facepile'] ) ) {
+			add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
+			add_filter( 'get_comments_number', array( Webmention::class, 'comment_count' ), 999, 2 );
+		}
 	}
 
 	/**
@@ -287,6 +293,11 @@ class Blocks {
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
 
+			if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
+				$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
+				$kind   = $comment->comment_type;
+			}
+
 			$classes = array(
 				'bookmark' => 'p-bookmark',
 				'like'     => 'p-like',
@@ -440,27 +451,57 @@ class Blocks {
 			return $facepile_comments;
 		}
 
-		$args = array(
-			'post_id'    => $post_id,
-			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				'relation' => 'AND',
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'EXISTS',
+		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+
+		$facepile_comments           = new \stdClass();
+		$facepile_comments->comments = array();
+
+		// IndieBlocks' webmentions use custom fields to set them apart.
+		$indieblocks_comments = new \WP_Comment_Query(
+			array(
+				'post_id'    => $post_id,
+				'fields'     => 'ids',
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'relation' => 'AND',
+					array(
+						'key'     => 'indieblocks_webmention_kind',
+						'compare' => 'EXISTS',
+					),
+					array(
+						'key'     => 'indieblocks_webmention_kind',
+						'compare' => 'IN',
+						'value'   => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
+					),
 				),
-				array(
-					'key'     => 'indieblocks_webmention_kind',
-					'compare' => 'IN',
-					'value'   => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
-				),
-			),
+			)
 		);
 
-		remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
-		$comment_query = new \WP_Comment_Query( $args );
+		// The Webmention plugin's mentions use "proper" comment types.
+		$webmention_comments = new \WP_Comment_Query(
+			array(
+				'post_id'  => $post_id,
+				'fields'   => 'ids',
+				'type__in' => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
+			)
+		);
+
+		$comment_ids = array_unique( array_merge( $indieblocks_comments->comments, $webmention_comments->comments ) );
+
+		if ( ! empty( $comment_ids ) ) {
+			// Grab 'em all.
+			$facepile_comments = new \WP_Comment_Query(
+				array(
+					'comment__in' => array_unique( array_merge( $indieblocks_comments->comments, $webmention_comments->comments ) ),
+					'post_id'     => $post_id,
+					'order_by'    => 'comment_date',
+					'order'       => 'ASC',
+				)
+			);
+		}
+
 		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
 
-		$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $comment_query->comments, $post_id );
+		$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $facepile_comments->comments, $post_id );
 
 		// Cache for the duration of the request (and then some)?
 		wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );

@@ -36,11 +36,6 @@ class Webmention {
 		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
 
 		$options = get_options();
-
-		if ( ! empty( $options['webmention_facepile'] ) ) {
-			add_action( 'pre_get_comments', array( __CLASS__, 'comment_query' ) );
-			add_filter( 'get_comments_number', array( __CLASS__, 'comment_count' ), 999, 2 );
-		}
 	}
 
 	/**
@@ -184,6 +179,11 @@ class Webmention {
 			return;
 		}
 
+		global $post;
+
+		// Exclude likes and reposts by the Webmention plugin.
+		$query->query_vars['type__not_in'] = apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), ! empty( $post->ID ) ? $post->ID : null );
+
 		// Exclude likes and reposts. The bad thing is, this screws up comment counts.
 		$query->query_vars['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'relation' => 'OR',
@@ -194,7 +194,7 @@ class Webmention {
 			array(
 				'key'     => 'indieblocks_webmention_kind',
 				'compare' => 'NOT IN',
-				'value'   => array( 'bookmark', 'like', 'repost' ),
+				'value'   => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), ! empty( $post->ID ) ? $post->ID : null ),
 			),
 		);
 	}
@@ -226,8 +226,9 @@ class Webmention {
 		$sql = "SELECT COUNT(c.comment_ID) FROM $comments AS c
 			LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
 			WHERE c.comment_post_ID = %d
-			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))			
-			AND (m.meta_key IS NULL OR m.meta_value NOT IN ('bookmark', 'like', 'repost'))";
+			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))
+			AND c.comment_type NOT IN ('bookmark', 'like', 'repost')
+			AND (m.meta_key IS NULL OR m.meta_value NOT IN ('bookmark', 'like', 'repost'))"; // @todo: Make these filterable.
 
 		/* @todo: Add caching. */
 		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching

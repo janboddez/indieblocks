@@ -242,13 +242,9 @@ class Webmention {
 			);
 		}
 
-		/* @todo: Add caching. */
 		$count = $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		$count = is_null( $count ) ? 0 : (string) $count; // Has to be a string, or literal `0`!
 
-		if ( null === $count ) {
-			return 0;
-		}
-
-		return (string) $count; // Has to be a string!
+		return $count;
 	}
 }

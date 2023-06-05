@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblog, microblogging, micropub, fse, site editor, webmention, syndication
 Tested up to: 6.2
-Stable tag: 0.7.0
+Stable tag: 0.7.1
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,6 +27,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.7.1 =
+The Facepile block now supports v5.0 and up of the Webmention plugin.
 = 0.7.0 =
 Store temperatures in Kelvin rather than degrees Celsius. Update `masterminds/html5` to version 2.8.0. Add Location block.
 = 0.6.0 =

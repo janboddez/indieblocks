@@ -269,8 +269,8 @@ class Blocks {
 		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
 		// Limit comments. Might provide a proper option later.
-		$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25 );
-		$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num, $block->context['postId'] );
+		$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $block->context['postId'] );
+		$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num );
 
 		$output = '';
 
@@ -294,6 +294,7 @@ class Blocks {
 			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
 
 			if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
+				// Mentions initiated by the Webmention plugin use a slightly different data structure.
 				$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
 				$kind   = $comment->comment_type;
 			}
@@ -501,7 +502,7 @@ class Blocks {
 			// Grab 'em all.
 			$facepile_comments = new \WP_Comment_Query(
 				array(
-					'comment__in' => array_unique( array_merge( $indieblocks_comments->comments, $webmention_comments->comments ) ),
+					'comment__in' => $comment_ids,
 					'post_id'     => $post_id,
 					'order_by'    => 'comment_date',
 					'order'       => 'ASC',

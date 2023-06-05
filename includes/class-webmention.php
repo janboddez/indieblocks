@@ -218,22 +218,32 @@ class Webmention {
 			return $count;
 		}
 
+		$comment_types = (array) apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id );
+		$comment_types = array_values( $comment_types ); // Ensure `$comment_types` has numeric keys.
+
 		global $wpdb;
 
 		$comments    = $wpdb->prefix . 'comments';
 		$commentmeta = $wpdb->prefix . 'commentmeta';
 
 		$sql = "SELECT COUNT(c.comment_ID) FROM $comments AS c
-			LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
-			WHERE c.comment_post_ID = %d
-			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))
-			AND c.comment_type NOT IN ('bookmark', 'like', 'repost')
-			AND (m.meta_key IS NULL OR m.meta_value NOT IN ('bookmark', 'like', 'repost'))"; // @todo: Make these filterable.
+			 LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
+			 WHERE c.comment_post_ID = %d
+			 AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))";
+		$sql = $wpdb->prepare( $sql, $post_id, get_current_user_id() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( ! empty( $comment_types ) ) {
+			$sql .= $wpdb->prepare(
+				sprintf(
+					' AND c.comment_type NOT IN (%1$s) AND (m.meta_key IS NULL OR m.meta_value NOT IN (%1$s))', // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+					implode( ',', array_fill( 0, count( $comment_types ), '%s' ) )
+				),
+				array_merge( $comment_types, $comment_types ) // Need two occurrences of this!
+			);
+		}
 
 		/* @todo: Add caching. */
-		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( $sql, $post_id, get_current_user_id() ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		);
+		$count = $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( null === $count ) {
 			return 0;

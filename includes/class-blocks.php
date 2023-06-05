@@ -509,8 +509,11 @@ class Blocks {
 			);
 		}
 
-		// Restore the filter disabled above.
-		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		$options = get_options();
+		if ( ! empty( $options['webmention_facepile'] ) ) {
+			// Restore the filter disabled above, but only if it was active before!
+			add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		}
 
 		// Allow filtering the resulting comments.
 		$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $facepile_comments->comments, $post_id );

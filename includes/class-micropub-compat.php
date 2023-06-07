@@ -228,10 +228,10 @@ class Micropub_Compat {
 		// Determine the _actual_ content, if any.
 		if ( ! empty( $input['properties']['content'][0] ) ) {
 			$content = $input['properties']['content'][0];
-			$options = get_options();
 
+			$options = get_options();
 			if ( ! empty( $options['parse_markdown'] ) ) {
-				// @todo: Store Markdown in `post_content_filtered`? Exceept we can't, not from this hook.
+				// @todo: Store Markdown in `post_content_filtered`? Except we can't, not from this hook.
 				$content = Michelf\MarkdownExtra::defaultTransform( $content );
 				// Probably better, for POSSE'ing and whatnot, to convert the
 				// post's content back to "Markdown." So that, rather than drop

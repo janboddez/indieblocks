@@ -669,7 +669,7 @@ class Theme_Mf2 {
 	public static function get_comment_link( $link, $comment ) {
 		$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 
-		if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
+		if ( empty( $source ) ) {
 			$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
 		}
 

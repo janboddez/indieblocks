@@ -504,7 +504,12 @@ class Theme_Mf2 {
 		}
 
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			if ( get_post_type() === 'indieblocks_like' && '' !== $linked_url ) {
+				// @todo: Expand to "implicit" likes? And how about bookmarks and so on?
+				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			} else {
+				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			}
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
@@ -668,6 +673,10 @@ class Theme_Mf2 {
 	 */
 	public static function get_comment_link( $link, $comment ) {
 		$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
+
+		if ( empty( $source ) ) {
+			$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
+		}
 
 		if ( empty( $source ) ) {
 			return $link;

@@ -27,11 +27,11 @@
 			var [ meta ] = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
 			var urls     = [];
 
-			if ( meta.hasOwnProperty( '_share_on_mastodon_url') && meta._share_on_mastodon_url.length ) {
+			if ( 'undefined' !== typeof meta && meta.hasOwnProperty( '_share_on_mastodon_url' ) && meta._share_on_mastodon_url.length ) {
 				urls.push( { name: __( 'Mastodon', 'indieblocks' ), value: meta._share_on_mastodon_url } );
 			}
 
-			if ( meta.hasOwnProperty( '_share_on_pixelfed_url') && meta._share_on_pixelfed_url.length ) {
+			if ( 'undefined' !== typeof meta && meta.hasOwnProperty( '_share_on_pixelfed_url' ) && meta._share_on_pixelfed_url.length ) {
 				urls.push( { name: __( 'Pixelfed', 'indieblocks' ), value: meta._share_on_pixelfed_url } );
 			}
 

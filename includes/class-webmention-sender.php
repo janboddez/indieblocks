@@ -28,6 +28,8 @@ class Webmention_Sender {
 
 		/* @see https://github.com/WordPress/gutenberg/issues/15094#issuecomment-1021288811. */
 		if ( ! empty( $_REQUEST['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// Avoid scheduling (or posting, in case of no delay) webmentions
+			// more than once.
 			return;
 		}
 

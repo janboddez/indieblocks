@@ -299,10 +299,11 @@ class Options_Handler {
 		);
 
 		$webmention_post_types = array();
+		$supported_post_types  = $this->get_post_types( 'names' );
 
 		if ( isset( $settings['webmention_post_types'] ) && is_array( $settings['webmention_post_types'] ) ) {
 			foreach ( $settings['webmention_post_types'] as $post_type ) {
-				if ( in_array( $post_type, $this->get_post_types(), true ) ) {
+				if ( in_array( $post_type, $supported_post_types, true ) ) {
 					$webmention_post_types[] = $post_type;
 				}
 			}
@@ -611,8 +612,8 @@ class Options_Handler {
 	/**
 	 * Returns post types we may want to enable Webmention for.
 	 */
-	protected function get_post_types() {
-		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+	protected function get_post_types( $output = 'objects' ) {
+		$post_types = get_post_types( array( 'public' => true ), $output );
 		unset( $post_types['attachment'] );
 
 		return array_values( $post_types );

@@ -302,7 +302,7 @@ class Options_Handler {
 
 		if ( isset( $settings['webmention_post_types'] ) && is_array( $settings['webmention_post_types'] ) ) {
 			foreach ( $settings['webmention_post_types'] as $post_type ) {
-				if ( in_array( $post_type, array_keys( $this->get_post_types() ), true ) ) {
+				if ( in_array( $post_type, $this->get_post_types(), true ) ) {
 					$webmention_post_types[] = $post_type;
 				}
 			}

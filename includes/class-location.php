@@ -174,11 +174,6 @@ class Location {
 			return;
 		}
 
-		/* @see https://github.com/WordPress/gutenberg/issues/15094#issuecomment-1021288811. */
-		if ( ! empty( $_REQUEST['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return;
-		}
-
 		if ( ! in_array( $post->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true ) ) {
 			// Unsupported post type.
 			return;

@@ -50,11 +50,13 @@ class Post_Types {
 			// Add "linked page" meta to likes, bookmarks and reposts. Do this
 			// here rather than in the block editor, because of reasons.
 			if ( ! empty( $options['enable_notes'] ) ) {
-				add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+				add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
+				add_filter( 'rest_after_insert_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
 			}
 
 			if ( ! empty( $options['enable_likes'] ) ) {
-				add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+				add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
+				add_filter( 'rest_after_insert_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
 			}
 		}
 
@@ -281,15 +283,18 @@ class Post_Types {
 	/**
 	 * Set linked meta for certain IndieWeb post types.
 	 *
-	 * @param  int     $post_id Post ID.
-	 * @param  WP_Post $post    Post object.
+	 * @param int|\WP_Post $post Post ID or object, depending on where the request originated.
 	 */
-	public static function set_post_meta( $post_id, $post ) {
-		if ( ! in_array( $post->post_type, array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+	public static function set_post_meta( $post ) {
+		debug_log( $post_or_request );
+
+		$post = get_post( $post );
+
+		if ( empty( $post->post_content ) ) {
 			return;
 		}
 
-		$content = get_the_content( $post_id );
+		$content = $post->post_content;
 
 		if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
 			$content = '<div class="e-content">' . $content . '</div>';
@@ -305,9 +310,9 @@ class Post_Types {
 		$linked_url = $parser->get_link_url();
 
 		if ( ! empty( $linked_url ) ) {
-			update_post_meta( $post_id, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
+			update_post_meta( $post->ID, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
 		} else {
-			delete_post_meta( $post_id, '_indieblocks_linked_url' );
+			delete_post_meta( $post->ID, '_indieblocks_linked_url' );
 		}
 	}
 

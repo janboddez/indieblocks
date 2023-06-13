@@ -147,3 +147,26 @@ function post_content_parser( $post ) {
 
 	return $parser;
 }
+
+/**
+ * Returns a post's implied kind.
+ *
+ * @param  int|\WP_Post $post Post ID or post object.
+ * @return string             The implied (per the post's microformats) post kind.
+ */
+function get_kind( $post ) {
+	$post = get_post( $post );
+	$kind = get_post_meta( $post->ID, '_indieblocks_kind', true );
+
+	if ( '' === $kind ) {
+		$parser = post_content_parser( $post );
+		$kind   = $parser->get_type();
+
+		if ( '' !== $kind ) {
+			// Store for future use.
+			update_post_meta( $post->ID, '_indieblocks_kind', $kind );
+		}
+	}
+
+	return $kind;
+}

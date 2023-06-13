@@ -476,23 +476,13 @@ class Theme_Mf2 {
 			$classes[] = "has-text-align-{$attributes['textAlign']}";
 		}
 
-		// Note and Like titles, by default, do not get the `p-name` class.
 		$options = get_options();
 
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			// Not a like or note.
 			$classes[] = 'p-name';
 		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) ) {
-			$kind = get_post_meta( $post_ID, '_indieblocks_kind', true );
-
-			if ( '' === $kind ) {
-				$parser = post_content_parser( get_post( $post_ID ) );
-				$kind   = $parser->get_type();
-
-				if ( '' !== $kind ) {
-					update_post_meta( $post_ID, '_indieblocks_kind', $kind );
-				}
-			}
+			$kind = get_kind( $post_ID );
 
 			if ( in_array( $kind, array( 'bookmark', 'like', 'repost' ), true ) ) {
 				// Do not hide like, bookmark, and repost titles.
@@ -518,11 +508,21 @@ class Theme_Mf2 {
 		}
 
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			if ( get_post_type() === 'indieblocks_like' && '' !== $linked_url ) {
-				// @todo: Expand to "implicit" likes? And how about bookmarks and so on?
-				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
-			} else {
+			if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+				// Not a like or note.
 				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			} else {
+				$kind = ! isset( $kind ) ? get_kind( $post_ID ) : $kind;
+
+				if ( 'bookmark' === $kind && ! empty( $linked_url ) ) {
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-bookmark-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+				} elseif ( 'like' === $kind && ! empty( $linked_url ) ) {
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+				} elseif ( 'repost' === $kind && ! empty( $linked_url ) ) {
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-repost-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+				} else {
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+				}
 			}
 		}
 

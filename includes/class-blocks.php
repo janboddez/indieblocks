@@ -23,6 +23,8 @@ class Blocks {
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'print_icons' ), 999 );
+		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
+		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
 
 		$options = get_options();
 		if ( ! empty( $options['webmention_facepile'] ) ) {
@@ -160,6 +162,30 @@ class Blocks {
 	}
 
 	/**
+	 * Allows IndieBlocks' blocks `InnerBlocks` in excerpts.
+	 *
+	 * @param  array $allowed_wrapper_blocks Allowed wrapper blocks.
+	 * @return array                         Filtered list of allowed blocks.
+	 */
+	public static function excerpt_allow_wrapper_blocks( $allowed_wrapper_blocks ) {
+		$plugin_blocks = array( 'indieblocks/bookmark', 'indieblocks/like', 'indieblocks/reply', 'indieblocks/repost' );
+
+		return array_merge( $allowed_wrapper_blocks, $plugin_blocks );
+	}
+
+	/**
+	 * Allows IndieBlocks' context block in excerpts.
+	 *
+	 * @param  array $excerpt_allowed_blocks Allowed wrapper blocks.
+	 * @return array                         Filtered list of allowed blocks.
+	 */
+	public static function excerpt_allow_blocks( $excerpt_allowed_blocks ) {
+		$excerpt_allowed_blocks[] = 'indieblocks/context';
+
+		return $excerpt_allowed_blocks;
+	}
+
+	/**
 	 * Registers (block-related) REST API endpoints.
 	 */
 	public static function register_api_endpoints() {
@@ -184,7 +210,7 @@ class Blocks {
 	}
 
 	/**
-	 * Returns certain metadata for a specific URL.
+	 * Returns certain metadata for a specific, often external, URL.
 	 *
 	 * @param  \WP_REST_Request $request   WP REST API request.
 	 * @return \WP_REST_Response|\WP_Error Response.

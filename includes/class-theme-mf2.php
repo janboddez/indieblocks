@@ -482,11 +482,25 @@ class Theme_Mf2 {
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			// Not a like or note.
 			$classes[] = 'p-name';
-		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) && '' !== get_post_meta( $post_ID, '_indieblocks_linked_url', true ) ) {
+		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) ) {
+			$kind = get_post_meta( $post_ID, '_indieblocks_kind', true );
+
+			if ( '' === $kind ) {
+				$parser = post_content_parser( get_post( $post_ID ) );
+				$kind   = $parser->get_type();
+
+				if ( '' !== $kind ) {
+					update_post_meta( $post_ID, '_indieblocks_kind', $kind );
+				}
+			}
+
+			if ( in_array( $kind, array( 'bookmark', 'like', 'repost' ), true ) ) {
 				// Do not hide like, bookmark, and repost titles.
 				$classes[] = 'p-name';
+			} elseif ( ! empty( $options['hide_titles'] ) ) {
+				$classes[] = 'screen-reader-text';
+			}
 		} elseif ( ! empty( $options['hide_titles'] ) ) {
-				// Hide titles. Counting on core/the theme to provide the CSS.
 				$classes[] = 'screen-reader-text';
 		}
 

@@ -292,16 +292,7 @@ class Post_Types {
 			return;
 		}
 
-		$content = $post->post_content;
-
-		if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
-			$content = '<div class="e-content">' . $content . '</div>';
-		}
-
-		$content = '<div class="h-entry">' . $content . '</div>';
-
-		$parser = new Parser();
-		$parser->parse( $content );
+		$parser = post_content_parser( $post );
 
 		// Grab the first like URL, or first bookmark URL, or first repost URL,
 		// if any.
@@ -311,6 +302,14 @@ class Post_Types {
 			update_post_meta( $post->ID, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
 		} else {
 			delete_post_meta( $post->ID, '_indieblocks_linked_url' );
+		}
+
+		$kind = $parser->get_type();
+
+		if ( ! empty( $linked_url ) ) {
+			update_post_meta( $post->ID, '_indieblocks_kind', $kind );
+		} else {
+			delete_post_meta( $post->ID, '_indieblocks_kind' );
 		}
 	}
 

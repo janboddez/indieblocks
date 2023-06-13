@@ -127,3 +127,23 @@ function webmentions_open( $post = null ) {
 
 	return apply_filters( 'indieblocks_webmentions_open', comments_open( $post ), $post );
 }
+
+/**
+ * Parses post content for microformats (and then some).
+ *
+ * @param \WP_Post $post Post object.
+ */
+function post_content_parser( $post ) {
+	$content = $post->post_content;
+
+	if ( ! preg_match( '~ class=("|\')([^"\']*?)e-content([^"\']*?)("|\')~', $content ) ) {
+		$content = '<div class="e-content">' . $content . '</div>';
+	}
+
+	$content = '<div class="h-entry">' . $content . '</div>';
+
+	$parser = new Parser();
+	$parser->parse( $content );
+
+	return $parser;
+}

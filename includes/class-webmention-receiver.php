@@ -57,6 +57,11 @@ class Webmention_Receiver {
 			return new \WP_Error( 'not_found', 'Not found', array( 'status' => 404 ) );
 		}
 
+		if ( ! webmentions_open( $post ) ) {
+			error_log( "[Indieblocks/Webmention] Webmentions closed for the post with ID {$post->ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			return new \WP_Error( 'invalid_request', 'Invalid target', array( 'status' => 400 ) );
+		}
+
 		// Set sender's IP address.
 		$ip = ! empty( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '', apply_filters( 'indieblocks_webmention_sender_ip', $ip, $request ) );
@@ -327,7 +332,7 @@ class Webmention_Receiver {
 			return;
 		}
 
-		if ( is_singular( Webmention::get_supported_post_types() ) ) {
+		if ( webmentions_open() ) {
 			echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
 		}
 	}

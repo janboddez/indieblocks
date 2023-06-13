@@ -27,12 +27,14 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.8.0 =
+Various bug fixes. Also, webmentions are now closed when comments are, although this behavior is filterable.
 = 0.7.1 =
 The Facepile block now supports v5.0 and up of the Webmention plugin.
 = 0.7.0 =
 Store temperatures in Kelvin rather than degrees Celsius. Update `masterminds/html5` to version 2.8.0. Add Location block.
 = 0.6.0 =
-"Facepile" Webmention likes, bookmarks, and reposts.
+"Facepile" likes, bookmarks, and reposts.
 = 0.5.0 =
 Add Bookmark, Like, Reply and Repost blocks. Additional title options.
 = 0.4.0 =

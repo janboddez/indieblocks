@@ -110,3 +110,20 @@ function get_user_agent( $url = '' ) {
 	// Allow developers to override this user agent.
 	return apply_filters( 'indieblocks_fetch_user_agent', $user_agent, $url );
 }
+
+/**
+ * Whether webmentions are enabled.
+ *
+ * @param  int|\WP_Post $post Post ID or post object. Defaults to the global `$post`.
+ * @return bool               Whether webmentions are open.
+ */
+function webmentions_open( $post = null ) {
+	$post = get_post( $post );
+
+	if ( ! in_array( $post->post_type, Webmention::get_supported_post_types(), true ) ) {
+		// Unsupported post type.
+		return false;
+	}
+
+	return apply_filters( 'indieblocks_webmentions_open', comments_open( $post ), $post );
+}

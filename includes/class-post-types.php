@@ -286,8 +286,6 @@ class Post_Types {
 	 * @param int|\WP_Post $post Post ID or object, depending on where the request originated.
 	 */
 	public static function set_post_meta( $post ) {
-		debug_log( $post_or_request );
-
 		$post = get_post( $post );
 
 		if ( empty( $post->post_content ) ) {

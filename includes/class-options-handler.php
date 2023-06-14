@@ -611,6 +611,9 @@ class Options_Handler {
 
 	/**
 	 * Returns post types we may want to enable Webmention for.
+	 *
+	 * @param  string $output Expected post type format.
+	 * @return array          Array of supported post types.
 	 */
 	protected function get_post_types( $output = 'objects' ) {
 		$post_types = get_post_types( array( 'public' => true ), $output );

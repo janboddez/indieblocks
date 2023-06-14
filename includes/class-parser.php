@@ -43,7 +43,7 @@ class Parser {
 	}
 
 	/**
-	 * Fetches the page, then loads its DOM.
+	 * Fetches the page, then loads its DOM. Then loads its mf2.
 	 *
 	 * @param string $content (Optional) HTML to be parsed instead.
 	 */
@@ -54,22 +54,12 @@ class Parser {
 			$hash = hash( 'sha256', $content );
 		}
 
-		if ( ! empty( $hash ) ) {
-			// Check for existing data.
-			$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
-		}
-
-		if ( ! empty( $mf2 ) ) {
-			$this->mf2 = $mf2;
-			return;
-		}
-
 		if ( empty( $content ) && ! empty( $this->url ) ) {
-			// No `$content` was passed along. First check the cache.
+			// No `$content` was passed along, but a URL was.
 			$content = get_transient( 'indieblocks:html:' . $hash );
 
-			if ( empty( $content ) ) {
-				// Download the page, and store the result.
+			if ( false === $content ) {
+				// Could not find a cached version. Download page.
 				$response = remote_get( $this->url );
 				$content  = wp_remote_retrieve_body( $response );
 				set_transient( 'indieblocks:html:' . $hash, $content, 3600 ); // Cache, even if empty.
@@ -77,15 +67,23 @@ class Parser {
 		}
 
 		if ( empty( $content ) ) {
-			// Can't continue without HTML.
+			// We need HTML to be able to load the DOM.
 			return;
 		}
 
-		// Parse for microformats, and store the outcome.
-		$mf2 = Mf2\parse( $content, $this->url );
-		set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 ); // Cache, even if empty or faulty.
+		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
+		libxml_use_internal_errors( true );
+		$this->dom->loadHTML( $content );
 
-		$this->mf2 = $mf2;
+		// Attempt to also load mf2.
+		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
+
+		if ( empty( $mf2 ) ) {
+			$mf2 = Mf2\parse( $content, $this->url );
+			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
+		}
+
+		$this->mf2 = Mf2\parse( $content, $this->url );
 	}
 
 	/**

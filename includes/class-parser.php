@@ -59,8 +59,6 @@ class Parser {
 			$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
 		}
 
-		debug_log( $mf2 );
-
 		if ( ! empty( $mf2 ) ) {
 			$this->mf2 = $mf2;
 			return;

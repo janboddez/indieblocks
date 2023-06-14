@@ -34,8 +34,6 @@ class Webmention {
 		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_route' ) );
 		add_action( 'wp_head', array( Webmention_Receiver::class, 'webmention_link' ) );
 		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
-
-		$options = get_options();
 	}
 
 	/**

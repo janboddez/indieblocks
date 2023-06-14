@@ -48,14 +48,30 @@ class Parser {
 	 * @param string $content (Optional) HTML to be parsed instead.
 	 */
 	public function parse( $content = '' ) {
-		$hash = hash( 'sha256', esc_url_raw( $this->url ) );
+		if ( ! empty( $this->url ) ) {
+			$hash = hash( 'sha256', esc_url_raw( $this->url ) );
+		} elseif ( ! empty( $content ) ) {
+			$hash = hash( 'sha256', $content );
+		}
 
-		if ( empty( $content ) ) {
-			// No `$content` was passed along.
+		if ( ! empty( $hash ) ) {
+			// Check for existing data.
+			$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
+		}
+
+		debug_log( $mf2 );
+
+		if ( ! empty( $mf2 ) ) {
+			$this->mf2 = $mf2;
+			return;
+		}
+
+		if ( empty( $content ) && ! empty( $this->url ) ) {
+			// No `$content` was passed along. First check the cache.
 			$content = get_transient( 'indieblocks:html:' . $hash );
 
-			if ( empty( $content ) && ! empty( $this->url ) ) {
-				// Download page.
+			if ( empty( $content ) ) {
+				// Download the page, and store the result.
 				$response = remote_get( $this->url );
 				$content  = wp_remote_retrieve_body( $response );
 				set_transient( 'indieblocks:html:' . $hash, $content, 3600 ); // Cache, even if empty.
@@ -63,22 +79,15 @@ class Parser {
 		}
 
 		if ( empty( $content ) ) {
-			// Can't do anything without HTML.
+			// Can't continue without HTML.
 			return;
 		}
 
-		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
-		libxml_use_internal_errors( true );
-		$this->dom->loadHTML( $content );
+		// Parse for microformats, and store the outcome.
+		$mf2 = Mf2\parse( $content, $this->url );
+		set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 ); // Cache, even if empty or faulty.
 
-		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
-
-		if ( empty( $mf2 ) ) {
-			$mf2 = Mf2\parse( $content, $this->url );
-			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
-		}
-
-		$this->mf2 = Mf2\parse( $content, $this->url );
+		$this->mf2 = $mf2;
 	}
 
 	/**

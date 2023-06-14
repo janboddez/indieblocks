@@ -501,10 +501,7 @@ class Theme_Mf2 {
 		$permalink = get_the_permalink( $post_ID );
 
 		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
-			$linked_url = get_post_meta( $post_ID, '_indieblocks_linked_url', true );
-			$permalink  = ! empty( $linked_url )
-				? $linked_url
-				: $permalink;
+			$linked_url = get_linked_url( $post_ID );
 		}
 
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
@@ -515,11 +512,11 @@ class Theme_Mf2 {
 				$kind = ! isset( $kind ) ? get_kind( $post_ID ) : $kind;
 
 				if ( 'bookmark' === $kind && ! empty( $linked_url ) ) {
-					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-bookmark-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-bookmark-of">%4$s</a>', esc_url( $linked_url ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 				} elseif ( 'like' === $kind && ! empty( $linked_url ) ) {
-					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $linked_url ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 				} elseif ( 'repost' === $kind && ! empty( $linked_url ) ) {
-					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-repost-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-repost-of">%4$s</a>', esc_url( $linked_url ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 				} else {
 					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 				}

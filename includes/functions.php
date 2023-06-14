@@ -170,3 +170,27 @@ function get_kind( $post ) {
 
 	return $kind;
 }
+
+/**
+ * Returns a post's first repost, like, or bookmark URL.
+ *
+ * @param  int|\WP_Post $post Post ID or post object.
+ * @return string             URL, or an empty string.
+ */
+function get_linked_url( $post ) {
+	$post       = get_post( $post );
+	$linked_url = get_post_meta( $post->ID, '_indieblocks_linked_url', true );
+
+	if ( '' === $linked_url ) {
+		// We should really only ever do this for supported kinds.
+		$parser     = post_content_parser( $post );
+		$linked_url = $parser->get_link_url();
+
+		if ( '' !== $linked_url ) {
+			// Store for future use.
+			update_post_meta( $post->ID, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
+		}
+	}
+
+	return $linked_url;
+}

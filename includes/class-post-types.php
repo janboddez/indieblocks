@@ -218,7 +218,6 @@ class Post_Types {
 		$content = apply_filters( 'the_content', $content );
 
 		$options = get_options();
-
 		if ( ! empty( $options['like_and_bookmark_titles'] ) ) {
 			// Ideally this would run only when a post is first inserted, but it
 			// looks like, since Gutenberg, this function is called multiple
@@ -306,7 +305,7 @@ class Post_Types {
 
 		$kind = $parser->get_type();
 
-		if ( ! empty( $linked_url ) ) {
+		if ( ! empty( $kind ) ) {
 			update_post_meta( $post->ID, '_indieblocks_kind', $kind );
 		} else {
 			delete_post_meta( $post->ID, '_indieblocks_kind' );

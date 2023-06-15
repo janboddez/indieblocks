@@ -92,11 +92,11 @@ class Parser {
 	 * @return string Current page's name or title.
 	 */
 	public function get_name() {
-		if ( ! empty( $this->mf2['items'][0] ) ) {
-			$post = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+			$properties = $this->mf2['items'][0]['properties'];
 
-			if ( ! empty( $post['properties']['name'][0] ) ) {
-				return $post['properties']['name'][0];
+			if ( ! empty( $properties['name'][0] ) ) {
+				return $properties['name'][0];
 			}
 
 			return ''; // If this thing supports microformats but does not have a name, assume a note.
@@ -104,8 +104,8 @@ class Parser {
 
 		$title = $this->dom->getElementsByTagName( 'title' );
 
-		if ( isset( $title->length ) && $title->length > 0 ) {
-			return trim( $title->item( 0 )->textContent );
+		foreach ( $title as $el ) {
+			return sanitize_text_field( $el->textContent );
 		}
 
 		return '';
@@ -117,15 +117,23 @@ class Parser {
 	 * @return string Page author.
 	 */
 	public function get_author() {
-		if ( ! empty( $this->mf2['items'][0] ) ) {
-			$post = $this->mf2['items'][0];
+		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+			$properties = $this->mf2['items'][0]['properties'];
 
-			if ( ! empty( $post['properties']['author'][0] ) && is_string( $post['properties']['author'][0] ) ) {
-				return $post['properties']['author'][0];
+			if ( ! empty( $properties['author'][0] ) && is_string( $properties['author'][0] ) ) {
+				return $properties['author'][0];
 			}
 
-			if ( ! empty( $post['properties']['author'][0]['properties']['name'][0] ) ) {
-				return $post['properties']['author'][0]['properties']['name'][0];
+			if ( ! empty( $properties['author'][0]['properties']['name'][0] ) ) {
+				return $properties['author'][0]['properties']['name'][0];
+			}
+		}
+
+		$meta = $this->dom->getElementsByTagName( 'meta' );
+
+		foreach ( $meta as $el ) {
+			if ( 'author' === $el->getAttribute( 'name' ) )	 {
+				return sanitize_text_field( $el->getAttribute( 'content' ) );
 			}
 		}
 

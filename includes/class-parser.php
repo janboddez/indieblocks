@@ -112,7 +112,7 @@ class Parser {
 				$content = $properties['summary'][0];
 			}
 
-			$content = preg_replace( '~\s+~', ' ', $content );
+			$content = preg_replace( '~\s+~', ' ', trim( $content ) );
 			$check   = preg_replace( '~\s+~', ' ', $name );
 			if ( '...' === substr( $check, -3 ) ) {
 				$check = substr( $check, 0, -3 );
@@ -335,7 +335,7 @@ class Parser {
 				$content = $properties['summary'][0];
 			}
 
-			$content = preg_replace( '~\s+~', ' ', $content );
+			$content = preg_replace( '~\s+~', ' ', trim( $content ) );
 			$check   = preg_replace( '~\s+~', ' ', $name );
 			if ( '...' === substr( $check, -3 ) ) {
 				$check = substr( $check, 0, -3 );

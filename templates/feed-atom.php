@@ -80,8 +80,15 @@ do_action( 'rss_tag_pre', 'atom' );
 			?>
 			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
 			<?php
-		elseif ( ! empty( $options['like_and_bookmark_titles'] ) && '' !== get_post_meta( get_the_ID(), '_indieblocks_linked_url', true ) ) :
-			// Do not hide like, bookmark, and repost titles.
+		elseif ( 'bookmark' === \IndieBlocks\get_kind( get_the_ID() ) && ( ! empty( $options['unhide_bookmark_titles'] ) || ! empty( $options['unhide_like_and_bookmark_titles'] ) ) ) :
+			// Do not hide bookmark titles.
+			// @todo: Link to bookmarked page.
+			?>
+			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
+			<?php
+		elseif ( 'like' === \IndieBlocks\get_kind( get_the_ID() ) && ( ! empty( $options['unhide_like_titles'] ) || ! empty( $options['unhide_like_and_bookmark_titles'] ) ) ) :
+			// Do not hide like titles.
+			// @todo: Link to liked page.
 			?>
 			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
 			<?php

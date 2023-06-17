@@ -423,11 +423,11 @@ class Options_Handler {
 						</tr>
 						<tr valign="top">
 								<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></th>
-								<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Modify feeds', 'indieblocks' ); ?></label>
+								<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Feed Titles', 'indieblocks' ); ?></label>
 								<p class="description"><?php esc_html_e( '(Experimental) Remove note (and like) titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates.', 'indieblocks' ); ?></p></td>
 							</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Hide Titles', 'indieblocks' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Hide (or Show) Titles', 'indieblocks' ); ?></th>
 							<td>
 								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
 								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Site Editor.', 'indieblocks' ); ?></p>

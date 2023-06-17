@@ -93,21 +93,48 @@ class Parser {
 	 */
 	public function get_name() {
 		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+			// Microformats.
 			$properties = $this->mf2['items'][0]['properties'];
 
-			if ( ! empty( $properties['name'][0] ) ) {
-				return $properties['name'][0];
+			$name = ! empty( $properties['name'][0] ) && is_string( $properties['name'][0] )
+				? trim( $properties['name'][0] )
+				: '';
+
+			if ( '' === $name ) {
+				// Note.
+				return '';
 			}
 
-			return ''; // If this thing supports microformats but does not have a name, assume a note.
+			$content = '';
+			if ( ! empty( $properties['content']['value'] ) ) {
+				$content = $properties['content']['value'];
+			} elseif ( ! empty( $post['summary'][0] ) ) {
+				$content = $properties['summary'][0];
+			}
+
+			$content = preg_replace( '~\s+~', ' ', $content );
+			$check   = preg_replace( '~\s+~', ' ', $name );
+			if ( '...' === substr( $check, -3 ) ) {
+				$check = substr( $check, 0, -3 );
+			} elseif ( '…' === substr( $check, -1) ) {
+				$check = substr( $check, 0, -1 );
+			}
+
+			if ( 0 === strpos( $content, $check ) ) {
+				// Note.
+				return '';
+			}
+
+			return $name;
 		}
 
+		// No microformats.
 		$title = $this->dom->getElementsByTagName( 'title' );
-
 		foreach ( $title as $el ) {
 			return sanitize_text_field( $el->textContent );
 		}
 
+		// No nothing.
 		return '';
 	}
 
@@ -118,6 +145,7 @@ class Parser {
 	 */
 	public function get_author() {
 		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+			// Microformats.
 			$properties = $this->mf2['items'][0]['properties'];
 
 			if ( ! empty( $properties['author'][0] ) && is_string( $properties['author'][0] ) ) {
@@ -129,14 +157,16 @@ class Parser {
 			}
 		}
 
+		// No microformats.
 		$meta = $this->dom->getElementsByTagName( 'meta' );
-
 		foreach ( $meta as $el ) {
 			if ( 'author' === $el->getAttribute( 'name' ) )	 {
+				// Some people still use these.
 				return sanitize_text_field( $el->getAttribute( 'content' ) ); // Returns an empty string if the `content` attribute does not exist.
 			}
 		}
 
+		// No nothing.
 		return '';
 	}
 
@@ -251,66 +281,74 @@ class Parser {
 				return $post['type'];
 			}
 
-			if ( ! empty( $post['properties']['repost-of'] ) ) {
+			$properties = $post['properties'];
+
+			if ( ! empty( $properties['repost-of'] ) ) {
 				return 'repost';
 			}
 
-			if ( ! empty( $post['properties']['in-reply-to'] ) ) {
+			if ( ! empty( $properties['in-reply-to'] ) ) {
 				return 'reply';
 			}
 
-			if ( ! empty( $post['properties']['like-of'] ) ) {
+			if ( ! empty( $properties['like-of'] ) ) {
 				return 'like';
 			}
 
-			if ( ! empty( $post['properties']['bookmark-of'] ) ) {
+			if ( ! empty( $properties['bookmark-of'] ) ) {
 				return 'bookmark';
 			}
 
-			if ( ! empty( $post['properties']['follow-of'] ) ) {
+			if ( ! empty( $properties['follow-of'] ) ) {
 				return 'follow';
 			}
 
-			if ( ! empty( $post['properties']['checkin'] ) ) {
+			if ( ! empty( $properties['checkin'] ) ) {
 				return 'checkin';
 			}
 
-			if ( ! empty( $post['properties']['video'] ) ) {
+			if ( ! empty( $properties['video'] ) ) {
 				return 'video';
 			}
 
-			if ( ! empty( $post['properties']['video'] ) ) {
+			if ( ! empty( $properties['video'] ) ) {
 				return 'audio';
 			}
 
-			if ( ! empty( $post['properties']['photo'] ) ) {
+			if ( ! empty( $properties['photo'] ) ) {
 				return 'photo';
 			}
 
-			$name =  ! empty( $post['properties']['name'][0] )
-				? trim( $post['properties']['name'][0] )
+			$name = ! empty( $properties['name'][0] ) && is_string( $properties['name'][0] )
+				? trim( $properties['name'][0] )
 				: '';
 
-			if ( empty( $name ) ) {
+			if ( '' === $name ) {
+				// Note.
 				return 'note';
 			}
 
 			$content = '';
-
-			if ( ! empty( $post['properties']['content']['text'] ) ) {
-				$content = $post['properties']['content']['text'];
-			} elseif ( ! empty( $post['properties']['summary'] ) ) {
-				$content = $post['properties']['summary'];
+			if ( ! empty( $properties['content']['value'] ) ) {
+				$content = $properties['content']['value'];
+			} elseif ( ! empty( $post['summary'][0] ) ) {
+				$content = $properties['summary'][0];
 			}
 
-			$name    = preg_replace( '~\s+~', ' ', $name );
 			$content = preg_replace( '~\s+~', ' ', $content );
-
-			if ( 0 !== strpos( $content, $name ) ) {
-				return 'article';
+			$check   = preg_replace( '~\s+~', ' ', $name );
+			if ( '...' === substr( $check, -3 ) ) {
+				$check = substr( $check, 0, -3 );
+			} elseif ( '…' === substr( $check, -1) ) {
+				$check = substr( $check, 0, -1 );
 			}
 
-			return 'note';
+			if ( 0 === strpos( $content, $check ) ) {
+				// Note.
+				return 'note';
+			}
+
+			return 'article';
 		}
 
 		return '';

@@ -33,36 +33,28 @@ class Post_Types {
 			add_filter( 'wp_unique_post_slug', array( __CLASS__, 'prevent_slug_clashes' ), 10, 6 );
 		}
 
-		if ( ! empty( $options['default_taxonomies'] ) ) {
-			// Include Notes in category and tag archives.
-			add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
-		}
-
-		// Optionally, display short-form entries on the homepage (or main blog page).
-		add_filter( 'pre_get_posts', array( __CLASS__, 'include_in_home' ), 99 );
+		// If applicable, include short-form post types on the blog page, in
+		// author archives, or in category and tag archives.
+		add_action( 'pre_get_posts', array( __CLASS__, 'include_in_archives' ), 99 );
 
 		if ( ! empty( $options['automatic_titles'] ) ) {
 			// Automatically generate a "post title" for short-form posts.
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_title' ), 10, 2 );
 		}
 
-		if ( ! empty( $options['like_and_bookmark_titles'] ) ) {
-			// Add "linked page" meta to likes, bookmarks and reposts. Do this
-			// here rather than in the block editor, because of reasons.
-			if ( ! empty( $options['enable_notes'] ) ) {
-				add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
-				add_filter( 'rest_after_insert_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
-			}
-
-			if ( ! empty( $options['enable_likes'] ) ) {
-				add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
-				add_filter( 'rest_after_insert_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
-			}
-		}
-
 		if ( ! empty( $options['random_slugs'] ) ) {
 			// Generate a random slug for short-form posts.
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'set_slug' ), 11, 2 );
+		}
+
+		if ( ! empty( $options['enable_notes'] ) ) {
+			add_filter( 'save_post_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
+			add_filter( 'rest_after_insert_indieblocks_note', array( __CLASS__, 'set_post_meta' ) );
+		}
+
+		if ( ! empty( $options['enable_likes'] ) ) {
+			add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
+			add_filter( 'rest_after_insert_indieblocks_like', array( __CLASS__, 'set_post_meta' ) );
 		}
 	}
 
@@ -106,7 +98,7 @@ class Post_Types {
 				$args['show_in_rest'] = true;
 			}
 
-			if ( ! empty( $options['default_taxonomies'] ) ) {
+			if ( ! empty( $options['note_taxonomies'] ) || ! empty( $options['default_taxonomies'] ) ) {
 				// Enable WordPress' default categories and tags.
 				$args['taxonomies'] = array( 'category', 'post_tag' );
 			}
@@ -145,6 +137,11 @@ class Post_Types {
 
 			if ( ! empty( $options['enable_blocks'] ) ) {
 				$args['show_in_rest'] = true;
+			}
+
+			if ( ! empty( $options['like_taxonomies'] ) ) {
+				// Enable WordPress' default categories and tags.
+				$args['taxonomies'] = array( 'category', 'post_tag' );
 			}
 
 			register_post_type( 'indieblocks_like', $args );
@@ -280,7 +277,7 @@ class Post_Types {
 	}
 
 	/**
-	 * Set linked meta for certain IndieWeb post types.
+	 * Set meta for certain IndieWeb post types.
 	 *
 	 * @param int|\WP_Post $post Post ID or object, depending on where the request originated.
 	 */
@@ -293,27 +290,23 @@ class Post_Types {
 
 		$parser = post_content_parser( $post );
 
-		// Grab the first like URL, or first bookmark URL, or first repost URL,
-		// if any.
-		$linked_url = $parser->get_link_url();
-
-		if ( ! empty( $linked_url ) ) {
-			update_post_meta( $post->ID, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
-		} else {
-			delete_post_meta( $post->ID, '_indieblocks_linked_url' );
-		}
-
 		$kind = $parser->get_type();
-
 		if ( ! empty( $kind ) ) {
 			update_post_meta( $post->ID, '_indieblocks_kind', $kind );
 		} else {
 			delete_post_meta( $post->ID, '_indieblocks_kind' );
 		}
+
+		$linked_url = $parser->get_link_url();
+		if ( ! empty( $linked_url ) ) {
+			update_post_meta( $post->ID, '_indieblocks_linked_url', esc_url_raw( $linked_url ) );
+		} else {
+			delete_post_meta( $post->ID, '_indieblocks_linked_url' );
+		}
 	}
 
 	/**
-	 * Includes notes in category and tag archives.
+	 * Includes notes in author or taxonomy archives, or on the blog page.
 	 *
 	 * @param  WP_Query $query The WP_Query object.
 	 * @return WP_Query        Modified query object.
@@ -331,75 +324,56 @@ class Post_Types {
 			return $query;
 		}
 
-		if ( ! $query->is_category() && ! $query->is_tag() ) {
+		if ( ! $query->is_home() && ! $query->is_author() && ! $query->is_category() && ! $query->is_tag() ) {
+			// Unsupported archive type.
 			return $query;
 		}
 
 		$post_types = $query->get( 'post_type' );
 		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
-
 		if ( is_string( $post_types ) ) {
 			$post_types = explode( ',', $post_types );
 		}
-
-		$post_types   = array_filter( (array) $post_types );
-		$post_types[] = 'indieblocks_note';
-
-		$query->set( 'post_type', array_unique( $post_types ) );
-
-		return $query;
-	}
-
-	/**
-	 * Show notes on the main blog page.
-	 *
-	 * @param  WP_Query $query The WP_Query object.
-	 * @return WP_Query        Modified query object.
-	 */
-	public static function include_in_home( $query ) {
-		$options = get_options();
-
-		if ( empty( $options['notes_in_home'] ) && empty( $options['likes_in_home'] ) ) {
-			// Do nothing.
-			return $query;
-		}
-
-		if ( is_admin() ) {
-			return $query;
-		}
-
-		if ( ! $query->is_main_query() ) {
-			return $query;
-		}
-
-		if ( ! empty( $query->query_vars['suppress_filters'] ) ) {
-			return $query;
-		}
-
-		if ( ! $query->is_home() ) {
-			return $query;
-		}
-
-		$post_types = $query->get( 'post_type' );
-		$post_types = ! empty( $post_types ) ? $post_types : array( 'post' );
-
-		if ( is_string( $post_types ) ) {
-			$post_types = explode( ',', $post_types );
-		}
-
 		$post_types = array_filter( (array) $post_types );
 
-		if ( ! empty( $options['notes_in_home'] ) ) {
+		$options = get_options();
+
+		// Show on blog page.
+		if ( ! empty( $options['notes_in_home'] ) && $query->is_home() ) {
 			$post_types[] = 'indieblocks_note';
 		}
 
-		if ( ! empty( $options['likes_in_home'] ) ) {
+		if ( ! empty( $options['likes_in_home'] ) && $query->is_home() ) {
+			$post_types[] = 'indieblocks_like';
+		}
+
+		// Include in author archives.
+		if ( ! empty( $options['notes_in_author'] ) && $query->is_author() ) {
+			$post_types[] = 'indieblocks_note';
+		}
+
+		if ( ! empty( $options['likes_in_author'] ) && $query->is_author() ) {
+			$post_types[] = 'indieblocks_like';
+		}
+
+		// Include in category and tag archives.
+		if (
+			! empty( $options['enable_notes'] ) &&
+			( ! empty( $options['note_taxonomies'] ) || ! empty( $options['default_taxonomies'] ) ) && // Old name.
+			( $query->is_category() || $query->is_tag() )
+		) {
+			$post_types[] = 'indieblocks_note';
+		}
+
+		if (
+			! empty( $options['enable_likes'] ) &&
+			( ! empty( $options['like_taxonomies'] ) ) &&
+			( $query->is_category() || $query->is_tag() )
+		) {
 			$post_types[] = 'indieblocks_like';
 		}
 
 		$query->set( 'post_type', array_unique( $post_types ) );
-
-		return $query;
 	}
 
 	/**

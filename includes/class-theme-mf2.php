@@ -479,19 +479,18 @@ class Theme_Mf2 {
 		$options = get_options();
 
 		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
-			// Not a like or note.
+			// Neither a like nor a note.
 			$classes[] = 'p-name';
-		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) ) {
-			$kind = get_kind( $post_ID );
+		} else {
+			$kind = get_kind( $post_ID ); // Attempt to detect "kind" only for "our" post types, at it would wrongly return "note" for articles.
 
-			if ( in_array( $kind, array( 'bookmark', 'like', 'repost' ), true ) ) {
-				// Do not hide like, bookmark, and repost titles.
+			if ( 'bookmark' === $kind && ( ! empty( $options['unhide_bookmark_titles'] ) || ! empty( $options['unhide_like_and_bookmark_titles'] ) ) ) {
+				$classes[] = 'p-name';
+			} elseif ( 'like' === $kind && ( ! empty( $options['unhide_like_titles'] ) || ! empty( $options['unhide_like_and_bookmark_titles'] ) ) ) {
 				$classes[] = 'p-name';
 			} elseif ( ! empty( $options['hide_titles'] ) ) {
 				$classes[] = 'screen-reader-text';
 			}
-		} elseif ( ! empty( $options['hide_titles'] ) ) {
-				$classes[] = 'screen-reader-text';
 		}
 
 		if ( isset( $attributes['level'] ) ) {
@@ -500,16 +499,18 @@ class Theme_Mf2 {
 
 		$permalink = get_the_permalink( $post_ID );
 
-		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
-			$linked_url = get_linked_url( $post_ID );
-		}
-
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 			if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 				// Not a like or note.
 				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 			} else {
-				$kind = ! isset( $kind ) ? get_kind( $post_ID ) : $kind;
+				$kind = ! isset( $kind ) ? get_kind( $post_ID ) : $kind; // Attempt to detect "kind" only for "our" post types, at it would wrongly return "note" for articles.
+				if (
+					( 'bookmark' === $kind && ( ! empty( $options['bookmark_titles'] ) || ! empty( $options['like_and_bookmark_titles'] ) ) ) ||
+					( 'like' === $kind && ( ! empty( $options['like_titles'] ) || ! empty( $options['like_and_bookmark_titles'] ) ) )
+				) {
+					$linked_url = get_linked_url( $post_ID );
+				}
 
 				if ( 'bookmark' === $kind && ! empty( $linked_url ) ) {
 					$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-bookmark-of">%4$s</a>', esc_url( $linked_url ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );

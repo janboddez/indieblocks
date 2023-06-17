@@ -133,7 +133,7 @@ class Parser {
 
 		foreach ( $meta as $el ) {
 			if ( 'author' === $el->getAttribute( 'name' ) )	 {
-				return sanitize_text_field( $el->getAttribute( 'content' ) );
+				return sanitize_text_field( $el->getAttribute( 'content' ) ); // Returns an empty string if the `content` attribute does not exist.
 			}
 		}
 
@@ -287,8 +287,8 @@ class Parser {
 				return 'photo';
 			}
 
-			$name = ! empty( $post['properties']['name'] )
-				? trim( $post['properties']['name'] )
+			$name =  ! empty( $post['properties']['name'][0] )
+				? trim( $post['properties']['name'][0] )
 				: '';
 
 			if ( empty( $name ) ) {

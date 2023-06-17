@@ -21,7 +21,7 @@
 			if ( temp ) {
 				temp = temp > 100 ? temp - 273.15 : temp; // Either degrees Celsius or Kelvin.
 
-				if ( ! options || ! options.weather_units || 'metric' === options.weather_units ) {
+				if ( 'undefined' === typeof options || ! options.hasOwnProperty( 'weather_units' ) || 'metric' === options.weather_units ) {
 					tempUnit = ' °C';
 				} else {
 					temp     = 32 + temp * 9 / 5;

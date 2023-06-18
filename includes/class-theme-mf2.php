@@ -278,7 +278,7 @@ class Theme_Mf2 {
 
 		$author_url = get_the_author_meta( 'url' );
 		if ( empty( $author_url ) ) {
-			$author_url = home_url( '/' );
+			$author_url = get_author_posts_url();
 		}
 
 		$classes[] = 'h-card p-author';

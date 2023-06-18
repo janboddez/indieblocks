@@ -332,7 +332,7 @@ class Webmention_Receiver {
 			return;
 		}
 
-		if ( webmentions_open() ) {
+		if ( is_singular() && webmentions_open() ) {
 			echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
 		}
 	}

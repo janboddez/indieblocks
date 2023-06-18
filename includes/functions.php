@@ -120,6 +120,10 @@ function get_user_agent( $url = '' ) {
 function webmentions_open( $post = null ) {
 	$post = get_post( $post );
 
+	if ( ! $post ) {
+		return false;
+	}
+
 	if ( ! in_array( $post->post_type, Webmention::get_supported_post_types(), true ) ) {
 		// Unsupported post type.
 		return false;

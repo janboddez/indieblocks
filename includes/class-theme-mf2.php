@@ -276,9 +276,9 @@ class Theme_Mf2 {
 			isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
 		);
 
-		$author_url = get_the_author_meta( 'url' );
+		$author_url = get_the_author_meta( 'url', $author_id );
 		if ( empty( $author_url ) ) {
-			$author_url = get_author_posts_url();
+			$author_url = get_author_posts_url( $author_id );
 		}
 
 		$classes[] = 'h-card p-author';

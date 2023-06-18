@@ -5,6 +5,9 @@
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
+	var Radio      = components.__experimentalRadio;
+	var RadioGroup = components.__experimentalRadioGroup;
+
 	var __ = i18n.__;
 
 	blocks.registerBlockType( 'indieblocks/location', {
@@ -31,6 +34,8 @@
 				temp = Math.round( temp )
 			}
 
+			var sep = props.attributes.separator;
+
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
 				el( blockEditor.InspectorControls, { key: 'inspector' },
@@ -42,13 +47,26 @@
 							label: __( 'Display weather information', 'indieblocks' ),
 							checked: includeWeather,
 							onChange: ( value ) => { props.setAttributes( { includeWeather: value } ) },
-						} )
+						} ),
+						el( components.BaseControl, {},
+							el( components.BaseControl.VisualLabel, { style: { display: 'block' } }, __( 'Separator' ) ),
+							el( RadioGroup, {
+									label: __( 'Separator', 'indieblocks' ),
+									checked: sep,
+									onChange: ( value ) => { props.setAttributes( { separator: value } ) },
+								},
+								el( Radio, { value: ' • ', style: { paddingInline: '1.25em' }  }, '•' ),
+								el( Radio, { value: ' | ', style: { paddingInline: '1.25em' } }, '|' ),
+								el( Radio, { value: ', ', style: { paddingInline: '1.25em' } }, ',' ),
+								el( Radio, { value: '; ', style: { paddingInline: '1.25em' } }, ';' )
+							)
+						)
 					)
 				),
 				'undefined' !== typeof meta && meta.hasOwnProperty( 'geo_address' ) && meta.geo_address.length
 					? el( 'span', { className: 'h-geo' },
 						temp
-							? interpolate( '<a>' + meta.geo_address + '</a> <b>•</b> <c>' + temp + tempUnit + ', ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {
+							? interpolate( '<a>' + meta.geo_address + '</a><b>' + sep + '</b><c>' + temp + tempUnit + ', ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {
 								a: el( 'span', { className: 'p-name' } ),
 								b: el( 'span', { className: 'sep',  'aria-hidden': 'true' } ),
 								c: el( 'span', {} )

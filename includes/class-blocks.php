@@ -393,6 +393,11 @@ class Blocks {
 
 		$output = '<span class="p-name">' . esc_html( $location ) . '</span>';
 
+		$sep = ' • ';
+		if ( ! empty( $attributes['separator'] ) ) {
+			$sep = $attributes['separator'];
+		}
+
 		if ( ! empty( $attributes['includeWeather'] ) ) {
 			$weather = get_post_meta( $block->context['postId'], '_indieblocks_weather', true );
 		}
@@ -413,7 +418,7 @@ class Blocks {
 			}
 			$temp = number_format( round( $temp ) ); // Round.
 
-			$output .= ' <span class="sep" aria-hidden="true">•</span> <span class="indieblocks-weather">' . esc_html( $temp . $temp_unit ) . ', ' . esc_html( strtolower( $weather['description'] ) ) . '</span>';
+			$output .= '<span class="sep" aria-hidden="true">' . esc_html( $sep ) . '</span><span class="indieblocks-weather">' . esc_html( $temp . $temp_unit ) . ', ' . esc_html( strtolower( $weather['description'] ) ) . '</span>';
 		}
 
 		$output = apply_filters( 'indieblocks_location_html', '<span class="h-geo">' . $output . '</span>', $block->context['postId'] );

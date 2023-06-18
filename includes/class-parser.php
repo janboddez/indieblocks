@@ -112,8 +112,8 @@ class Parser {
 				$content = $props['summary'][0];
 			}
 
-			$content = preg_replace( '~\s+~', ' ', mb_strtolower( sanitize_textarea_field( $content ) ) ); // Also strips tags.
-			$check   = preg_replace( '~\s+~', ' ', mb_strtolower( $name ) );
+			$content = preg_replace( '~\s+~', ' ', strtolower( sanitize_textarea_field( $content ) ) ); // Also strips tags.
+			$check   = preg_replace( '~\s+~', ' ', strtolower( $name ) );
 
 			if ( '...' === substr( $check, -3 ) ) {
 				$check = substr( $check, 0, -3 );
@@ -123,7 +123,7 @@ class Parser {
 
 			if ( 0 === strpos( $content, $check ) ) {
 				// `$name` looks like a (possibly truncated) copy of `$content`.
-				if ( preg_replace( '~\s+~', ' ', mb_strtolower( $name ) ) !== $content && str_word_count( $content ) > 4 ) { // Good enough.
+				if ( preg_replace( '~\s+~', ' ', strtolower( $name ) ) !== $content && str_word_count( $content ) > 4 ) { // Good enough.
 					// If content is long-ish and name not an _identical_ copy,
 					// it could just be that this really is an article that
 					// starts off with its title.

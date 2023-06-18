@@ -118,9 +118,13 @@ function get_user_agent( $url = '' ) {
  * @return bool               Whether webmentions are open.
  */
 function webmentions_open( $post = null ) {
+	if ( ! is_singular() ) {
+		return false;
+	}
+
 	$post = get_post( $post );
 
-	if ( ! $post ) {
+	if ( null === $post ) {
 		return false;
 	}
 

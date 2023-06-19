@@ -423,7 +423,7 @@ class Options_Handler {
 						</tr>
 						<tr valign="top">
 								<th scope="row"><?php esc_html_e( 'Feed Modifications', 'indieblocks' ); ?></th>
-								<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Feed Titles', 'indieblocks' ); ?></label>
+								<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Feed titles', 'indieblocks' ); ?></label>
 								<p class="description"><?php esc_html_e( '(Experimental) Remove note (and like) titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates.', 'indieblocks' ); ?></p></td>
 							</tr>
 						<tr valign="top">

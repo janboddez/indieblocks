@@ -16,21 +16,21 @@ class Parser {
 	 *
 	 * @var string $url URL of the page we're parsing.
 	 */
-	private $url;
+	protected $url;
 
 	/**
 	 * Page DOM.
 	 *
 	 * @var \DOMDocument $dom DOM of the page we're parsing.
 	 */
-	private $dom;
+	protected $dom;
 
 	/**
 	 * Microformats2.
 	 *
 	 * @var array $mf2 Microformats2 representation of the page we're parsing.
 	 */
-	private $mf2;
+	protected $mf2;
 
 	/**
 	 * Constructor.
@@ -89,7 +89,28 @@ class Parser {
 	}
 
 	/**
-	 * Returns a page name.
+	 * Returns page's (source) URL.
+	 *
+	 * @return string Page URL.
+	 */
+	public function get_url() {
+		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+			$props = $this->mf2['items'][0]['properties'];
+
+			if ( ! empty( $props['url'][0] ) && wp_http_validate_url( $props['url'][0] ) ) {
+				return esc_url_raw( $props['url'][0] );
+			}
+		}
+
+		if ( ! empty( $this->url ) ) {
+			return $this->url;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the page's name.
 	 *
 	 * @return string Current page's name or title.
 	 */
@@ -151,12 +172,11 @@ class Parser {
 			return sanitize_text_field( $el->textContent ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		}
 
-		// No nothing.
 		return '';
 	}
 
 	/**
-	 * Returns the author, if it can find one.
+	 * Returns the page's author.
 	 *
 	 * @return string Page author.
 	 */
@@ -184,7 +204,6 @@ class Parser {
 			}
 		}
 
-		// No nothing.
 		return '';
 	}
 
@@ -213,12 +232,18 @@ class Parser {
 	 * @return string Avatar URL.
 	 */
 	public function get_avatar() {
-		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
-			$props = $this->mf2['items'][0]['properties'];
+		if ( empty( $this->mf2['items'][0]['properties'] ) ) {
+			return '';
+		}
 
-			if ( ! empty( $props['author'][0]['properties']['photo'][0] ) && filter_var( $props['author'][0]['properties']['photo'][0], FILTER_VALIDATE_URL ) ) {
-				return $props['author'][0]['properties']['photo'][0];
-			}
+		$props = $this->mf2['items'][0]['properties'];
+
+		if ( ! empty( $props['author'][0]['properties']['photo'][0] ) && filter_var( $props['author'][0]['properties']['photo'][0], FILTER_VALIDATE_URL ) ) {
+			return $props['author'][0]['properties']['photo'][0];
+		}
+
+		if ( ! empty( $props['author'][0]['properties']['photo'][0]['value'] ) && filter_var( $props['author'][0]['properties']['photo'][0]['value'], FILTER_VALIDATE_URL ) ) {
+			return $props['author'][0]['properties']['photo'][0]['value'];
 		}
 
 		return '';
@@ -236,6 +261,32 @@ class Parser {
 				$url = $el->getAttribute( 'content' );
 				return wp_http_validate_url( $url ) ? esc_url_raw( $url ) : '';
 			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns the published date.
+	 *
+	 * @return string (UTC) datetime string in `Y-m-d H:i:s` format.
+	 */
+	public function get_published() {
+		if ( ! empty( $this->mf2['items'][0]['properties']['published'][0] ) ) {
+			return gmdate( 'Y-m-d H:i:s', strtotime( $this->mf2['items'][0]['properties']['published'][0] ) );
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns page's ("inner") content.
+	 *
+	 * @return string Content.
+	 */
+	public function get_content() {
+		if ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['html'] ) ) {
+			return $this->mf2['items'][0]['properties']['content'][0]['html'];
 		}
 
 		return '';
@@ -328,8 +379,12 @@ class Parser {
 
 		$post = $this->mf2['items'][0];
 
-		if ( ! empty( $post['type'][0] ) && in_array( $post['type'][0], array( 'event', 'recipe', 'review' ), true ) ) {
-			return $post['type'];
+		if ( ! empty( $post['type'][0] ) && 'h-feed' === $post['type'][0] ) {
+			return 'feed';
+		}
+
+		if ( ! empty( $post['type'][0] ) && in_array( $post['type'][0], array( 'h-event', 'h-recipe', 'h-review' ), true ) ) {
+			return preg_replace( '~^h-~', '', $post['type'] );
 		}
 
 		$props = $post['properties'];
@@ -375,5 +430,14 @@ class Parser {
 		}
 
 		return 'article';
+	}
+
+	/**
+	 * Returns the current page's parsed microformats array.
+	 *
+	 * @return array Mf2 array.
+	 */
+	public function get_mf2() {
+		return $this->mf2;
 	}
 }

@@ -118,10 +118,6 @@ function get_user_agent( $url = '' ) {
  * @return bool               Whether webmentions are open.
  */
 function webmentions_open( $post = null ) {
-	if ( ! is_singular() ) {
-		return false;
-	}
-
 	$post = get_post( $post );
 
 	if ( null === $post ) {
@@ -206,4 +202,90 @@ function get_linked_url( $post ) {
 	}
 
 	return $linked_url;
+}
+
+/**
+ * Stores a remote image locally.
+ *
+ * @param  string $url      Image URL.
+ * @param  string $filename File name.
+ * @param  string $dir      Target directory, relative to the uploads directory.
+ * @param  string $width    Target width.
+ * @param  string $height   Target height.
+ * @return string|null      Local image URL, or nothing on failure.
+ */
+function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
+	$upload_dir = wp_upload_dir();
+	$dir        = trailingslashit( $upload_dir['basedir'] ) . trim( $dir, '/' );
+
+	if ( ! is_dir( $dir ) ) {
+		wp_mkdir_p( $dir ); // Recursive directory creation. Permissions are taken from the nearest parent folder.
+	}
+
+	$file_path = trailingslashit( $dir ) . sanitize_file_name( $filename );
+
+	if ( file_exists( $file_path ) && ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
+		// File exists and is under a month old.
+		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+	} else {
+		// Attempt to download the image.
+		$response = remote_get(
+			esc_url_raw( $url ),
+			false,
+			array( 'headers' => array( 'Accept' => 'image/*' ) )
+		);
+
+		$body = wp_remote_retrieve_body( $response );
+
+		if ( empty( $body ) ) {
+			debug_log( '[IndieBlocks] Could not download the image at ' . esc_url_raw( $url ) . '.' );
+			return null;
+		}
+
+		// Now store it locally.
+		global $wp_filesystem;
+
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		// Write image data.
+		if ( ! $wp_filesystem->put_contents( $file_path, $body, 0644 ) ) {
+			debug_log( '[IndieBlocks] Could not save image file: ' . $file_path . '.' );
+			return null;
+		}
+
+		if ( ! function_exists( 'wp_crop_image' ) ) {
+			// Load WordPress' image functions.
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
+			// Somehow not a valid image. Delete it.
+			unlink( $file_path );
+
+			debug_log( '[IndieBlocks] Invalid image file: ' . esc_url_raw( $url ) . '.' );
+			return null;
+		}
+
+		// Try to scale down and crop it.
+		$image = wp_get_image_editor( $file_path );
+
+		if ( ! is_wp_error( $image ) ) {
+			$image->resize( $width, $height, true );
+			$result = $image->save( $file_path );
+
+			if ( $file_path !== $result['path'] ) {
+				// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
+				unlink( $file_path ); // Delete "old" image.
+				$file_path = $result['path'];
+			}
+		} else {
+			debug_log( '[IndieBlocks] Could not reisize ' . $file_path . ': ' . $image->get_error_message() . '.' );
+		}
+
+		// And return the local URL.
+		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+	}
 }

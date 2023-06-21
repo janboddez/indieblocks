@@ -38,6 +38,7 @@ return array(
     'IndieBlocks\\Options_Handler' => $baseDir . '/../includes/class-options-handler.php',
     'IndieBlocks\\Parser' => $baseDir . '/../includes/class-parser.php',
     'IndieBlocks\\Post_Types' => $baseDir . '/../includes/class-post-types.php',
+    'IndieBlocks\\Preview_Cards' => $baseDir . '/../includes/class-preview-cards.php',
     'IndieBlocks\\Theme_Mf2' => $baseDir . '/../includes/class-theme-mf2.php',
     'IndieBlocks\\Webmention' => $baseDir . '/../includes/class-webmention.php',
     'IndieBlocks\\Webmention_Parser' => $baseDir . '/../includes/class-webmention-parser.php',

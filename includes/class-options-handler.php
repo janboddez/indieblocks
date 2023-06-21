@@ -144,6 +144,10 @@ class Options_Handler {
 			'type'    => 'boolean',
 			'default' => false,
 		),
+		'preview_cards'          => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
 	);
 
 	/**
@@ -339,6 +343,7 @@ class Options_Handler {
 						: 'metric',
 					'micropub'            => isset( $settings['micropub'] ) ? true : false,
 					'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
+					'preview_cards'       => isset( $settings['preview_cards'] ) ? true : false,
 				);
 
 				$this->options = array_merge( $this->options, $options );
@@ -515,9 +520,9 @@ class Options_Handler {
 							<p class="description"><?php esc_html_e( '(Experimental) Add post type and category data to responses to Micropub &ldquo;config&rdquo; queries.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Parse Markdown', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[parse_markdown]" value="1" <?php checked( ! empty( $this->options['parse_markdown'] ) ); ?>/> <?php esc_html_e( 'Parse Markdown', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Parse Markdown inside &ldquo;Micropub&rdquo; notes or likes.', 'indieblocks' ); ?></p></td>
+							<th scope="row"><?php esc_html_e( 'Link Preview Cards', 'indieblocks' ); ?></th>
+							<td><label><input type="checkbox" name="indieblocks_settings[preview_cards]" value="1" <?php checked( ! empty( $this->options['preview_cards'] ) ); ?>/> <?php esc_html_e( 'Generate preview cards', 'indieblocks' ); ?></label>
+							<p class="description"><?php esc_html_e( '(Experimental) Fetch link metadata in order to generate &ldquo;link preview cards.&rdquo;', 'indieblocks' ); ?></p></td>
 						</tr>
 					</table>
 				<?php endif; ?>

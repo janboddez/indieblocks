@@ -99,6 +99,11 @@ class IndieBlocks {
 
 		// Micropub hook callbacks.
 		add_action( 'plugins_loaded', array( Micropub_Compat::class, 'register' ) );
+
+		// Link preview cards.
+		if ( ! empty( $options['preview_cards'] ) ) {
+			add_action( 'plugins_loaded', array( Preview_Cards::class, 'register' ) );
+		}
 	}
 
 	/**

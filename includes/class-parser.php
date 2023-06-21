@@ -137,6 +137,15 @@ class Parser {
 		}
 
 		// No microformats.
+		$meta = $this->dom->getElementsByTagName( 'meta' );
+		foreach ( $meta as $el ) {
+			// @codingStandardsIgnoreLine
+			if ( 'og:title' === $el->getAttribute( 'name' ) || 'twitter:title' === $el->getAttribute( 'name' ) ) {
+				return sanitize_text_field( $el->getAttribute( 'content' ) ); // @codingStandardsIgnoreLine
+			}
+		}
+
+		// Fallback to `title`.
 		$title = $this->dom->getElementsByTagName( 'title' );
 		foreach ( $title as $el ) {
 			return sanitize_text_field( $el->textContent ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
@@ -199,7 +208,7 @@ class Parser {
 	}
 
 	/**
-	 * Returns the author's avatar, we can find one.
+	 * Returns the author's avatar, if we can find one.
 	 *
 	 * @return string Avatar URL.
 	 */
@@ -216,13 +225,31 @@ class Parser {
 	}
 
 	/**
+	 * Returns a "page thumbnail," if we can find one.
+	 *
+	 * @return string Image URL.
+	 */
+	public function get_image() {
+		$meta = $this->dom->getElementsByTagName( 'meta' );
+		foreach ( $meta as $el ) {
+			if ( 'og:image' === $el->getAttribute( 'property' ) || 'twitter:image' === $el->getAttribute( 'property' ) ) {
+				$url = $el->getAttribute( 'content' );
+				return wp_http_validate_url( $url ) ? esc_url_raw( $url ) : '';
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Returns the URL, i.e., `href` value, of the current page's first "like,"
 	 * "bookmark," or "repost" link.
 	 *
-	 * @return string Link URL.
+	 * @param  bool $mf2 Whether to consider only microformatted links (or only _other_ links).
+	 * @return string    Link URL.
 	 */
-	public function get_link_url() {
-		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+	public function get_link_url( $mf2 = true ) {
+		if ( $mf2 && ! empty( $this->mf2['items'][0]['properties'] ) ) {
 			$props = $this->mf2['items'][0]['properties'];
 
 			if ( ! empty( $props['repost-of'][0] ) && filter_var( $props['repost-of'][0], FILTER_VALIDATE_URL ) ) {
@@ -247,6 +274,16 @@ class Parser {
 
 			if ( ! empty( $props['bookmark-of'][0]['value'] ) && filter_var( $props['bookmark-of'][0]['value'], FILTER_VALIDATE_URL ) ) {
 				return $props['bookmark-of'][0]['value'];
+			}
+		} else {
+			$links = $this->dom->getElementsByTagName( 'a' );
+			foreach ( $links as $link ) {
+				// @codingStandardsIgnoreLine
+				if ( ! $link->hasAttribute( 'href' ) ) {
+					continue;
+				}
+
+				return esc_url_raw( $link->getAttribute( 'href' ) );
 			}
 		}
 

@@ -63,6 +63,7 @@ class ComposerStaticInit19353fabf872393046d3c8146bd8f63a
         'IndieBlocks\\Options_Handler' => __DIR__ . '/../..' . '/../includes/class-options-handler.php',
         'IndieBlocks\\Parser' => __DIR__ . '/../..' . '/../includes/class-parser.php',
         'IndieBlocks\\Post_Types' => __DIR__ . '/../..' . '/../includes/class-post-types.php',
+        'IndieBlocks\\Preview_Cards' => __DIR__ . '/../..' . '/../includes/class-preview-cards.php',
         'IndieBlocks\\Theme_Mf2' => __DIR__ . '/../..' . '/../includes/class-theme-mf2.php',
         'IndieBlocks\\Webmention' => __DIR__ . '/../..' . '/../includes/class-webmention.php',
         'IndieBlocks\\Webmention_Parser' => __DIR__ . '/../..' . '/../includes/class-webmention-parser.php',

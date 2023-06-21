@@ -64,7 +64,7 @@ class Preview_Cards {
 		if ( '' !== $name ) {
 			update_post_meta( $post_id, '_indieblocks_og_title', $name );
 		} else {
-				delete_post_meta( $post_id, '_indieblocks_og_title' );
+			delete_post_meta( $post_id, '_indieblocks_og_title' );
 		}
 
 		$image = $parser->get_image();

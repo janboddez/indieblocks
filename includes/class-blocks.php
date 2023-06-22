@@ -71,8 +71,10 @@ class Blocks {
 		// (Semi-)dynamic blocks; these have a render callback.
 		$dyn_blocks = array( 'facepile', 'facepile-content', 'location', 'syndication' );
 
+		global $wp_version;
+
 		$options = get_options();
-		if ( ! empty( $options['preview_cards'] ) ) {
+		if ( ! empty( $options['preview_cards'] ) && version_compare( $wp_version, '6.2.0' ) >= 0 ) {
 			$dyn_blocks[] = 'link-preview';
 		}
 
@@ -594,55 +596,66 @@ class Blocks {
 		// Enqueue front-end block styles.
 		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
-		$style = '';
+		$border_style = '';
 		if ( ! empty( $attributes['borderColor'] ) ) {
-			$style .= "border-color: var(--wp--preset--color--{$attributes['borderColor']})";
+			$border_style .= "border-color: var(--wp--preset--color--{$attributes['borderColor']}); ";
 		}
 		if ( ! empty( $attributes['style']['border']['color'] ) ) {
-			$style .= "border-color: {$attributes['style']['border']['color']};";
+			$border_style .= "border-color: {$attributes['style']['border']['color']}; ";
 		}
 		if ( ! empty( $attributes['style']['border']['width'] ) ) {
-			$style .= "border-width: {$attributes['style']['border']['width']};";
+			$border_style .= "border-width: {$attributes['style']['border']['width']}; ";
 		}
 		if ( ! empty( $attributes['style']['border']['radius'] ) ) {
-			$style .= "border-radius: {$attributes['style']['border']['radius']};";
+			$border_style .= "border-radius: {$attributes['style']['border']['radius']}; ";
 		}
+		$border_style = trim( $border_style );
 
 		ob_start();
-		// @todo: There's a lot of hardcoded CSS here that needs to move to a CSS file or be set in the editor instead.
-		printf(
-			'<a class="indieblocks-card" href="%s" rel="nofollow" style="%s">',
-			esc_url( $card['url'] ),
-			! empty( $style ) ? esc_attr( $style ) : ''
-		);
-
-		printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( $style . '; border-block: none; border-inline-start: none; border-radius: 0 !important;' ) );
-
-		if ( ! empty( $card['thumbnail'] ) ) :
-			// Check if file still exists.
-			$upload_dir = wp_upload_dir();
-			$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
-
-			if ( is_file( $file_path ) ) :
-				?>
-				<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
-				<?php
-			endif;
-		endif;
 		?>
-		</div>
-		<div class="indieblocks-card-body">
-			<strong><?php echo esc_html( $card['title'] ); ?></strong>
-			<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
-		</div>
+		<a class="indieblocks-card" href="<?php echo esc_url( $card['url'] ); ?>" rel="nofollow">
+			<?php
+			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( $border_style . ' border-block: none; border-inline-start: none; border-radius: 0 !important;' ) );
+
+			if ( ! empty( $card['thumbnail'] ) ) :
+				// Check if file still exists.
+				$upload_dir = wp_upload_dir();
+				$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
+
+				if ( is_file( $file_path ) ) :
+					?>
+					<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
+					<?php
+				endif;
+			endif;
+
+			echo '</div>';
+			?>
+			<div class="indieblocks-card-body" style="width: calc(100% - 90px - <?php echo esc_attr( $attributes['style']['border']['width'] ); ?>);">
+				<strong><?php echo esc_html( $card['title'] ); ?></strong>
+				<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
+			</div>
 		</a>
 		<?php
 		$output = ob_get_clean();
 
 		$wrapper_attributes = get_block_wrapper_attributes();
 
-		return '<div ' . $wrapper_attributes . '>' .
+		$output = '<div ' . $wrapper_attributes . ' >' .
 			$output .
 		'</div>';
+
+		$processor = new \WP_HTML_Tag_Processor( $output );
+		$processor->next_tag( 'div' );
+
+		$style = $processor->get_attribute( 'style' );
+		if ( null === $style ) {
+			$processor->set_attribute( 'style', esc_attr( $border_style ) );
+		} else {
+			// Append our styles.
+			$processor->set_attribute( 'style', esc_attr( $style . ' ' . $border_style ) );
+		}
+
+		return $processor->get_updated_html();
 	}
 }

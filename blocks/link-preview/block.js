@@ -10,8 +10,6 @@
 
 	blocks.registerBlockType( 'indieblocks/link-preview', {
 		edit: function ( props ) {
-			console.log( props.attributes.style );
-
 			// We'd use `serverSideRender` but it doesn't support passing block
 			// context to PHP. I.e., rendering in JS better reflects what the
 			// block will look like on the front end.
@@ -39,24 +37,33 @@
 			}
 
 			var borderProps = useBorderProps( props.attributes );
+			var bodyProps = { className: 'indieblocks-card-body' };
+			if ( 'undefined' !== typeof borderProps.style && 'undefined' !== typeof borderProps.style.borderWidth ) {
+				bodyProps.style = { width: 'calc(100% - 90px - ' + borderProps.style.borderWidth + ')' };
+			}
 
-			return el( 'div', useBlockProps(),
+			var blockProps = useBlockProps();
+
+			return el( 'div', { ...blockProps, style: borderProps.style },
 				el( BlockControls ),
 				title.length && url.length
-					? el( 'a', { className: 'indieblocks-card', style: borderProps.style },
+					? el( 'a', { className: 'indieblocks-card' },
 						el( 'div', { className: 'indieblocks-card-thumbnail', style: { ...borderProps.style, borderBlock: 'none', borderInlineStart: 'none', borderRadius: '0 !important' } },
 							thumbnail
 								? el( 'img', { src: thumbnail, width: 90, height: 90, alt: '' } )
 								: null
 						),
-						el( 'div', { className: 'indieblocks-card-body' },
+						el( 'div', bodyProps,
 							el( 'strong', {}, title ),
 							el( 'small', {}, ( new URL( url ) ).hostname.replace( /^www\./, '' ) )
 						)
 					)
-					: props.context.postId
-						? __( 'No link preview card', 'indieblocks' )
-						: __( 'Link Preview', 'indieblocks' ),
+					: el( 'div', { className: 'indieblocks-card' },
+						el( 'div', { className: 'indieblocks-card-thumbnail', style: { ...borderProps.style, borderBlock: 'none', borderInlineStart: 'none', borderRadius: '0 !important' } } ),
+						el( 'div', bodyProps,
+							el( 'strong', { style: { fontWeight: 'normal' } }, props.context.postId ? __( 'No link preview card', 'indieblocks' ) : __( 'Link Preview', 'indieblocks' ) )
+						)
+					)
 			);
 		},
 	} );

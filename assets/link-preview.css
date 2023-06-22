@@ -1,10 +1,23 @@
+.wp-block-indieblocks-link-preview {
+	float: none !important;
+	width: 550px;
+	overflow: hidden;
+}
+
+.wp-block-indieblocks-link-preview.alignleft {
+	margin-inline-start: 0 !important;
+	margin-inline-end: auto !important;
+}
+
+.wp-block-indieblocks-link-preview.alignright {
+	margin-inline-start: auto !important;
+	margin-inline-end: 0 !important;
+}
+
 .wp-block-indieblocks-link-preview .indieblocks-card {
 	display: flex;
 	height: 90px;
 	line-height: 1.4;
-	margin-inline-start: auto;
-	max-width: 550px;
-	overflow: hidden;
 }
 
 .wp-block-indieblocks-link-preview .indieblocks-card-thumbnail {
@@ -18,8 +31,8 @@
 }
 
 .wp-block-indieblocks-link-preview .indieblocks-card-body {
+	box-sizing: border-box;
 	padding: 0.67em;
-	width: calc( 100% - 2 * 0.67em - 91px );
 }
 
 .wp-block-indieblocks-link-preview .indieblocks-card-body strong {

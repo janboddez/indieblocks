@@ -3,6 +3,7 @@
 	"title": "Link Preview",
 	"name": "indieblocks/link-preview",
 	"category": "theme",
+	"icon": "admin-links",
 	"editorScript": "file:./block.js",
 	"editorStyle": "file:./editor.css",
 	"usesContext": [ "postId", "postType" ],
@@ -19,9 +20,11 @@
 				"width": true
 			}
 		},
+		"align": ["left", "right"],
 		"color": {
+			"text": false,
 			"link": true,
-			"background": false
+			"background": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -37,7 +40,7 @@
 			}
 		},
 		"spacing": {
-			"margin": true,
+			"margin": ["top", "bottom"],
 			"padding": false,
 			"blockGap": false
 		}

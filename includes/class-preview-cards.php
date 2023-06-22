@@ -19,6 +19,8 @@ class Preview_Cards {
 		add_filter( 'publish_indieblocks_like', array( __CLASS__, 'schedule' ), 20, 2 );
 
 		add_action( 'indieblocks_preview_card', array( __CLASS__, 'add_meta' ) );
+
+		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
 	}
 
 	/**
@@ -55,31 +57,36 @@ class Preview_Cards {
 		}
 
 		$parser     = post_content_parser( $post );
-		$linked_url = $parser->get_link_url( false );
+		$linked_url = $parser->get_link_url( false ); // Get the first link, regardless of microformats.
+
+		if ( empty( $linked_url ) ) {
+			delete_post_meta( $post_id, '_indieblocks_link_preview' );
+			return;
+		}
 
 		$parser = new Parser( $linked_url );
 		$parser->parse();
 
-		$name = $parser->get_name();
-
-		if ( '' !== $name ) {
-			update_post_meta( $post_id, '_indieblocks_og_title', $name );
-		} else {
-			delete_post_meta( $post_id, '_indieblocks_og_title' );
+		$name = $parser->get_name( false ); // Also consider non-mf2 titles, e.g., for notes.
+		if ( '' === $name ) {
+			delete_post_meta( $post_id, '_indieblocks_link_preview' );
+			return;
 		}
 
-		$image = $parser->get_image();
-
+		$tumbnail = '';
+		$image    = $parser->get_image();
 		if ( '' !== $image ) {
-			$thumb = static::create_thumbnail( $image, $post );
-
-			if ( ! empty( $thumb ) ) {
-				update_post_meta( $post_id, '_indieblocks_og_image', $thumb );
-			} else {
-				// @todo: Delete image?
-				delete_post_meta( $post_id, '_indieblocks_og_image' );
-			}
+			$tumbnail = static::create_thumbnail( $image, $post );
 		}
+
+		$meta = array_filter( // Remove empty values.
+			array(
+				'title'     => $name,
+				'url'       => $linked_url,
+				'thumbnail' => $tumbnail,
+			)
+		);
+		update_post_meta( $post->ID, '_indieblocks_link_preview', $meta );
 	}
 
 	/**
@@ -102,5 +109,32 @@ class Preview_Cards {
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
 		return store_image( $url, $filename, $dir );
+	}
+
+	/**
+	 * Registers post meta for use with the REST API.
+	 */
+	public static function register_meta() {
+		$post_types = array( 'post', 'indieblocks_note' );
+
+		foreach ( $post_types as $post_type ) {
+			register_post_meta(
+				$post_type,
+				'_indieblocks_link_preview',
+				array(
+					'single'        => true,
+					'show_in_rest'  => array(
+						'prepare_callback' => function( $value ) {
+							// `return $value` would've sufficed, too. The funny thing is WP doesn't actually fetch and unserialize `$value` if this isn't here.
+							return maybe_unserialize( $value );
+						},
+					),
+					'type'          => 'object',
+					'auth_callback' => function() {
+						return current_user_can( 'edit_posts' );
+					},
+				)
+			);
+		}
 	}
 }

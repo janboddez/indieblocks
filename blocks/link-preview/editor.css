@@ -1,0 +1,37 @@
+.wp-block-indieblocks-link-preview .indieblocks-card {
+	display: flex;
+	height: 90px;
+	line-height: 1.4;
+	margin-inline-start: auto;
+	max-width: 550px;
+	overflow: hidden;
+}
+
+.wp-block-indieblocks-link-preview .indieblocks-card-thumbnail {
+	background: #eee;
+	flex-shrink: 0;
+	width: 90px;
+}
+
+.wp-block-indieblocks-link-preview .indieblocks-card-thumbnail img {
+	display: block;
+}
+
+.wp-block-indieblocks-link-preview .indieblocks-card-body {
+	padding: 0.67em;
+	width: calc( 100% - 2 * 0.67em - 91px );
+}
+
+.wp-block-indieblocks-link-preview .indieblocks-card-body strong {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wp-block-indieblocks-link-preview .indieblocks-card-body small {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

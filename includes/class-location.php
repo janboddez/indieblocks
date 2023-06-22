@@ -431,9 +431,7 @@ class Location {
 	}
 
 	/**
-	 * Registers (block-related) REST API endpoints.
-	 *
-	 * @todo: (Eventually) also add an "author" endpoint. Or have the single endpoint return both title and author information.
+	 * Registers post meta for use with the REST API.
 	 */
 	public static function register_meta() {
 		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );

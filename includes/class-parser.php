@@ -64,6 +64,8 @@ class Parser {
 				$response = remote_get( $this->url );
 				$content  = wp_remote_retrieve_body( $response );
 				set_transient( 'indieblocks:html:' . $hash, $content, 3600 ); // Cache, even if empty.
+			} else {
+				debug_log( '[IndieBlocks] Found HTML for ' . esc_url_raw( $this->url ) . ' in cache.' );
 			}
 		}
 
@@ -112,10 +114,11 @@ class Parser {
 	/**
 	 * Returns the page's name.
 	 *
-	 * @return string Current page's name or title.
+	 * @param  bool $mf2 Whether we should look _only_ at microformats.
+	 * @return string    Current page's name or title.
 	 */
-	public function get_name() {
-		if ( ! empty( $this->mf2['items'][0]['properties'] ) ) {
+	public function get_name( $mf2 = true ) {
+		if ( $mf2 && ! empty( $this->mf2['items'][0]['properties'] ) ) {
 			// Microformats.
 			$props = $this->mf2['items'][0]['properties'];
 			$name  = ! empty( $props['name'][0] ) && is_string( $props['name'][0] )

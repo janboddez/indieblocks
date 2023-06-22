@@ -69,7 +69,7 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		// (Semi-)dynamic blocks; these have a render callback.
-		foreach ( array( 'facepile', 'facepile-content', 'location', 'syndication' ) as $block ) {
+		foreach ( array( 'facepile', 'facepile-content', 'location', 'syndication', 'link-preview' ) as $block ) {
 			register_block_type_from_metadata(
 				dirname( __DIR__ ) . "/blocks/$block",
 				array(
@@ -434,7 +434,7 @@ class Blocks {
 	 * @param  array    $attributes Block attributes.
 	 * @param  string   $content    Block default content.
 	 * @param  WP_Block $block      Block instance.
-	 * @return string               The filtered post content of the current post.
+	 * @return string               The block's output HTML.
 	 */
 	public static function render_syndication_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -563,5 +563,81 @@ class Blocks {
 		if ( is_readable( $icons ) ) {
 			require_once $icons;
 		}
+	}
+
+	/**
+	 * Renders the `indieblocks/link-preview` block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               The block's output HTML.
+	 */
+	public static function render_link_preview_block( $attributes, $content, $block ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			return '';
+		}
+
+		$card = get_post_meta( $block->context['postId'], '_indieblocks_link_preview', true );
+
+		if ( empty( $card['title'] ) || empty( $card['url'] ) ) {
+			return '';
+		}
+
+		// Enqueue front-end block styles.
+		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+
+		$style = '';
+		if ( ! empty( $attributes['borderColor'] ) ) {
+			$style .= 'border-color: var(--wp--preset--color--' . $attributes['borderColor'] . ');';
+		}
+		if ( ! empty( $attributes['style']['border']['color'] ) ) {
+			$style .= 'border-color: ' . $attributes['style']['border']['color'] . ';';
+		}
+		if ( ! empty( $attributes['style']['border']['width'] ) ) {
+			$style .= 'border-width: ' . $attributes['style']['border']['width'] . ';';
+		}
+		if ( ! empty( $attributes['style']['border']['radius'] ) ) {
+			$style .= 'border-radius: ' . $attributes['style']['border']['radius'] . ';';
+		}
+
+		ob_start();
+		// @todo: There's a lot of hardcoded CSS here that needs to move to a CSS file or be set in the editor instead.
+		printf(
+			'<a class="indieblocks-card" href="%s" rel="nofollow" style="%s">',
+			esc_url( $card['url'] ),
+			! empty( $style ) ? esc_attr( $style ) : ''
+		);
+		?>
+			<div class="indieblocks-card-thumbnail">
+				<?php
+				if ( ! empty( $card['thumbnail'] ) ) :
+					// Check if file still exists.
+					$upload_dir = wp_upload_dir();
+					$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
+
+					if ( is_file( $file_path ) ) :
+						printf(
+							'<img src="%s" width="90" height="90" alt="" style="%s">',
+							esc_url_raw( $card['thumbnail'] ),
+							esc_attr( $style . '; border-block: none; border-inline-start: none; border-radius: 0 !important;' )
+						);
+					endif;
+				endif;
+				?>
+			</div>
+			<div class="indieblocks-card-body">
+				<strong><?php echo esc_html( $card['title'] ); ?></strong>
+				<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
+			</div>
+		</a>
+		<?php
+		$output = ob_get_clean();
+
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return '<div ' . $wrapper_attributes . '>' .
+			$output .
+		'</div>';
 	}
 }

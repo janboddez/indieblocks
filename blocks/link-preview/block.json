@@ -1,0 +1,45 @@
+{
+	"apiVersion": 2,
+	"title": "Link Preview",
+	"name": "indieblocks/link-preview",
+	"category": "theme",
+	"editorScript": "file:./block.js",
+	"editorStyle": "file:./editor.css",
+	"usesContext": [ "postId", "postType" ],
+	"textdomain": "indieblocks",
+	"supports": {
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"width": true
+			}
+		},
+		"color": {
+			"link": true,
+			"background": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": false,
+			"blockGap": false
+		}
+	}
+}

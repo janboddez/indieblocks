@@ -44,7 +44,7 @@
 
 			var blockProps = useBlockProps();
 
-			return el( 'div', { ...blockProps, style: borderProps.style },
+			return el( 'div', { ...blockProps, style: { ...blockProps.style, ...borderProps.style } },
 				el( BlockControls ),
 				title.length && url.length
 					? el( 'a', { className: 'indieblocks-card' },

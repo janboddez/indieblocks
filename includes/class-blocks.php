@@ -69,7 +69,14 @@ class Blocks {
 	 */
 	public static function register_blocks() {
 		// (Semi-)dynamic blocks; these have a render callback.
-		foreach ( array( 'facepile', 'facepile-content', 'location', 'syndication', 'link-preview' ) as $block ) {
+		$dyn_blocks = array( 'facepile', 'facepile-content', 'location', 'syndication' );
+
+		$options = get_options();
+		if ( ! empty( $options['preview_cards'] ) ) {
+			$dyn_blocks[] = 'link-preview';
+		}
+
+		foreach ( $dyn_blocks as $block ) {
 			register_block_type_from_metadata(
 				dirname( __DIR__ ) . "/blocks/$block",
 				array(
@@ -589,16 +596,16 @@ class Blocks {
 
 		$style = '';
 		if ( ! empty( $attributes['borderColor'] ) ) {
-			$style .= 'border-color: var(--wp--preset--color--' . $attributes['borderColor'] . ');';
+			$style .= "border-color: var(--wp--preset--color--{$attributes['borderColor']})";
 		}
 		if ( ! empty( $attributes['style']['border']['color'] ) ) {
-			$style .= 'border-color: ' . $attributes['style']['border']['color'] . ';';
+			$style .= "border-color: {$attributes['style']['border']['color']};";
 		}
 		if ( ! empty( $attributes['style']['border']['width'] ) ) {
-			$style .= 'border-width: ' . $attributes['style']['border']['width'] . ';';
+			$style .= "border-width: {$attributes['style']['border']['width']};";
 		}
 		if ( ! empty( $attributes['style']['border']['radius'] ) ) {
-			$style .= 'border-radius: ' . $attributes['style']['border']['radius'] . ';';
+			$style .= "border-radius: {$attributes['style']['border']['radius']};";
 		}
 
 		ob_start();
@@ -608,28 +615,26 @@ class Blocks {
 			esc_url( $card['url'] ),
 			! empty( $style ) ? esc_attr( $style ) : ''
 		);
-		?>
-			<div class="indieblocks-card-thumbnail">
-				<?php
-				if ( ! empty( $card['thumbnail'] ) ) :
-					// Check if file still exists.
-					$upload_dir = wp_upload_dir();
-					$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
 
-					if ( is_file( $file_path ) ) :
-						printf(
-							'<img src="%s" width="90" height="90" alt="" style="%s">',
-							esc_url_raw( $card['thumbnail'] ),
-							esc_attr( $style . '; border-block: none; border-inline-start: none; border-radius: 0 !important;' )
-						);
-					endif;
-				endif;
+		printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( $style . '; border-block: none; border-inline-start: none; border-radius: 0 !important;' ) );
+
+		if ( ! empty( $card['thumbnail'] ) ) :
+			// Check if file still exists.
+			$upload_dir = wp_upload_dir();
+			$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
+
+			if ( is_file( $file_path ) ) :
 				?>
-			</div>
-			<div class="indieblocks-card-body">
-				<strong><?php echo esc_html( $card['title'] ); ?></strong>
-				<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
-			</div>
+				<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
+				<?php
+			endif;
+		endif;
+		?>
+		</div>
+		<div class="indieblocks-card-body">
+			<strong><?php echo esc_html( $card['title'] ); ?></strong>
+			<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
+		</div>
 		</a>
 		<?php
 		$output = ob_get_clean();

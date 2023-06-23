@@ -37,7 +37,7 @@
 			}
 
 			var borderProps = useBorderProps( props.attributes );
-			var bodyProps = { className: 'indieblocks-card-body' };
+			var bodyProps   = { className: 'indieblocks-card-body' };
 			if ( 'undefined' !== typeof borderProps.style && 'undefined' !== typeof borderProps.style.borderWidth ) {
 				bodyProps.style = { width: 'calc(100% - 90px - ' + borderProps.style.borderWidth + ')' };
 			}

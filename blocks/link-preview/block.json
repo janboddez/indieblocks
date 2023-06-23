@@ -20,7 +20,6 @@
 				"width": true
 			}
 		},
-		"align": ["left", "right"],
 		"color": {
 			"text": false,
 			"link": true,

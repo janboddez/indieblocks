@@ -4,16 +4,6 @@
 	overflow: hidden;
 }
 
-.wp-block-indieblocks-link-preview.alignleft {
-	margin-inline-start: 0 !important;
-	margin-inline-end: auto !important;
-}
-
-.wp-block-indieblocks-link-preview.alignright {
-	margin-inline-start: auto !important;
-	margin-inline-end: 0 !important;
-}
-
 .wp-block-indieblocks-link-preview .indieblocks-card {
 	display: flex;
 	height: 90px;

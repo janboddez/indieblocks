@@ -355,12 +355,18 @@ class Webmention_Sender {
 			return;
 		}
 
+		$supported_post_types = Webmention::get_supported_post_types();
+
+		if ( empty( $supported_post_types ) ) {
+			return;
+		}
+
 		// Add meta box, for those post types that are supported.
 		add_meta_box(
 			'indieblocks-webmention',
 			__( 'Webmention', 'indieblocks' ),
 			array( __CLASS__, 'render_meta_box' ),
-			Webmention::get_supported_post_types(),
+			$supported_post_types,
 			'normal',
 			'default'
 		);

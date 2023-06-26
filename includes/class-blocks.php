@@ -599,8 +599,7 @@ class Blocks {
 		$border_style = '';
 		if ( ! empty( $attributes['borderColor'] ) ) {
 			$border_style .= "border-color: var(--wp--preset--color--{$attributes['borderColor']}); ";
-		}
-		if ( ! empty( $attributes['style']['border']['color'] ) ) {
+		} elseif ( ! empty( $attributes['style']['border']['color'] ) ) {
 			$border_style .= "border-color: {$attributes['style']['border']['color']}; ";
 		}
 		if ( ! empty( $attributes['style']['border']['width'] ) ) {

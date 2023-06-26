@@ -1,6 +1,7 @@
 .wp-block-indieblocks-link-preview {
 	float: none !important;
-	width: 550px;
+	box-sizing: border-box;
+	max-width: 550px !important;
 	overflow: hidden;
 }
 

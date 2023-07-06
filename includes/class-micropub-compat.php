@@ -34,7 +34,7 @@ class Micropub_Compat {
 				add_filter( 'micropub_query', array( __CLASS__, 'query_post_types' ), 20, 2 );
 			}
 
-			if ( ! empty( $options['default_taxonomies'] ) ) {
+			if ( ! empty( $options['note_taxonomies'] ) || ! empty( $options['default_taxonomies'] ) || ! empty( $options['like_taxonomies'] ) ) {
 				// Certain Micropub clients support existing category or tag
 				// lookups. Filterable.
 				add_filter( 'micropub_query', array( __CLASS__, 'query_categories' ), 20, 2 );

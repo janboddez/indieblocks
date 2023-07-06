@@ -262,10 +262,10 @@ class Blocks {
 	/**
 	 * Renders the `indieblocks/facepile` block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               Output HTML.
+	 * @param  array     $attributes Block attributes.
+	 * @param  string    $content    Block default content.
+	 * @param  \WP_Block $block      Block instance.
+	 * @return string                Output HTML.
 	 */
 	public static function render_facepile_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -284,10 +284,10 @@ class Blocks {
 	/**
 	 * Renders the `indieblocks/facepile-content` block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               Facepile HTML, or an empty string.
+	 * @param  array     $attributes Block attributes.
+	 * @param  string    $content    Block default content.
+	 * @param  \WP_Block $block      Block instance.
+	 * @return string                Facepile HTML, or an empty string.
 	 */
 	public static function render_facepile_content_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -384,10 +384,10 @@ class Blocks {
 	/**
 	 * Renders the `indieblocks/location` block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               Output HTML.
+	 * @param  array     $attributes Block attributes.
+	 * @param  string    $content    Block default content.
+	 * @param  \WP_Block $block      Block instance.
+	 * @return string                Output HTML.
 	 */
 	public static function render_location_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -440,10 +440,10 @@ class Blocks {
 	/**
 	 * Renders the `indieblocks/syndication` block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               The block's output HTML.
+	 * @param  array     $attributes Block attributes.
+	 * @param  string    $content    Block default content.
+	 * @param  \WP_Block $block      Block instance.
+	 * @return string                The block's output HTML.
 	 */
 	public static function render_syndication_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -577,10 +577,10 @@ class Blocks {
 	/**
 	 * Renders the `indieblocks/link-preview` block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               The block's output HTML.
+	 * @param  array     $attributes Block attributes.
+	 * @param  string    $content    Block default content.
+	 * @param  \WP_Block $block      Block instance.
+	 * @return string                The block's output HTML.
 	 */
 	public static function render_link_preview_block( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
@@ -598,15 +598,15 @@ class Blocks {
 
 		$border_style = '';
 		if ( ! empty( $attributes['borderColor'] ) ) {
-			$border_style .= "border-color: var(--wp--preset--color--{$attributes['borderColor']}); ";
+			$border_style .= "border-color:var(--wp--preset--color--{$attributes['borderColor']});";
 		} elseif ( ! empty( $attributes['style']['border']['color'] ) ) {
-			$border_style .= "border-color: {$attributes['style']['border']['color']}; ";
+			$border_style .= "border-color:{$attributes['style']['border']['color']};";
 		}
 		if ( ! empty( $attributes['style']['border']['width'] ) ) {
-			$border_style .= "border-width: {$attributes['style']['border']['width']}; ";
+			$border_style .= "border-width:{$attributes['style']['border']['width']};";
 		}
 		if ( ! empty( $attributes['style']['border']['radius'] ) ) {
-			$border_style .= "border-radius: {$attributes['style']['border']['radius']}; ";
+			$border_style .= "border-radius:{$attributes['style']['border']['radius']};";
 		}
 		$border_style = trim( $border_style );
 
@@ -652,7 +652,7 @@ class Blocks {
 			$processor->set_attribute( 'style', esc_attr( $border_style ) );
 		} else {
 			// Append our styles.
-			$processor->set_attribute( 'style', esc_attr( $style . ' ' . $border_style ) );
+			$processor->set_attribute( 'style', esc_attr( rtrim( $style, ';' ) . ";$border_style" ) );
 		}
 
 		return $processor->get_updated_html();

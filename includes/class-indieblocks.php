@@ -56,12 +56,7 @@ class IndieBlocks {
 		register_uninstall_hook( dirname( __DIR__ ) . '/indieblocks.php', array( Webmention::class, 'uninstall' ) );
 
 		// Bit of a trick to "forget" about older keys.
-		add_filter(
-			'option_indieblocks_settings',
-			function( $option ) {
-				return array_intersect_key( $option, Options_Handler::SCHEMA );
-			}
-		);
+		add_filter( 'option_indieblocks_settings', array( Options_Handler::class, 'prep_options' ) );
 
 		// Set up the settings page.
 		$this->options_handler = new Options_Handler();

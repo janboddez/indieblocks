@@ -392,17 +392,17 @@ class Options_Handler {
 						<tr valign="top">
 							<th scope="row" rowspan="2"><?php esc_html_e( 'Custom Post Types', 'indieblocks' ); ?></th>
 							<td>
-								<label><input type="checkbox" name="indieblocks_settings[enable_notes]" value="1" <?php checked( ! empty( $this->options['post_types'] ) || ! empty( $this->options['enable_notes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Notes&rdquo;', 'indieblocks' ); ?></label>
+								<label><input type="checkbox" name="indieblocks_settings[enable_notes]" value="1" <?php checked( ! empty( $this->options['enable_notes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Notes&rdquo;', 'indieblocks' ); ?></label>
 								<div style="margin-inline-start: 1.25em;">
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_feed]" value="1" <?php checked( ! empty( $this->options['notes_in_feed'] ) ); ?>/> <?php esc_html_e( 'Include in main feed', 'indieblocks' ); ?></label><br />
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_home]" value="1" <?php checked( ! empty( $this->options['notes_in_home'] ) ); ?>/> <?php esc_html_e( 'Show on blog page', 'indieblocks' ); ?></label><br />
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_author]" value="1" <?php checked( ! empty( $this->options['notes_in_author'] ) ); ?>/> <?php esc_html_e( 'Include in author archives', 'indieblocks' ); ?></label><br />
-									<label><input type="checkbox" name="indieblocks_settings[note_taxonomies]" value="1" <?php checked( ! empty( $this->options['note_taxonomies'] ) || ! empty( $this->options['default_taxonomies'] ) ); ?>/> <?php esc_html_e( 'Enable categories and tags', 'indieblocks' ); ?></label>
+									<label><input type="checkbox" name="indieblocks_settings[note_taxonomies]" value="1" <?php checked( ! empty( $this->options['note_taxonomies'] ) ); ?>/> <?php esc_html_e( 'Enable categories and tags', 'indieblocks' ); ?></label>
 								</div>
 							</td>
 						</tr>
 						<tr valign="top">
-							<td><label><input type="checkbox" name="indieblocks_settings[enable_likes]" value="1" <?php checked( ! empty( $this->options['post_types'] ) || ! empty( $this->options['enable_likes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Likes&rdquo;', 'indieblocks' ); ?></label>
+							<td><label><input type="checkbox" name="indieblocks_settings[enable_likes]" value="1" <?php checked( ! empty( $this->options['enable_likes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Likes&rdquo;', 'indieblocks' ); ?></label>
 							<div style="margin-inline-start: 1.25em; margin-block-start: 0.25em;">
 								<label><input type="checkbox" name="indieblocks_settings[likes_in_feed]" value="1" <?php checked( ! empty( $this->options['likes_in_feed'] ) ); ?>/> <?php esc_html_e( 'Include in main feed', 'indieblocks' ); ?></label><br />
 								<label><input type="checkbox" name="indieblocks_settings[likes_in_home]" value="1" <?php checked( ! empty( $this->options['likes_in_home'] ) ); ?>/> <?php esc_html_e( 'Show on blog page', 'indieblocks' ); ?></label><br />
@@ -437,9 +437,9 @@ class Options_Handler {
 								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
 								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Site Editor.', 'indieblocks' ); ?></p>
 								<div style="margin-inline-start: 1.25em; margin-block-start: 0.5em;">
-									<label><input type="checkbox" name="indieblocks_settings[unhide_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_bookmark_titles'] ) || ! empty( $this->options['unhide_like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt bookmark titles', 'indieblocks' ); ?></label>
+									<label><input type="checkbox" name="indieblocks_settings[unhide_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt bookmark titles', 'indieblocks' ); ?></label>
 									<p class="description"><?php _e( 'Do <em>not</em> hide bookmark titles, <em>and</em> have them link to the bookmarked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
-									<label style="display: inline-block; margin-block-start: 0.5em;"><input type="checkbox" name="indieblocks_settings[unhide_like_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_titles'] ) || ! empty( $this->options['unhide_like_and_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like titles', 'indieblocks' ); ?></label>
+									<label style="display: inline-block; margin-block-start: 0.5em;"><input type="checkbox" name="indieblocks_settings[unhide_like_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like titles', 'indieblocks' ); ?></label>
 									<p class="description"><?php _e( 'Do <em>not</em> hide like titles, <em>and</em> have them link to the liked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
 								</div>
 							</td>
@@ -589,12 +589,53 @@ class Options_Handler {
 	}
 
 	/**
+	 * Maps this plugin's older settings to their newer equivalents.
+	 *
+	 * @param  array $options Plugin settings as retrieved from the datbase.
+	 * @return array          This plugin's settings.
+	 */
+	public static function prep_options( $options ) {
+		// We used to enable/disable both post types together.
+		$options['enable_notes'] = isset( $options['enable_notes'] )
+			? $options['enable_notes']
+			: ! empty( $options['post_types'] );
+
+		$options['enable_likes'] = isset( $options['enable_likes'] )
+			? $options['enable_likes']
+			: ! empty( $options['post_types'] );
+
+		// We used to only allow notes to use WP's default taxonomies.
+		$options['note_taxonomies'] = isset( $options['note_taxonomies'] )
+			? $options['note_taxonomies']
+			: ! empty( $options['default_taxonomies'] );
+
+		// There were no separate "smart title" settings for bookmarks and likes.
+		$options['bookmark_titles'] = isset( $options['bookmark_titles'] )
+			? $options['bookmark_titles']
+			: ! empty( $options['like_and_bookmark_titles'] );
+
+		$options['like_titles'] = isset( $options['like_titles'] )
+			? $options['like_titles']
+			: ! empty( $options['like_and_bookmark_titles'] );
+
+		$options['unhide_like_titles'] = isset( $options['unhide_like_titles'] )
+			? $options['unhide_like_titles']
+			: ! empty( $options['unhide_like_and_bookmark_titles'] );
+
+		$options['unhide_bookmark_titles'] = isset( $options['unhide_bookmark_titles'] )
+			? $options['unhide_bookmark_titles']
+			: ! empty( $options['unhide_like_and_bookmark_titles'] );
+
+		return array_intersect_key( $options, self::SCHEMA ); // Avoid REST API errors.
+	}
+
+	/**
 	 * Generates example permalinks for use in the settings table.
 	 *
 	 * @param  string $format Permalink format.
 	 * @return string         Example permalink.
 	 */
-	private function get_example_permalink( $format ) {
+	protected function get_example_permalink( $format ) {
 		$example_front = __( 'notes', 'indieblocks' ); // Just a default.
 
 		if ( ! empty( $this->options['enable_notes'] ) ) {

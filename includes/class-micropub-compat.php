@@ -243,25 +243,25 @@ class Micropub_Compat {
 			$content = apply_filters( 'indieblocks_inner_content', $content, $input );
 		}
 
+		$post_content = '';
+
 		if ( ! empty( $url ) ) {
 			// Could be we're looking at a bookmark, reply, repost or like.
 			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
 				// Depending on the scenario, Micropub clients may add a page
 				// title in front of the URL.
-				$url = trim( $matches[0] );
+				$url = trim( $matches[0] ); // Keep only the URL.
 			}
 
 			// So that developers can, e.g., remove certain query strings.
 			$url = apply_filters( 'indieblocks_micropub_url', $url );
 
-			// Try to parse the web page at this URL, and use the newer block instead?
+			// Try to parse the web page at this URL.
 			$parser = new Parser( $url );
 			$parser->parse();
 
 			$name   = sanitize_text_field( ! empty( $input['post_title'] ) ? $input['post_title'] : $parser->get_name() );
 			$author = sanitize_text_field( $parser->get_author() );
-
-			$post_content = '';
 
 			switch ( $post_type ) {
 				case 'like':
@@ -291,7 +291,7 @@ class Micropub_Compat {
 						$post_content .= '</div>
 							<!-- /wp:indieblocks/like -->' . PHP_EOL;
 					} elseif ( '' !== $name ) {
-						// We've got a post title; use the Reply block, but without byline.
+						// We've got a post title; use the Like block, but without byline.
 						if ( empty( $content ) ) {
 							$post_content .= '<!-- wp:indieblocks/like -->' . PHP_EOL;
 						} else {

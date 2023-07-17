@@ -17,7 +17,7 @@ It also comes with "short-form" (Note and Like) custom post types, and a (somewh
 
 These microformats, in combination with the Webmention protocol, allow for rich _cross-site_ conversations. IndieBlocks comes with its own Webmention implementation, but a separate plugin can be used, too.
 
-IndieBlocks also registers several "theme" blocks (Facepile, and Syndication), to be used in (block) theme templates.
+IndieBlocks also registers several "theme" blocks (Facepile, Location, Syndication, and Link Preview), to be used in (block) theme templates.
 
 == Installation ==
 Upload this plugin's ZIP file via the Plugins > Add New > "Upload Plugin" button.
@@ -28,9 +28,9 @@ More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/
 
 == Changelog ==
 = 0.8.0 =
-Various bug fixes. Also, webmentions are now closed when comments are, although this behavior is filterable.
+Various bug fixes. Add Link Preview block. Also, webmentions are now closed when comments are, although this behavior is filterable.
 = 0.7.1 =
-The Facepile block now supports v5.0 and up of the Webmention plugin.
+Add Location block. The Facepile block now supports v5.0 and up of the Webmention plugin.
 = 0.7.0 =
 Store temperatures in Kelvin rather than degrees Celsius. Update `masterminds/html5` to version 2.8.0. Add Location block.
 = 0.6.0 =

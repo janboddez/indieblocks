@@ -614,7 +614,7 @@ class Blocks {
 		?>
 		<a class="indieblocks-card" href="<?php echo esc_url( $card['url'] ); ?>" rel="nofollow">
 			<?php
-			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( $border_style . ' border-block: none; border-inline-start: none; border-radius: 0 !important;' ) );
+			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( trim( $border_style . ' border-block: none; border-inline-start: none; border-radius: 0 !important;' ) ) );
 
 			if ( ! empty( $card['thumbnail'] ) ) :
 				// Check if file still exists.
@@ -630,7 +630,7 @@ class Blocks {
 
 			echo '</div>';
 			?>
-			<div class="indieblocks-card-body" style="width: calc(100% - 90px - <?php echo esc_attr( $attributes['style']['border']['width'] ); ?>);">
+			<div class="indieblocks-card-body" style="width: calc(100% - 90px - <?php echo isset( $attributes['style']['border']['width'] ) ? esc_attr( $attributes['style']['border']['width'] ) : '0px'; ?>);">
 				<strong><?php echo esc_html( $card['title'] ); ?></strong>
 				<small><?php echo esc_html( preg_replace( '~www.~', '', wp_parse_url( $card['url'], PHP_URL_HOST ) ) ); ?></small>
 			</div>

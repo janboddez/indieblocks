@@ -437,12 +437,7 @@ class Location {
 				'geo_address',
 				array(
 					'single'       => true,
-					'show_in_rest' => array(
-						'prepare_callback' => function( $value ) {
-							// `return $value` would've sufficed, too. The funny thing is WP doesn't actually fetch and unserialize `$value` if this isn't here.
-							return maybe_unserialize( $value );
-						},
-					),
+					'show_in_rest' => true,
 					'type'         => 'string',
 				)
 			);

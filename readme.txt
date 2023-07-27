@@ -27,6 +27,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.8.1 =
+Fix issue with saving meta from block editor.
 = 0.8.0 =
 Various bug fixes. Add Link Preview block. Also, webmentions are now closed when comments are, although this behavior is filterable.
 = 0.7.1 =

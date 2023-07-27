@@ -195,7 +195,13 @@ class Location {
 		}
 
 		// Adds weather data.
-		if ( static::is_recent( $post ) && '' === get_post_meta( $post->ID, '_indieblocks_weather', true ) ) {
+		if ( static::is_recent( $post ) ) {
+			$indieblocks_weather = get_post_meta( $post->ID, '_indieblocks_weather', true );
+
+			if ( ! empty( $indieblocks_weather ) ) { // Checking for an empty string won't cut it anymore, as the block editor will save an, empty at first, array.
+				return;
+			}
+
 			// Let's do weather information, too.
 			$weather = static::get_weather( $lat, $lon );
 

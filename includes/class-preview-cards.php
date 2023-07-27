@@ -124,10 +124,13 @@ class Preview_Cards {
 				array(
 					'single'        => true,
 					'show_in_rest'  => array(
-						'prepare_callback' => function( $value ) {
-							// `return $value` would've sufficed, too. The funny thing is WP doesn't actually fetch and unserialize `$value` if this isn't here.
-							return maybe_unserialize( $value );
-						},
+						'schema' => array(
+							'properties' => array(
+								'title'     => array( 'type' => 'string' ),
+								'url'       => array( 'type' => 'string' ),
+								'thumbnail' => array( 'type' => 'string' ),
+							),
+						),
 					),
 					'type'          => 'object',
 					'auth_callback' => function() {

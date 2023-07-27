@@ -291,11 +291,11 @@ class Location {
 		$weather_data = array();
 
 		$weather_data['temperature'] = isset( $weather['main']['temp'] ) && is_numeric( $weather['main']['temp'] )
-			? round( $weather['main']['temp'], 2 )
+			? (float) round( $weather['main']['temp'], 2 )
 			: null;
 
 		$weather_data['humidity'] = isset( $weather['main']['humidity'] ) && is_numeric( $weather['main']['humidity'] )
-			? round( $weather['main']['humidity'] )
+			? (int) round( $weather['main']['humidity'] )
 			: null;
 
 		if ( ! empty( $weather['weather'] ) ) {
@@ -443,7 +443,7 @@ class Location {
 							return maybe_unserialize( $value );
 						},
 					),
-					'type'         => 'object',
+					'type'         => 'string',
 				)
 			);
 
@@ -453,10 +453,22 @@ class Location {
 				array(
 					'single'        => true,
 					'show_in_rest'  => array(
-						'prepare_callback' => function( $value ) {
-							// `return $value` would've sufficed, too. The funny thing is WP doesn't actually fetch and unserialize `$value` if this isn't here.
-							return maybe_unserialize( $value );
-						},
+						'schema' => array(
+							'properties' => array(
+								'id'          => array(
+									'type' => 'string',
+								),
+								'description' => array(
+									'type' => 'string',
+								),
+								'temperature' => array(
+									'type' => 'number',
+								),
+								'humidity'    => array(
+									'type' => 'integer',
+								),
+							),
+						),
 					),
 					'type'          => 'object',
 					'auth_callback' => function() {

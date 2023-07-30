@@ -31,7 +31,7 @@ class Webmention {
 		add_action( 'wp_ajax_indieblocks_delete_avatar', array( Webmention_Receiver::class, 'delete_avatar' ) );
 
 		add_action( 'add_meta_boxes_comment', array( Webmention_Receiver::class, 'add_meta_box' ) );
-		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_route' ) );
+		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_api_endpoint' ) );
 		add_action( 'wp_head', array( Webmention_Receiver::class, 'webmention_link' ) );
 		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
 	}

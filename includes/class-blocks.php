@@ -21,7 +21,7 @@ class Blocks {
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
-		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoint' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'print_icons' ), 999 );
 		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
 		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
@@ -197,7 +197,7 @@ class Blocks {
 	/**
 	 * Registers (block-related) REST API endpoints.
 	 */
-	public static function register_api_endpoints() {
+	public static function register_api_endpoint() {
 		register_rest_route(
 			'indieblocks/v1',
 			'/meta',

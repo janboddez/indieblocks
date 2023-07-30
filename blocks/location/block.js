@@ -1,4 +1,4 @@
-( function ( blocks, element, blockEditor, coreData, i18n, components ) {
+( function ( blocks, element, blockEditor, components, coreData, i18n ) {
 	var el          = element.createElement;
 	var interpolate = element.createInterpolateElement;
 
@@ -12,12 +12,15 @@
 
 	blocks.registerBlockType( 'indieblocks/location', {
 		edit: function ( props ) {
-			var [ meta ]    = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
-			var [ options ] = coreData.useEntityProp( 'root', 'site', 'indieblocks_settings' );
-
+			var [ options ]    = coreData.useEntityProp( 'root', 'site', 'indieblocks_settings' );
 			var includeWeather = props.attributes.includeWeather;
-			var temp           = includeWeather && 'undefined' !== typeof meta && meta.hasOwnProperty( '_indieblocks_weather' ) && meta._indieblocks_weather.hasOwnProperty( 'temperature' )
-				? meta._indieblocks_weather.temperature
+
+			const { record, isResolving } = coreData.useEntityRecord( 'postType', props.context.postType, props.context.postId );
+
+			var geoAddress  = record?.indieblocks_location?.geo_address ?? '';
+			var description = record?.indieblocks_location?.weather?.description ?? '';
+			var temp        = includeWeather
+				? ( record?.indieblocks_location?.weather?.temperature ?? null )
 				: null;
 			var tempUnit;
 
@@ -63,16 +66,16 @@
 						)
 					)
 				),
-				'undefined' !== typeof meta && meta.hasOwnProperty( 'geo_address' ) && meta.geo_address.length
+				'' !== geoAddress
 					? el( 'span', { className: 'h-geo' },
 						temp
-							? interpolate( '<a>' + meta.geo_address + '</a><b>' + sep + '</b><c>' + temp + tempUnit + ', ' + meta._indieblocks_weather.description.toLowerCase() + '</c>', {
+							? interpolate( '<a>' + geoAddress + '</a><b>' + sep + '</b><c>' + temp + tempUnit + ', ' + description.toLowerCase() + '</c>', {
 								a: el( 'span', { className: 'p-name' } ),
 								b: el( 'span', { className: 'sep',  'aria-hidden': 'true' } ),
 								c: el( 'span', {} )
 							} )
 							: el( 'span', { className: 'p-name' },
-								meta.geo_address
+								geoAddress
 							),
 					)
 					: props.context.postId
@@ -81,4 +84,4 @@
 			);
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.coreData, window.wp.i18n, window.wp.components );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.components, window.wp.coreData, window.wp.i18n );

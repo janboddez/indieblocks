@@ -14,7 +14,7 @@ class Webmention_Receiver {
 	/**
 	 * Registers a new REST API route.
 	 */
-	public static function register_route() {
+	public static function register_api_endpoint() {
 		register_rest_route(
 			'indieblocks/v1',
 			'/webmention',

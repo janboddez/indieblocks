@@ -24,7 +24,7 @@ class Location {
 		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
 
 		// Register for REST API use.
-		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
 	}
 
 	/**
@@ -432,52 +432,67 @@ class Location {
 	}
 
 	/**
-	 * Registers post meta for use with the REST API.
+	 * Registers a custom REST API endpoint for reading (but not writing) our
+	 * location data.
 	 */
-	public static function register_meta() {
+	public static function register_rest_field() {
 		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
 
 		foreach ( $post_types as $post_type ) {
-			register_post_meta(
+			register_rest_field(
 				$post_type,
-				'geo_address',
+				'indieblocks_location',
 				array(
-					'single'       => true,
-					'show_in_rest' => true,
-					'type'         => 'string',
-				)
-			);
-
-			register_post_meta(
-				$post_type,
-				'_indieblocks_weather',
-				array(
-					'single'        => true,
-					'show_in_rest'  => array(
-						'schema' => array(
-							'properties' => array(
-								'id'          => array(
-									'type' => 'string',
-								),
-								'description' => array(
-									'type' => 'string',
-								),
-								'temperature' => array(
-									'type' => 'number',
-								),
-								'humidity'    => array(
-									'type' => 'integer',
-								),
+					'get_callback'    => array( __CLASS__, 'get_meta' ),
+					'update_callback' => null,
+					'schema'          => array(
+						'type'       => 'object',
+						'properties' => array(
+							'id'          => array(
+								'type' => 'string',
+							),
+							'description' => array(
+								'type' => 'string',
+							),
+							'temperature' => array(
+								'type' => 'number',
+							),
+							'humidity'    => array(
+								'type' => 'integer',
 							),
 						),
 					),
-					'type'          => 'object',
-					'auth_callback' => function() {
-						return current_user_can( 'edit_posts' );
-					},
 				)
 			);
 		}
+	}
+
+	/**
+	 * Returns location metadata.
+	 *
+	 * @param  array $params WP REST API request.
+	 * @return mixed         Response.
+	 */
+	public static function get_meta( $params ) {
+		$post_id = $params['id'];
+
+		if ( empty( $post_id ) || ! ctype_digit( $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		$post_id = (int) $post_id;
+
+		$location = get_transient( "indieblocks:$post_id:location" );
+		if ( false === $location ) {
+			$weather  = get_post_meta( $post_id, '_indieblocks_weather', true );
+			$location = array(
+				'geo_address' => get_post_meta( $post_id, 'geo_address', true ),
+				'weather'     => is_array( $weather ) ? $weather : array(),
+			);
+			set_transient( "indieblocks:$post_id:location", $location, 300 );
+		}
+
+		return $location; // Either an empty string, or an associated array (which gets translated into a JSON object).
 	}
 
 	/**

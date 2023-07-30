@@ -20,7 +20,7 @@ class Preview_Cards {
 
 		add_action( 'indieblocks_preview_card', array( __CLASS__, 'add_meta' ) );
 
-		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
 	}
 
 	/**
@@ -112,32 +112,57 @@ class Preview_Cards {
 	}
 
 	/**
-	 * Registers post meta for use with the REST API.
+	 * Registers a custom REST API endpoint for reading (but not writing) our
+	 * location data.
 	 */
-	public static function register_meta() {
-		$post_types = array( 'post', 'indieblocks_note' );
-
-		foreach ( $post_types as $post_type ) {
-			register_post_meta(
+	public static function register_rest_field() {
+		foreach ( array( 'post', 'indieblocks_note', 'indieblocks_like' ) as $post_type ) {
+			register_rest_field(
 				$post_type,
-				'_indieblocks_link_preview',
+				'indieblocks_link_preview',
 				array(
-					'single'        => true,
-					'show_in_rest'  => array(
-						'schema' => array(
-							'properties' => array(
-								'title'     => array( 'type' => 'string' ),
-								'url'       => array( 'type' => 'string' ),
-								'thumbnail' => array( 'type' => 'string' ),
+					'get_callback'    => array( __CLASS__, 'get_meta' ),
+					'update_callback' => null,
+					'schema'          => array(
+						'type'       => 'object',
+						'properties' => array(
+							'title'     => array(
+								'type' => 'string',
+							),
+							'url'       => array(
+								'type' => 'string',
+							),
+							'thumbnail' => array(
+								'type' => 'number',
 							),
 						),
 					),
-					'type'          => 'object',
-					'auth_callback' => function() {
-						return current_user_can( 'edit_posts' );
-					},
 				)
 			);
 		}
+	}
+
+	/**
+	 * Returns link preview metadata.
+	 *
+	 * @param  array $params WP REST API request.
+	 * @return mixed         Response.
+	 */
+	public static function get_meta( $params ) {
+		$post_id = $params['id'];
+
+		if ( empty( $post_id ) || ! ctype_digit( $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		$post_id = (int) $post_id;
+
+		$link_preview = get_transient( "indieblocks:$post_id:link_preview" );
+		if ( false === $link_preview ) {
+			$link_preview = get_post_meta( $post_id, '_indieblocks_link_preview', true );
+			set_transient( "indieblocks:$post_id:link_preview", $link_preview, 300 );
+		}
+
+		return $link_preview; // Either an empty string, or an associated array (which gets translated into a JSON object).
 	}
 }

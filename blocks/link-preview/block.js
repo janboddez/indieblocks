@@ -10,31 +10,11 @@
 
 	blocks.registerBlockType( 'indieblocks/link-preview', {
 		edit: function ( props ) {
-			// We'd use `serverSideRender` but it doesn't support passing block
-			// context to PHP. I.e., rendering in JS better reflects what the
-			// block will look like on the front end.
-			// @see https://github.com/WordPress/gutenberg/issues/40714
-			var [ meta ] = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
+			const { record, isResolving } = coreData.useEntityRecord( 'postType', props.context.postType, props.context.postId );
 
-			var title     = '';
-			var url       = '';
-			var thumbnail = '';
-
-			if ( 'undefined' !== typeof meta && meta.hasOwnProperty( '_indieblocks_link_preview' ) ) {
-				var card = meta._indieblocks_link_preview;
-
-				if ( card.hasOwnProperty( 'title' ) && card.title.length ) {
-					title = card.title;
-				}
-
-				if ( card.hasOwnProperty( 'url' ) && card.url.length ) {
-					url = card.url;
-				}
-
-				if ( card.hasOwnProperty( 'thumbnail' ) && card.thumbnail.length ) {
-					thumbnail = card.thumbnail;
-				}
-			}
+			var title     = record?.indieblocks_link_preview?.title ?? '';
+			var cardUrl   = record?.indieblocks_link_preview?.url ?? '';
+			var thumbnail = record?.indieblocks_link_preview?.thumbnail ?? '';
 
 			var borderProps = useBorderProps( props.attributes );
 			var bodyProps   = { className: 'indieblocks-card-body' };
@@ -46,7 +26,7 @@
 
 			return el( 'div', { ...blockProps, style: { ...blockProps.style, ...borderProps.style } },
 				el( BlockControls ),
-				title.length && url.length
+				title.length && cardUrl.length
 					? el( 'a', { className: 'indieblocks-card' },
 						el( 'div', { className: 'indieblocks-card-thumbnail', style: { ...borderProps.style, borderBlock: 'none', borderInlineStart: 'none', borderRadius: '0 !important' } },
 							thumbnail
@@ -55,7 +35,7 @@
 						),
 						el( 'div', bodyProps,
 							el( 'strong', {}, title ),
-							el( 'small', {}, ( new URL( url ) ).hostname.replace( /^www\./, '' ) )
+							el( 'small', {}, ( new URL( cardUrl ) ).hostname.replace( /^www\./, '' ) )
 						)
 					)
 					: el( 'div', { className: 'indieblocks-card' },

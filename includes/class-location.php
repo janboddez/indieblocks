@@ -445,23 +445,6 @@ class Location {
 				array(
 					'get_callback'    => array( __CLASS__, 'get_meta' ),
 					'update_callback' => null,
-					'schema'          => array(
-						'type'       => 'object',
-						'properties' => array(
-							'id'          => array(
-								'type' => 'string',
-							),
-							'description' => array(
-								'type' => 'string',
-							),
-							'temperature' => array(
-								'type' => 'number',
-							),
-							'humidity'    => array(
-								'type' => 'integer',
-							),
-						),
-					),
 				)
 			);
 		}

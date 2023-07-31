@@ -123,20 +123,6 @@ class Preview_Cards {
 				array(
 					'get_callback'    => array( __CLASS__, 'get_meta' ),
 					'update_callback' => null,
-					'schema'          => array(
-						'type'       => 'object',
-						'properties' => array(
-							'title'     => array(
-								'type' => 'string',
-							),
-							'url'       => array(
-								'type' => 'string',
-							),
-							'thumbnail' => array(
-								'type' => 'number',
-							),
-						),
-					),
 				)
 			);
 		}

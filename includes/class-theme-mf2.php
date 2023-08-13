@@ -476,9 +476,10 @@ class Theme_Mf2 {
 			$classes[] = "has-text-align-{$attributes['textAlign']}";
 		}
 
-		$options = get_options();
+		$post_types = (array) apply_filters( 'indieblocks_short-form_post_types', array( 'indieblocks_like', 'indieblocks_note' ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		$options    = get_options();
 
-		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! in_array( get_post_type(), $post_types, true ) ) {
 			// Neither a like nor a note.
 			$classes[] = 'p-name';
 		} else {

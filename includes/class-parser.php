@@ -114,11 +114,15 @@ class Parser {
 	/**
 	 * Returns the page's name.
 	 *
-	 * @param  bool $mf2 Whether we should look _only_ at microformats.
+	 * @param  bool $mf2 Whether to consider microformats. Set to `false` so skip microformats parsing.
 	 * @return string    Current page's name or title.
 	 */
 	public function get_name( $mf2 = true ) {
-		if ( $mf2 && ! empty( $this->mf2['items'][0]['properties'] ) ) {
+		if (
+			$mf2 &&
+			! empty( $this->mf2['items'][0]['type'] ) && in_array( $this->mf2['items'][0]['type'], array( 'h-entry', 'h-recipe', 'h-review' ), true ) &&
+			! empty( $this->mf2['items'][0]['properties'] )
+		) {
 			// Microformats.
 			$props = $this->mf2['items'][0]['properties'];
 			$name  = ! empty( $props['name'][0] ) && is_string( $props['name'][0] )
@@ -126,9 +130,11 @@ class Parser {
 				: '';
 
 			if ( '' === $name ) {
+				// Could be a note.
 				return '';
 			}
 
+			// Need some form of content to compare `$name` to.
 			$content = '';
 			if ( ! empty( $props['content'][0]['value'] ) ) {
 				$content = $props['content'][0]['value'];
@@ -154,7 +160,7 @@ class Parser {
 					return $name;
 				}
 
-				return '';
+				return ''; // Probably a note after all.
 			}
 
 			return $name;

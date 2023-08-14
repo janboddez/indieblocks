@@ -98,6 +98,7 @@ class Feeds {
 		}
 
 		add_rewrite_rule( "^{$front}/feed/?$", 'index.php?post_type=post&feed=rss2', 'top' );
+		add_rewrite_rule( "^{$front}/feed/atom/?$", 'index.php?post_type=post&feed=atom', 'top' );
 
 		// Set the new feed's title.
 		add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );

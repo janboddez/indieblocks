@@ -1,17 +1,18 @@
 ( function ( blocks, element, blockEditor, coreData, i18n ) {
-	var el = element.createElement;
+	const el       = element.createElement;
+	const useState = element.useState;
 
-	var BlockControls = blockEditor.BlockControls;
-	var useBlockProps = blockEditor.useBlockProps;
+	const BlockControls = blockEditor.BlockControls;
+	const useBlockProps = blockEditor.useBlockProps;
 
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
+	const __      = i18n.__;
+	const sprintf = i18n.sprintf;
 
 	function render( urls ) {
-		var output = '';
+		let output = '';
 
 		urls.forEach( function( url ) {
-			output += '<a class="u-syndication" href="' + encodeURI( url.value ) + '">' + url.name + '</a>, ';
+			output += '<a class="u-syndication" href="' + encodeURI( url.value ) + '" target="_blank" rel="noopener noreferrer">' + url.name + '</a>, ';
 		} );
 
 		/* translators: %s: plain-text "list" of links. */
@@ -24,15 +25,18 @@
 			// context to PHP. I.e., rendering in JS better reflects what the
 			// block will look like on the front end.
 			// @see https://github.com/WordPress/gutenberg/issues/40714
-			var [ meta ] = coreData.useEntityProp( 'postType', props.context.postType, 'meta', props.context.postId );
-			var urls     = [];
+			const { record, isResolving } = coreData.useEntityRecord( 'postType', props.context.postType, props.context.postId );
+			const [ mastodonUrl ]         = useState( record?.share_on_mastodon?.url ?? '' );
+			const [ pixelfedUrl ]         = useState( record?.share_on_pixelfed?.url ?? '' );
 
-			if ( 'undefined' !== typeof meta && meta.hasOwnProperty( '_share_on_mastodon_url' ) && meta._share_on_mastodon_url.length ) {
-				urls.push( { name: __( 'Mastodon', 'indieblocks' ), value: meta._share_on_mastodon_url } );
+			const urls = [];
+
+			if ( '' !== mastodonUrl ) {
+				urls.push( { name: __( 'Mastodon', 'indieblocks' ), value: mastodonUrl } );
 			}
 
-			if ( 'undefined' !== typeof meta && meta.hasOwnProperty( '_share_on_pixelfed_url' ) && meta._share_on_pixelfed_url.length ) {
-				urls.push( { name: __( 'Pixelfed', 'indieblocks' ), value: meta._share_on_pixelfed_url } );
+			if ( '' !== pixelfedUrl ) {
+				urls.push( { name: __( 'Pixelfed', 'indieblocks' ), value: pixelfedUrl } );
 			}
 
 			return el( 'div', useBlockProps(),

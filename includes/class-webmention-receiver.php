@@ -393,11 +393,11 @@ class Webmention_Receiver {
 			return $allowedtags;
 		}
 
-		if ( empty( $allowedtags['br'] ) ) {
+		if ( ! array_key_exists( 'br', $allowedtags ) ) {
 			$allowedtags['br'] = array();
 		}
 
-		if ( empty( $allowedtags['p'] ) ) {
+		if ( ! array_key_exists( 'p', $allowedtags ) ) {
 			$allowedtags['p'] = array();
 		}
 

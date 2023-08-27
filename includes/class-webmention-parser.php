@@ -99,16 +99,16 @@ class Webmention_Parser {
 
 				if ( ! empty( $content ) && mb_strlen( sanitize_text_field( $content ) ) <= 500 ) {
 					// If `$content` is short enough, simply store it in its entirety.
-					$comment_content = sanitize_textarea_field( $content ); // @todo: WordPress will still sanitize this, so we oughta be a bit less strict.
+					$comment_content = wp_kses( $content, 'pre_comment_content' ); // WordPress will still sanitize this, but ...
 				} else {
 					// Fetch the bit of text surrounding the link to our page.
 					$context = static::fetch_context( $content, $target );
 
 					if ( '' !== $context ) {
-						$comment_content = $context;
+						$comment_content = $context; // Already sanitized (and escaped).
 					} elseif ( ! empty( $content ) ) {
 						// Simply show an excerpt.
-						$comment_content = wp_trim_words( sanitize_text_field( $content ), 25, ' [&hellip;]' );
+						$comment_content = wp_trim_words( $content, 25, ' [&hellip;]' );
 					}
 				}
 		}

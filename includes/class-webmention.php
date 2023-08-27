@@ -34,6 +34,8 @@ class Webmention {
 		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_api_endpoint' ) );
 		add_action( 'wp_head', array( Webmention_Receiver::class, 'webmention_link' ) );
 		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
+
+		add_filter( 'wp_kses_allowed_html', array( Webmention_Receiver::class, 'allowed_html' ), 10, 2 );
 	}
 
 	/**

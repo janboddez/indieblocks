@@ -380,4 +380,27 @@ class Webmention_Receiver {
 
 		wp_die();
 	}
+
+	/**
+	 * Adds line breaks to the list of allowed comment tags.
+	 *
+	 * @param  array  $allowedtags Allowed HTML tags.
+	 * @param  string $context     Context.
+	 * @return array               Filtered tag list.
+	 */
+	public static function allowed_html( $allowedtags, $context = '' ) {
+		if ( 'pre_comment_content' !== $context ) {
+			return $allowedtags;
+		}
+
+		if ( empty( $allowedtags['br'] ) ) {
+			$allowedtags['br'] = array();
+		}
+
+		if ( empty( $allowedtags['p'] ) ) {
+			$allowedtags['p'] = array();
+		}
+
+		return $allowedtags;
+	}
 }

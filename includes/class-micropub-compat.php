@@ -231,12 +231,7 @@ class Micropub_Compat {
 
 			$options = get_options();
 			if ( ! empty( $options['parse_markdown'] ) ) {
-				// @todo: Store Markdown in `post_content_filtered`? Except we can't, not from this hook.
 				$content = Michelf\MarkdownExtra::defaultTransform( $content );
-				// Probably better, for POSSE'ing and whatnot, to convert the
-				// post's content back to "Markdown." So that, rather than drop
-				// elements like `blockquote`, we get, e.g., `> `, etc. So, let
-				// those plugins deal with it.
 			}
 
 			$content = wp_kses_post( $content );
@@ -515,13 +510,9 @@ class Micropub_Compat {
 						}
 					}
 					break;
-
-				case 'note':
-					if ( ! empty( $content ) ) {
-						$post_content .= '<!-- wp:freeform -->' . $content . '<!-- /wp:freeform -->';
-					}
-					break;
 			}
+		} elseif ( 'note' === $post_type && ! empty( $content ) ) {
+			$post_content .= '<!-- wp:freeform -->' . $content . '<!-- /wp:freeform -->';
 		}
 
 		return trim( $post_content );

@@ -28,7 +28,7 @@ More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/
 
 == Changelog ==
 = 0.8.1 =
-Fix issue with saving meta from block editor.
+Fix issue with saving meta from block editor. Fix Markdown in Micropub notes.
 = 0.8.0 =
 Various bug fixes. Add Link Preview block. Also, webmentions are now closed when comments are, although this behavior is filterable.
 = 0.7.1 =

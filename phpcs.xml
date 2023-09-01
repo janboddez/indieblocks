@@ -4,6 +4,7 @@
 
 	<rule ref="WordPress">
 		<exclude name="Generic.Files.LineEndings.InvalidEOLChar" />
+		<exclude name="WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound" />
 	</rule>
 
 	<exclude-pattern>tests/*</exclude-pattern>

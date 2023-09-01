@@ -24,7 +24,9 @@ class Theme_Mf2 {
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
 		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 
-		add_action( 'init', array( __CLASS__, 'register_core_block_callbacks' ) );
+		add_action( 'init', array( __CLASS__, 'deregister_core_blocks' ), 1 );
+		add_action( 'init', array( __CLASS__, 'reregister_core_blocks' ) );
+		add_action( 'init', array( __CLASS__, 'deregister_gutenberg_blocks' ) );
 	}
 
 	/**
@@ -152,71 +154,116 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Reregisters, and adds a custom render callback to, the same core post
-	 * blocks.
+	 * Deregisters some of WordPress's default post blocks.
 	 */
-	public static function register_core_block_callbacks() {
-		add_filter( 'render_block_core/post-author', array( __CLASS__, 'render_block_core_post_author' ), 10, 3 );
-		add_filter( 'render_block_core/post-author', array( __CLASS__, 'render_block_core_post_author_name' ), 10, 3 );
-		add_filter( 'render_block_core/post-content', array( __CLASS__, 'render_block_core_post_content' ), 10, 3 );
-		add_filter( 'render_block_core/post-date', array( __CLASS__, 'render_block_core_post_date' ), 10, 3 );
-		add_filter( 'render_block_core/post-excerpt', array( __CLASS__, 'render_block_core_post_excerpt' ), 10, 3 );
-		add_filter( 'render_block_core/post-title', array( __CLASS__, 'render_block_core_post_title' ), 10, 3 );
-		add_filter( 'render_block_core/comment-author-name', array( __CLASS__, 'render_block_core_comment_author_name' ), 10, 3 );
-		add_filter( 'render_block_core/comment-content', array( __CLASS__, 'render_block_core_comment_content' ), 10, 3 );
-		add_filter( 'render_block_core/comment-date', array( __CLASS__, 'render_block_core_comment_date' ), 10, 3 );
+	public static function deregister_core_blocks() {
+		remove_action( 'init', 'register_block_core_post_content' );
+		remove_action( 'init', 'register_block_core_post_date' );
+		remove_action( 'init', 'register_block_core_post_excerpt' );
+		remove_action( 'init', 'register_block_core_post_title' );
+		remove_action( 'init', 'register_block_core_comment_author_name' );
+		remove_action( 'init', 'register_block_core_comment_content' );
+		remove_action( 'init', 'register_block_core_comment_date' );
 	}
 
 	/**
-	 * Adds `p-author` and `h-card` (and so on) to the post author block.
-	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               Post author HTML.
+	 * Reregisters, and adds a custom render callback to, the same core post
+	 * blocks.
 	 */
-	public static function render_block_core_post_author( $attributes, $content, $block ) {
-		if ( ! isset( $block->context['postId'] ) ) {
-			$author_id = get_query_var( 'author' );
-		} else {
-			$author_id = get_post_field( 'post_author', $block->context['postId'] );
-		}
+	public static function reregister_core_blocks() {
+		add_filter( 'render_block_core/post-author-name', array( __CLASS__, 'render_block_core_post_author_name' ), 11, 3 );
+		add_filter( 'render_block_core/post-author', array( __CLASS__, 'render_block_core_post_author' ), 11, 3 );
 
-		if ( empty( $author_id ) ) {
-			return '';
-		}
-
-		$avatar = ! empty( $attributes['avatarSize'] ) ? get_avatar(
-			$author_id,
-			$attributes['avatarSize'],
-			'',
-			'',
-			array( 'class' => 'u-photo' )
-		) : null;
-
-		$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
-		$classes = array_merge(
-			isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-			isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/post-content',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_post_content' ),
+			)
 		);
 
-		$author_url = get_the_author_meta( 'url', $author_id );
-		if ( empty( $author_url ) ) {
-			$author_url = get_author_posts_url( $author_id );
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/post-date',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_post_date' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/post-excerpt',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_post_excerpt' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/post-title',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_post_title' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-author-name',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_author_name' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-content',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_content' ),
+			)
+		);
+
+		register_block_type_from_metadata(
+			ABSPATH . WPINC . '/blocks/comment-date',
+			array(
+				'render_callback' => array( __CLASS__, 'render_block_core_comment_date' ),
+			)
+		);
+	}
+
+	/**
+	 * Stops the Gutenberg plugin from registering these blocks a second time.
+	 */
+	public static function deregister_gutenberg_blocks() {
+		remove_action( 'init', 'gutenberg_register_block_core_post_content', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_post_date', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_post_excerpt', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_post_title', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_author_name', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_content', 20 );
+		remove_action( 'init', 'gutenberg_register_block_core_comment_date', 20 );
+	}
+
+	/**
+	 * Adds `p-author` and `h-card` (and so on) to the post author name block.
+	 *
+	 * @param string    $content  Rendered block HTML.
+	 * @param array     $block    Parsed block.
+	 * @param \WP_Block $instance Block instance.
+	 * @return string             Updated block HTML.
+	 */
+	public static function render_block_core_post_author( $content, $block, $instance ) {
+		$processor = new \WP_HTML_Tag_Processor( $content );
+		$processor->next_tag( array( 'tag_name' => 'div', 'class_name' => 'wp-block-post-author' ) );
+		$processor->add_class( 'h-card' );
+		$processor->add_class( 'p-author' );
+
+		if ( ! empty( $instance->attributes['avatarSize'] ) ) {
+			$processor->next_tag( array( 'tag_name' => 'img', 'class_name' => 'avatar' ) );
+			$processor->add_class( 'u-photo' );
 		}
 
-		$classes[] = 'h-card p-author';
+		if ( ! empty( $instance->attributes['isLink'] ) ) {
+			$processor->next_tag( array( 'tag_name' => 'p', 'class_name' => 'wp-block-post-author__name' ) ); // Not sure this helps, at all, to skip possible `a` elements that might occur before.
+			$processor->next_tag( 'a' );
+			$processor->add_class( 'u-url' );
+			$processor->set_attribute( 'rel', 'author me' );
+		}
 
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
-
-		return sprintf( '<div %1$s>', $wrapper_attributes ) .
-		( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
-		'<div class="wp-block-post-author__content">' .
-		( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . wp_kses_post( $byline ) . '</p>' : '' ) .
-		'<p class="wp-block-post-author__name"><a class="u-url" href="' . esc_url( $author_url ) . '" rel="author me"><span class="p-name">' . get_the_author_meta( 'display_name', $author_id ) . '</span></a></p>' .
-		( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
-		'</div>' .
-		'</div>';
+		return $processor->get_updated_html();
 	}
 
 	/**
@@ -228,37 +275,17 @@ class Theme_Mf2 {
 	 * @return string             Updated block HTML.
 	 */
 	public static function render_block_core_post_author_name( $content, $block, $instance ) {
-		if ( ! isset( $instance->context['postId'] ) ) {
-			return '';
+		$processor = new \WP_HTML_Tag_Processor( $content );
+		$processor->next_tag( array( 'tag_name' => 'div', 'class_name' => 'wp-block-post-author-name' ) );
+		$processor->add_class( 'h-card' );
+		$processor->add_class( 'p-author' );
+
+		if ( ! empty( $instance->attributes['isLink'] ) ) {
+			$processor->next_tag( array( 'tag_name' => 'a', 'class_name' => 'wp-block-post-author-name__link' ) );
+			$processor->add_class( 'u-url' );
 		}
 
-		$author_id = get_post_field( 'post_author', $instance->context['postId'] );
-		if ( empty( $author_id ) ) {
-			return '';
-		}
-
-		$author_name = get_the_author_meta( 'display_name', $author_id );
-		if ( isset( $block['attrs']['isLink'] ) && $block['attrs']['isLink'] ) {
-			$author_url = get_the_author_meta( 'url', $author_id );
-			if ( empty( $author_url ) ) {
-				$author_url = get_author_posts_url( $author_id );
-			}
-
-			$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link u-url">%3$s</a>', esc_url( $author_url ), esc_attr( $block['attrs']['linkTarget'] ), $author_name );
-		}
-
-		$classes = array();
-		if ( isset( $block['attrs']['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $block['attrs']['textAlign'];
-		}
-		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-			$classes[] = 'has-link-color';
-		}
-		$classes[] = 'h-card p-author';
-
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
-
-		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $author_name );
+		return $processor->get_updated_html();
 	}
 
 	/**

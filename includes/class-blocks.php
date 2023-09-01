@@ -597,24 +597,28 @@ class Blocks {
 		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
 
 		$border_style = '';
+
 		if ( ! empty( $attributes['borderColor'] ) ) {
 			$border_style .= "border-color:var(--wp--preset--color--{$attributes['borderColor']});";
 		} elseif ( ! empty( $attributes['style']['border']['color'] ) ) {
 			$border_style .= "border-color:{$attributes['style']['border']['color']};";
 		}
+
 		if ( ! empty( $attributes['style']['border']['width'] ) ) {
 			$border_style .= "border-width:{$attributes['style']['border']['width']};";
 		}
+
 		if ( ! empty( $attributes['style']['border']['radius'] ) ) {
 			$border_style .= "border-radius:{$attributes['style']['border']['radius']};";
 		}
+
 		$border_style = trim( $border_style );
 
 		ob_start();
 		?>
 		<a class="indieblocks-card" href="<?php echo esc_url( $card['url'] ); ?>" rel="nofollow">
 			<?php
-			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( trim( $border_style . ' border-block: none; border-inline-start: none; border-radius: 0 !important;' ) ) );
+			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( trim( $border_style . ' border-block:none;border-inline-start:none;border-radius:0 !important;' ) ) );
 
 			if ( ! empty( $card['thumbnail'] ) ) :
 				// Check if file still exists.

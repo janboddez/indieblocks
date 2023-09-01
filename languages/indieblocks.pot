@@ -2,22 +2,22 @@
 # This file is distributed under the GNU General Public License v3.
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.7.0\n"
+"Project-Id-Version: IndieBlocks 0.8.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-22T16:34:31+00:00\n"
+"POT-Creation-Date: 2023-09-01T06:37:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: indieblocks\n"
 
 #. Plugin Name of the plugin
-#: includes/class-options-handler.php:182
-#: includes/class-options-handler.php:183
-#: includes/class-options-handler.php:348
+#: includes/class-options-handler.php:207
+#: includes/class-options-handler.php:208
+#: includes/class-options-handler.php:360
 msgid "IndieBlocks"
 msgstr ""
 
@@ -37,38 +37,38 @@ msgstr ""
 msgid "https://jan.boddez.net/"
 msgstr ""
 
-#: includes/class-blocks.php:99
+#: includes/class-blocks.php:116
 msgid "Note Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:100
+#: includes/class-blocks.php:117
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:117
+#: includes/class-blocks.php:134
 msgid "Repost Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:118
+#: includes/class-blocks.php:135
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts."
 msgstr ""
 
-#: includes/class-blocks.php:405
-#: blocks/syndication/block.js:31
+#: includes/class-blocks.php:455
+#: blocks/syndication/block.js:35
 msgid "Mastodon"
 msgstr ""
 
-#: includes/class-blocks.php:406
-#: blocks/syndication/block.js:35
+#: includes/class-blocks.php:456
+#: blocks/syndication/block.js:39
 msgid "Pixelfed"
 msgstr ""
 
-#: includes/class-blocks.php:417
+#: includes/class-blocks.php:467
 msgid "Also on"
 msgstr ""
 
 #. translators: %s: site title
-#: includes/class-feeds.php:124
+#: includes/class-feeds.php:125
 msgid "Posts &#8211; %s"
 msgstr ""
 
@@ -89,34 +89,34 @@ msgid "Name"
 msgstr ""
 
 #: includes/class-location.php:107
-#: blocks/location/block.js:38
-#: blocks/location/block.js:62
+#: blocks/location/block.js:46
+#: blocks/location/block.js:83
 msgid "Location"
 msgstr ""
 
 #. translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page.
-#: includes/class-micropub-compat.php:281
+#: includes/class-micropub-compat.php:276
 #: assets/common.js:13
 msgid "Likes %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
-#: includes/class-micropub-compat.php:304
-#: includes/class-micropub-compat.php:319
+#: includes/class-micropub-compat.php:299
+#: includes/class-micropub-compat.php:314
 #: assets/common.js:24
 #: blocks/context/block.js:22
 msgid "Likes %s."
 msgstr ""
 
 #. translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page.
-#: includes/class-micropub-compat.php:344
+#: includes/class-micropub-compat.php:339
 #: assets/common.js:11
 msgid "Bookmarked %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
-#: includes/class-micropub-compat.php:367
-#: includes/class-micropub-compat.php:382
+#: includes/class-micropub-compat.php:362
+#: includes/class-micropub-compat.php:377
 #: assets/common.js:22
 #: blocks/context/block.js:20
 #: blocks/context/block.js:93
@@ -124,14 +124,14 @@ msgid "Bookmarked %s."
 msgstr ""
 
 #. translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to.
-#: includes/class-micropub-compat.php:407
+#: includes/class-micropub-compat.php:402
 #: assets/common.js:15
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the page being replied to.
-#: includes/class-micropub-compat.php:430
-#: includes/class-micropub-compat.php:445
+#: includes/class-micropub-compat.php:425
+#: includes/class-micropub-compat.php:440
 #: assets/common.js:26
 #: blocks/context/block.js:24
 #: blocks/context/block.js:97
@@ -139,496 +139,531 @@ msgid "In reply to %s."
 msgstr ""
 
 #. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted.
-#: includes/class-micropub-compat.php:470
+#: includes/class-micropub-compat.php:465
 #: assets/common.js:17
 msgid "Reposted %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "page" being reposted.
-#: includes/class-micropub-compat.php:493
-#: includes/class-micropub-compat.php:508
+#: includes/class-micropub-compat.php:488
+#: includes/class-micropub-compat.php:503
 #: assets/common.js:28
 #: blocks/context/block.js:26
 #: blocks/context/block.js:99
 msgid "Reposted %s."
 msgstr ""
 
-#: includes/class-options-handler.php:357
+#: includes/class-options-handler.php:369
 msgid "Microformats and Blocks"
 msgstr ""
 
-#: includes/class-options-handler.php:358
-#: includes/class-options-handler.php:445
+#: includes/class-options-handler.php:370
+#: includes/class-options-handler.php:474
 msgid "Post Types"
 msgstr ""
 
-#: includes/class-options-handler.php:359
-#: includes/class-options-handler.php:440
-#: includes/class-webmention-receiver.php:283
-#: includes/class-webmention-sender.php:359
+#: includes/class-options-handler.php:371
+#: includes/class-options-handler.php:469
+#: includes/class-webmention-receiver.php:288
+#: includes/class-webmention-sender.php:367
 msgid "Webmention"
 msgstr ""
 
-#: includes/class-options-handler.php:360
+#: includes/class-options-handler.php:372
 msgid "Miscellaneous"
 msgstr ""
 
-#: includes/class-options-handler.php:366
+#: includes/class-options-handler.php:378
 msgid "Blocks"
 msgstr ""
 
-#: includes/class-options-handler.php:367
+#: includes/class-options-handler.php:379
 msgid "Enable blocks"
 msgstr ""
 
-#: includes/class-options-handler.php:368
+#: includes/class-options-handler.php:380
 msgid "Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!"
 msgstr ""
 
-#: includes/class-options-handler.php:371
+#: includes/class-options-handler.php:383
 msgid "Microformats"
 msgstr ""
 
-#: includes/class-options-handler.php:372
+#: includes/class-options-handler.php:384
 msgid "Enable microformats"
 msgstr ""
 
-#: includes/class-options-handler.php:373
+#: includes/class-options-handler.php:385
 msgid "(Experimental) Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor."
 msgstr ""
 
-#: includes/class-options-handler.php:381
+#: includes/class-options-handler.php:393
 msgid "Custom Post Types"
 msgstr ""
 
-#: includes/class-options-handler.php:382
+#: includes/class-options-handler.php:395
 msgid "Enable &ldquo;Notes&rdquo;"
 msgstr ""
 
-#: includes/class-options-handler.php:383
-#: includes/class-options-handler.php:389
+#: includes/class-options-handler.php:397
+#: includes/class-options-handler.php:407
 msgid "Include in main feed"
 msgstr ""
 
-#: includes/class-options-handler.php:384
-#: includes/class-options-handler.php:390
+#: includes/class-options-handler.php:398
+#: includes/class-options-handler.php:408
 msgid "Show on blog page"
 msgstr ""
 
-#: includes/class-options-handler.php:385
-msgid "Enable categories and tags"
-msgstr ""
-
-#: includes/class-options-handler.php:388
-msgid "Enable &ldquo;Likes&rdquo;"
-msgstr ""
-
-#: includes/class-options-handler.php:393
-msgid "Random Slugs"
-msgstr ""
-
-#: includes/class-options-handler.php:394
-msgid "Generate random slugs"
-msgstr ""
-
-#: includes/class-options-handler.php:395
-msgid "Autogenerate unique note and like slugs. Disable for WordPress&rsquo; default behavior."
-msgstr ""
-
-#: includes/class-options-handler.php:398
-msgid "Autogenerate Titles"
-msgstr ""
-
 #: includes/class-options-handler.php:399
-msgid "Automatically generate titles"
+#: includes/class-options-handler.php:409
+msgid "Include in author archives"
 msgstr ""
 
 #: includes/class-options-handler.php:400
-msgid "Have like and bookmark titles reflect linked (i.e., liked or bookmarked) pages"
-msgstr ""
-
-#: includes/class-options-handler.php:403
-msgid "Hide Titles"
+#: includes/class-options-handler.php:410
+msgid "Enable categories and tags"
 msgstr ""
 
 #: includes/class-options-handler.php:405
-msgid "Hide note and like titles"
+msgid "Enable &ldquo;Likes&rdquo;"
 msgstr ""
 
-#: includes/class-options-handler.php:406
-msgid "(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Full-Site Editor."
-msgstr ""
-
-#: includes/class-options-handler.php:408
-msgid "Exempt like and bookmark titles"
-msgstr ""
-
-#: includes/class-options-handler.php:409
-msgid "Do <em>not</em> hide not and bookmark titles, <em>and</em> have them link to the liked or bookmarked page."
+#: includes/class-options-handler.php:414
+msgid "Random Slugs"
 msgstr ""
 
 #: includes/class-options-handler.php:415
-msgid "Date-Based Archives"
+msgid "Generate random slugs"
 msgstr ""
 
 #: includes/class-options-handler.php:416
-msgid "Enable date-based archives"
+msgid "Autogenerate unique note and like slugs. Disable for WordPress&rsquo; default behavior."
 msgstr ""
 
-#: includes/class-options-handler.php:417
-msgid "(Experimental) Enable year, month, and day archives for notes and likes."
+#: includes/class-options-handler.php:419
+msgid "Autogenerate Titles"
 msgstr ""
 
-#: includes/class-options-handler.php:420
-msgid "Permalink Format"
+#: includes/class-options-handler.php:421
+msgid "Automatically generate titles"
+msgstr ""
+
+#: includes/class-options-handler.php:423
+msgid "Have bookmark titles reflect bookmarked pages"
+msgstr ""
+
+#: includes/class-options-handler.php:424
+msgid "&ldquo;Bookmarks&rdquo; are <em>notes that contain a Bookmark block</em>."
 msgstr ""
 
 #: includes/class-options-handler.php:425
-msgid "(Experimental) Set a custom note and like permalink format."
-msgstr ""
-
-#: includes/class-options-handler.php:429
-msgid "Feed Modifications"
+msgid "Have like titles reflect liked pages"
 msgstr ""
 
 #: includes/class-options-handler.php:430
-msgid "Modify feeds"
+msgid "Web Feeds"
 msgstr ""
 
 #: includes/class-options-handler.php:431
-msgid "(Experimental) Remove note and like titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates."
+#: includes/class-options-handler.php:437
+msgid "Hide note and like titles"
+msgstr ""
+
+#: includes/class-options-handler.php:432
+msgid "(Experimental) Remove note (and like) titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates."
+msgstr ""
+
+#: includes/class-options-handler.php:435
+msgid "Hide (or Show) Titles"
+msgstr ""
+
+#: includes/class-options-handler.php:438
+msgid "(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Site Editor."
+msgstr ""
+
+#: includes/class-options-handler.php:440
+msgid "Exempt bookmark titles"
 msgstr ""
 
 #: includes/class-options-handler.php:441
-msgid "Enable Webmention"
+msgid "Do <em>not</em> hide bookmark titles, <em>and</em> have them link to the bookmarked page."
 msgstr ""
 
 #: includes/class-options-handler.php:442
-msgid "(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same."
+msgid "Exempt like titles"
+msgstr ""
+
+#: includes/class-options-handler.php:443
+msgid "Do <em>not</em> hide like titles, <em>and</em> have them link to the liked page."
+msgstr ""
+
+#: includes/class-options-handler.php:449
+msgid "Date-Based Archives"
 msgstr ""
 
 #: includes/class-options-handler.php:450
-msgid "The post types for which webmentions (outgoing and incoming) should be enabled."
+msgid "Enable date-based archives"
+msgstr ""
+
+#: includes/class-options-handler.php:451
+msgid "(Experimental) Enable year, month, and day archives for notes and likes."
 msgstr ""
 
 #: includes/class-options-handler.php:454
-msgid "Webmention Delay"
-msgstr ""
-
-#: includes/class-options-handler.php:456
-msgid "The time, in seconds, WordPress should delay sending webmentions after a post is first published."
+msgid "Permalink Format"
 msgstr ""
 
 #: includes/class-options-handler.php:459
+msgid "(Experimental) Set a custom note and like permalink format."
+msgstr ""
+
+#: includes/class-options-handler.php:470
+msgid "Enable Webmention"
+msgstr ""
+
+#: includes/class-options-handler.php:471
+msgid "(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same."
+msgstr ""
+
+#: includes/class-options-handler.php:479
+msgid "The post types for which webmentions (outgoing and incoming) should be enabled."
+msgstr ""
+
+#: includes/class-options-handler.php:483
+msgid "Webmention Delay"
+msgstr ""
+
+#: includes/class-options-handler.php:485
+msgid "The time, in seconds, WordPress should delay sending webmentions after a post is first published."
+msgstr ""
+
+#: includes/class-options-handler.php:488
 #: blocks/facepile-content/block.js:55
 msgid "Avatars"
 msgstr ""
 
-#: includes/class-options-handler.php:460
+#: includes/class-options-handler.php:489
 msgid "Cache avatars"
 msgstr ""
 
-#: includes/class-options-handler.php:461
+#: includes/class-options-handler.php:490
 msgid "(Experimental) Attempt to locally cache avatars. Uncheck to disable webmention avatars altogether."
 msgstr ""
 
-#: includes/class-options-handler.php:464
+#: includes/class-options-handler.php:493
 msgid "Facepile"
 msgstr ""
 
-#: includes/class-options-handler.php:465
+#: includes/class-options-handler.php:494
 msgid "&ldquo;Facepile&rdquo; bookmarks, likes, and reposts"
 msgstr ""
 
-#: includes/class-options-handler.php:466
+#: includes/class-options-handler.php:495
 msgid "(Experimental) Display bookmarks, likes, and reposts separate from &ldquo;regular&rdquo; comments."
 msgstr ""
 
-#: includes/class-options-handler.php:474
+#: includes/class-options-handler.php:503
 msgid "Featured Images"
 msgstr ""
 
-#: includes/class-options-handler.php:475
+#: includes/class-options-handler.php:504
 msgid "Add Featured Images to feeds"
 msgstr ""
 
-#: includes/class-options-handler.php:476
+#: includes/class-options-handler.php:505
 msgid "(Experimental) Prepend Featured Images to feed items."
 msgstr ""
 
-#: includes/class-options-handler.php:479
+#: includes/class-options-handler.php:508
 msgid "Location and Weather"
 msgstr ""
 
-#: includes/class-options-handler.php:480
+#: includes/class-options-handler.php:509
 msgid "Enable location functions"
 msgstr ""
 
-#: includes/class-options-handler.php:481
+#: includes/class-options-handler.php:510
 msgid "(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts."
 msgstr ""
 
-#: includes/class-options-handler.php:484
+#: includes/class-options-handler.php:513
 msgid "Weather Units"
 msgstr ""
 
-#: includes/class-options-handler.php:485
+#: includes/class-options-handler.php:514
 msgid "Metric"
 msgstr ""
 
-#: includes/class-options-handler.php:486
+#: includes/class-options-handler.php:515
 msgid "Imperial"
 msgstr ""
 
-#: includes/class-options-handler.php:489
+#: includes/class-options-handler.php:518
 msgid "Micropub"
 msgstr ""
 
-#: includes/class-options-handler.php:490
+#: includes/class-options-handler.php:519
 msgid "Deeper Micropub integration"
 msgstr ""
 
-#: includes/class-options-handler.php:491
+#: includes/class-options-handler.php:520
 msgid "(Experimental) Add post type and category data to responses to Micropub &ldquo;config&rdquo; queries."
 msgstr ""
 
-#: includes/class-options-handler.php:494
-#: includes/class-options-handler.php:495
+#: includes/class-options-handler.php:523
+#: includes/class-options-handler.php:524
 msgid "Parse Markdown"
 msgstr ""
 
-#: includes/class-options-handler.php:496
+#: includes/class-options-handler.php:525
 msgid "(Experimental) Parse Markdown inside &ldquo;Micropub&rdquo; notes or likes."
 msgstr ""
 
-#: includes/class-options-handler.php:569
-#: includes/class-post-types.php:92
+#: includes/class-options-handler.php:528
+msgid "Link Preview Cards"
+msgstr ""
+
+#: includes/class-options-handler.php:529
+msgid "Generate preview cards"
+msgstr ""
+
+#: includes/class-options-handler.php:530
+msgid "(Experimental) Fetch link metadata in order to generate &ldquo;link preview cards.&rdquo;"
+msgstr ""
+
+#: includes/class-options-handler.php:644
+#: includes/class-post-types.php:86
 msgid "notes"
 msgstr ""
 
-#: includes/class-options-handler.php:587
+#: includes/class-options-handler.php:672
 msgid "sample-post"
 msgstr ""
 
-#: includes/class-post-types.php:77
+#: includes/class-post-types.php:71
 msgid "Notes"
 msgstr ""
 
-#: includes/class-post-types.php:78
+#: includes/class-post-types.php:72
 msgid "Note"
 msgstr ""
 
-#: includes/class-post-types.php:79
+#: includes/class-post-types.php:73
 msgid "New Note"
 msgstr ""
 
-#: includes/class-post-types.php:80
+#: includes/class-post-types.php:74
 msgid "Add New Note"
 msgstr ""
 
-#: includes/class-post-types.php:81
+#: includes/class-post-types.php:75
 msgid "Edit Note"
 msgstr ""
 
-#: includes/class-post-types.php:82
+#: includes/class-post-types.php:76
 msgid "View Note"
 msgstr ""
 
-#: includes/class-post-types.php:83
+#: includes/class-post-types.php:77
 msgid "View Notes"
 msgstr ""
 
-#: includes/class-post-types.php:84
+#: includes/class-post-types.php:78
 msgid "Search Notes"
 msgstr ""
 
-#: includes/class-post-types.php:85
+#: includes/class-post-types.php:79
 msgid "No notes found."
 msgstr ""
 
-#: includes/class-post-types.php:86
+#: includes/class-post-types.php:80
 msgid "No notes found in trash."
 msgstr ""
 
-#: includes/class-post-types.php:119
+#: includes/class-post-types.php:113
 msgid "Likes"
 msgstr ""
 
-#: includes/class-post-types.php:120
+#: includes/class-post-types.php:114
 #: blocks/context/block.js:71
-#: blocks/like/block.js:79
+#: blocks/like/block.js:78
 msgid "Like"
 msgstr ""
 
-#: includes/class-post-types.php:121
+#: includes/class-post-types.php:115
 msgid "New Like"
 msgstr ""
 
-#: includes/class-post-types.php:122
+#: includes/class-post-types.php:116
 msgid "Add New Like"
 msgstr ""
 
-#: includes/class-post-types.php:123
+#: includes/class-post-types.php:117
 msgid "Edit Like"
 msgstr ""
 
-#: includes/class-post-types.php:124
+#: includes/class-post-types.php:118
 msgid "View Like"
 msgstr ""
 
-#: includes/class-post-types.php:125
+#: includes/class-post-types.php:119
 msgid "View Likes"
 msgstr ""
 
-#: includes/class-post-types.php:126
+#: includes/class-post-types.php:120
 msgid "Search Likes"
 msgstr ""
 
-#: includes/class-post-types.php:127
+#: includes/class-post-types.php:121
 msgid "No likes found."
 msgstr ""
 
-#: includes/class-post-types.php:128
+#: includes/class-post-types.php:122
 msgid "No likes found in trash."
 msgstr ""
 
-#: includes/class-post-types.php:134
+#: includes/class-post-types.php:128
 msgid "likes"
 msgstr ""
 
-#: includes/class-webmention-parser.php:154
+#: includes/class-webmention-parser.php:80
 msgid "&hellip; bookmarked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:158
+#: includes/class-webmention-parser.php:85
 msgid "&hellip; liked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:162
+#: includes/class-webmention-parser.php:89
 msgid "&hellip; reposted this!"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:209
+#: includes/class-webmention-parser.php:93
+msgid "&hellip; (wants to) read this!"
+msgstr ""
+
+#: includes/class-webmention-receiver.php:214
 msgid "&hellip; commented on this."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:302
+#: includes/class-webmention-receiver.php:307
 msgid "Source"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:305
+#: includes/class-webmention-receiver.php:310
 #: blocks/context/block.js:67
 msgid "Type"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:309
+#: includes/class-webmention-receiver.php:314
 msgid "Avatar"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:313
+#: includes/class-webmention-receiver.php:318
 msgid "Delete"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:337
-#: includes/class-webmention-sender.php:426
+#: includes/class-webmention-receiver.php:348
+#: includes/class-webmention-sender.php:434
 msgid "Missing or invalid nonce."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:343
+#: includes/class-webmention-receiver.php:354
 msgid "Invalid comment ID."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:351
-#: includes/class-webmention-sender.php:440
+#: includes/class-webmention-receiver.php:362
+#: includes/class-webmention-sender.php:448
 msgid "Insufficient rights."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:391
+#: includes/class-webmention-sender.php:399
 msgid "Sent to %1$s on %2$s. Response code: %3$d."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:391
+#: includes/class-webmention-sender.php:399
 msgid "M j, Y \\a\\t H:i"
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:394
+#: includes/class-webmention-sender.php:402
 msgid "Could not send webmention to %s."
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:397
+#: includes/class-webmention-sender.php:405
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr ""
 
-#: includes/class-webmention-sender.php:407
+#: includes/class-webmention-sender.php:415
 msgid "Resend"
 msgstr ""
 
-#: includes/class-webmention-sender.php:411
-#: includes/class-webmention.php:148
+#: includes/class-webmention-sender.php:419
+#: includes/class-webmention.php:143
 msgid "Webmention scheduled."
 msgstr ""
 
-#: includes/class-webmention-sender.php:413
+#: includes/class-webmention-sender.php:421
 msgid "No endpoints found."
 msgstr ""
 
-#: includes/class-webmention-sender.php:432
+#: includes/class-webmention-sender.php:440
 msgid "Invalid post ID."
 msgstr ""
 
-#: blocks/bookmark/block.js:27
+#: blocks/bookmark/block.js:26
 msgid "Bookmark and annotate web pages or posts."
 msgstr ""
 
-#: blocks/bookmark/block.js:79
+#: blocks/bookmark/block.js:78
 #: blocks/context/block.js:70
 msgid "Bookmark"
 msgstr ""
 
-#: blocks/bookmark/block.js:84
-#: blocks/like/block.js:84
-#: blocks/reply/block.js:71
-#: blocks/repost/block.js:84
+#: blocks/bookmark/block.js:83
+#: blocks/like/block.js:83
+#: blocks/reply/block.js:70
+#: blocks/repost/block.js:83
 msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
-#: blocks/bookmark/block.js:88
-#: blocks/like/block.js:88
-#: blocks/reply/block.js:75
-#: blocks/repost/block.js:88
+#: blocks/bookmark/block.js:87
+#: blocks/like/block.js:87
+#: blocks/reply/block.js:74
+#: blocks/repost/block.js:87
 msgid "Title"
 msgstr ""
 
-#: blocks/bookmark/block.js:98
-#: blocks/like/block.js:98
-#: blocks/reply/block.js:85
-#: blocks/repost/block.js:98
+#: blocks/bookmark/block.js:97
+#: blocks/like/block.js:97
+#: blocks/reply/block.js:84
+#: blocks/repost/block.js:97
 msgid "Author"
 msgstr ""
 
-#: blocks/bookmark/block.js:118
-#: blocks/like/block.js:118
-#: blocks/reply/block.js:105
-#: blocks/repost/block.js:118
+#: blocks/bookmark/block.js:117
+#: blocks/like/block.js:117
+#: blocks/reply/block.js:104
+#: blocks/repost/block.js:117
 msgid "Customize title"
 msgstr ""
 
-#: blocks/bookmark/block.js:124
-#: blocks/like/block.js:124
-#: blocks/reply/block.js:111
-#: blocks/repost/block.js:124
+#: blocks/bookmark/block.js:123
+#: blocks/like/block.js:123
+#: blocks/reply/block.js:110
+#: blocks/repost/block.js:123
 msgid "Customize author"
 msgstr ""
 
-#: blocks/bookmark/block.js:131
+#: blocks/bookmark/block.js:130
 #: blocks/context/block.js:62
-#: blocks/like/block.js:131
-#: blocks/reply/block.js:118
-#: blocks/repost/block.js:131
+#: blocks/like/block.js:130
+#: blocks/reply/block.js:117
+#: blocks/repost/block.js:130
 msgid "URL"
 msgstr ""
 
@@ -641,12 +676,12 @@ msgid "Add a URL and post type, and have WordPress automatically generate a corr
 msgstr ""
 
 #: blocks/context/block.js:72
-#: blocks/reply/block.js:66
+#: blocks/reply/block.js:65
 msgid "Reply"
 msgstr ""
 
 #: blocks/context/block.js:73
-#: blocks/repost/block.js:79
+#: blocks/repost/block.js:78
 msgid "Repost"
 msgstr ""
 
@@ -675,36 +710,48 @@ msgstr ""
 msgid "Likes, Bookmarks, and Reposts"
 msgstr ""
 
-#: blocks/like/block.js:20
+#: blocks/like/block.js:19
 msgid "Show your appreciation for a certain web page or post."
 msgstr ""
 
-#: blocks/location/block.js:42
+#: blocks/link-preview/block.js:44
+msgid "No link preview card"
+msgstr ""
+
+#: blocks/link-preview/block.js:44
+msgid "Link Preview"
+msgstr ""
+
+#: blocks/location/block.js:50
 msgid "Display weather information"
 msgstr ""
 
-#: blocks/location/block.js:61
+#: blocks/location/block.js:57
+msgid "Separator"
+msgstr ""
+
+#: blocks/location/block.js:82
 msgid "No location"
 msgstr ""
 
-#: blocks/reply/block.js:20
+#: blocks/reply/block.js:19
 msgid "Reply to others’ (or your own) posts and pages."
 msgstr ""
 
-#: blocks/repost/block.js:27
+#: blocks/repost/block.js:26
 msgid "Use the Repost block to “reblog” another (short) post verbatim while still giving credit."
 msgstr ""
 
 #. translators: %s: plain-text "list" of links.
-#: blocks/syndication/block.js:18
+#: blocks/syndication/block.js:19
 msgid "Also on %s"
 msgstr ""
 
-#: blocks/syndication/block.js:43
+#: blocks/syndication/block.js:47
 msgid "No syndication links"
 msgstr ""
 
-#: blocks/syndication/block.js:44
+#: blocks/syndication/block.js:48
 msgid "Syndication Links"
 msgstr ""
 
@@ -731,6 +778,11 @@ msgstr ""
 #: blocks/like/block.json
 msgctxt "block title"
 msgid "Like"
+msgstr ""
+
+#: blocks/link-preview/block.json
+msgctxt "block title"
+msgid "Link Preview"
 msgstr ""
 
 #: blocks/location/block.json

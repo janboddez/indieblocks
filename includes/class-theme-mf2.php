@@ -24,9 +24,7 @@ class Theme_Mf2 {
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
 		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
 
-		add_action( 'init', array( __CLASS__, 'deregister_core_blocks' ), 1 );
-		add_action( 'init', array( __CLASS__, 'reregister_core_blocks' ) );
-		add_action( 'init', array( __CLASS__, 'deregister_gutenberg_blocks' ) );
+		add_action( 'init', array( __CLASS__, 'register_core_block_callbacks' ) );
 	}
 
 	/**
@@ -154,93 +152,19 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Deregisters some of WordPress's default post blocks.
-	 */
-	public static function deregister_core_blocks() {
-		remove_action( 'init', 'register_block_core_post_author' );
-		remove_action( 'init', 'register_block_core_post_content' );
-		remove_action( 'init', 'register_block_core_post_date' );
-		remove_action( 'init', 'register_block_core_post_excerpt' );
-		remove_action( 'init', 'register_block_core_post_title' );
-		remove_action( 'init', 'register_block_core_comment_author_name' );
-		remove_action( 'init', 'register_block_core_comment_content' );
-		remove_action( 'init', 'register_block_core_comment_date' );
-	}
-
-	/**
 	 * Reregisters, and adds a custom render callback to, the same core post
 	 * blocks.
 	 */
-	public static function reregister_core_blocks() {
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/post-author',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_post_author' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/post-content',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_post_content' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/post-date',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_post_date' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/post-excerpt',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_post_excerpt' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/post-title',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_post_title' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/comment-author-name',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_comment_author_name' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/comment-content',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_comment_content' ),
-			)
-		);
-
-		register_block_type_from_metadata(
-			ABSPATH . WPINC . '/blocks/comment-date',
-			array(
-				'render_callback' => array( __CLASS__, 'render_block_core_comment_date' ),
-			)
-		);
-	}
-
-	/**
-	 * Stops the Gutenberg plugin from registering these blocks a second time.
-	 */
-	public static function deregister_gutenberg_blocks() {
-		remove_action( 'init', 'gutenberg_register_block_core_post_author', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_post_content', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_post_date', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_post_excerpt', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_post_title', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_comment_author_name', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_comment_content', 20 );
-		remove_action( 'init', 'gutenberg_register_block_core_comment_date', 20 );
+	public static function register_core_block_callbacks() {
+		add_filter( 'render_block_core/post-author', array( __CLASS__, 'render_block_core_post_author' ), 10, 3 );
+		add_filter( 'render_block_core/post-author', array( __CLASS__, 'render_block_core_post_author_name' ), 10, 3 );
+		add_filter( 'render_block_core/post-content', array( __CLASS__, 'render_block_core_post_content' ), 10, 3 );
+		add_filter( 'render_block_core/post-date', array( __CLASS__, 'render_block_core_post_date' ), 10, 3 );
+		add_filter( 'render_block_core/post-excerpt', array( __CLASS__, 'render_block_core_post_excerpt' ), 10, 3 );
+		add_filter( 'render_block_core/post-title', array( __CLASS__, 'render_block_core_post_title' ), 10, 3 );
+		add_filter( 'render_block_core/comment-author-name', array( __CLASS__, 'render_block_core_comment_author_name' ), 10, 3 );
+		add_filter( 'render_block_core/comment-content', array( __CLASS__, 'render_block_core_comment_content' ), 10, 3 );
+		add_filter( 'render_block_core/comment-date', array( __CLASS__, 'render_block_core_comment_date' ), 10, 3 );
 	}
 
 	/**
@@ -293,6 +217,24 @@ class Theme_Mf2 {
 		( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description', $author_id ) . '</p>' : '' ) .
 		'</div>' .
 		'</div>';
+	}
+
+	/**
+	 * Adds `p-author` and `h-card` (and so on) to the post author name block.
+	 *
+	 * @param  array    $attributes Block attributes.
+	 * @param  string   $content    Block default content.
+	 * @param  WP_Block $block      Block instance.
+	 * @return string               Post author HTML.
+	 */
+	public static function render_block_core_post_author_name( $content, $block, $instance ) {
+		if ( ! isset( $block->context['postId'] ) ) {
+			$author_id = get_query_var( 'author' );
+		} else {
+			$author_id = get_post_field( 'post_author', $block->context['postId'] );
+		}
+
+        return $content;
 	}
 
 	/**

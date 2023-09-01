@@ -222,19 +222,43 @@ class Theme_Mf2 {
 	/**
 	 * Adds `p-author` and `h-card` (and so on) to the post author name block.
 	 *
-	 * @param  array    $attributes Block attributes.
-	 * @param  string   $content    Block default content.
-	 * @param  WP_Block $block      Block instance.
-	 * @return string               Post author HTML.
+	 * @param string    $content  Rendered block HTML.
+	 * @param array     $block    Parsed block.
+	 * @param \WP_Block $instance Block instance.
+	 * @return string             Updated block HTML.
 	 */
 	public static function render_block_core_post_author_name( $content, $block, $instance ) {
-		if ( ! isset( $block->context['postId'] ) ) {
-			$author_id = get_query_var( 'author' );
-		} else {
-			$author_id = get_post_field( 'post_author', $block->context['postId'] );
+		if ( ! isset( $instance->context['postId'] ) ) {
+			return '';
 		}
 
-        return $content;
+		$author_id = get_post_field( 'post_author', $instance->context['postId'] );
+		if ( empty( $author_id ) ) {
+			return '';
+		}
+
+		$author_name = get_the_author_meta( 'display_name', $author_id );
+		if ( isset( $block['attrs']['isLink'] ) && $block['attrs']['isLink'] ) {
+			$author_url = get_the_author_meta( 'url', $author_id );
+			if ( empty( $author_url ) ) {
+				$author_url = get_author_posts_url( $author_id );
+			}
+
+			$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link u-url">%3$s</a>', esc_url( $author_url ), esc_attr( $block['attrs']['linkTarget'] ), $author_name );
+		}
+
+		$classes = array();
+		if ( isset( $block['attrs']['textAlign'] ) ) {
+			$classes[] = 'has-text-align-' . $block['attrs']['textAlign'];
+		}
+		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+			$classes[] = 'has-link-color';
+		}
+		$classes[] = 'h-card p-author';
+
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $author_name );
 	}
 
 	/**

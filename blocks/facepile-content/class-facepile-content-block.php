@@ -7,12 +7,7 @@ class Facepile_Content_Block {
 	 * Registers the Facepile Content block.
 	 */
 	public static function register() {
-		register_block_type_from_metadata(
-			__DIR__,
-			array(
-				'render_callback' => array( __CLASS__, 'render_facepile_content_block' ),
-			)
-		);
+		register_block_type_from_metadata( __DIR__, array( 'render_callback' => array( __CLASS__, 'render_facepile_content_block' ) ) );
 
 		// This oughta happen automatically, but whatevs.
 		wp_set_script_translations(

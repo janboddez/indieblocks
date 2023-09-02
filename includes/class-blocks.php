@@ -2,16 +2,11 @@
 /**
  * Where Gutenberg blocks are registered.
  *
- * @todo: Move block registration and render functions to their respective folders?
- *
  * @package IndieBlocks
  */
 
 namespace IndieBlocks;
 
-/**
- * All things Gutenberg.
- */
 class Blocks {
 	/**
 	 * Hooks and such.

@@ -7,9 +7,6 @@
 
 namespace IndieBlocks;
 
-/**
- * Main plugin class.
- */
 class Plugin {
 	/**
 	 * Plugin version.

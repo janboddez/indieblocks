@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package IndieBlocks
+ */
 
 namespace IndieBlocks;
 

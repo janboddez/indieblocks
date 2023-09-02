@@ -45,7 +45,7 @@ class Blocks {
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
 			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
-			\IndieBlocks\IndieBlocks::PLUGIN_VERSION,
+			\IndieBlocks\Plugin::PLUGIN_VERSION,
 			true
 		);
 
@@ -301,7 +301,7 @@ class Blocks {
 		}
 
 		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __FILE__ ) ), array(), Plugin::PLUGIN_VERSION, false );
 
 		// Limit comments. Might provide a proper option later.
 		$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $block->context['postId'] );
@@ -594,7 +594,7 @@ class Blocks {
 		}
 
 		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __FILE__ ) ), array(), IndieBlocks::PLUGIN_VERSION, false );
+		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __FILE__ ) ), array(), Plugin::PLUGIN_VERSION, false );
 
 		$border_style = '';
 

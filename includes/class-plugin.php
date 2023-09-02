@@ -8,13 +8,13 @@
 namespace IndieBlocks;
 
 /**
- * Main IndieBlocks class.
+ * Main plugin class.
  */
-class IndieBlocks {
+class Plugin {
 	/**
 	 * Plugin version.
 	 */
-	const PLUGIN_VERSION = '0.8.1';
+	const PLUGIN_VERSION = '0.9.0';
 
 	/**
 	 * Options handler.

@@ -8,7 +8,8 @@
  * License:           GNU General Public License v3
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       indieblocks
- * Version:           0.8.1
+ * Version:           0.9.0
+ * Requires at least: 6.2
  * GitHub Plugin URI: https://github.com/janboddez/indieblocks
  * Primary Branch:    main
  *
@@ -27,5 +28,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Load dependencies.
 require_once __DIR__ . '/build/vendor/scoper-autoload.php';
 
-$indieblocks = IndieBlocks::get_instance();
+$indieblocks = Plugin::get_instance();
 $indieblocks->register();

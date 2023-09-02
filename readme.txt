@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblog, microblogging, micropub, fse, site editor, webmention, syndication
 Tested up to: 6.3
-Stable tag: 0.8.1
+Stable tag: 0.9.0
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,6 +27,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.9.0 =
+Overhaul theme microformats functionality.
 = 0.8.1 =
 Fix issue with saving meta from block editor. Fix Markdown in Micropub notes.
 = 0.8.0 =

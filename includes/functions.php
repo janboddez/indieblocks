@@ -15,7 +15,7 @@ namespace IndieBlocks;
  * @return array Current plugin settings.
  */
 function get_options() {
-	return IndieBlocks::get_instance()
+	return Plugin::get_instance()
 		->get_options_handler()
 		->get_options();
 }

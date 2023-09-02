@@ -15,6 +15,7 @@ class Theme_Mf2 {
 	 * Hooks and such.
 	 */
 	public static function register() {
+		add_action( 'init', array( __CLASS__, 'filter_core_blocks' ) );
 		add_filter( 'term_links-category', array( __CLASS__, 'add_term_link_class' ) );
 		add_filter( 'term_links-post_tag', array( __CLASS__, 'add_term_link_class' ) );
 		add_filter( 'body_class', array( __CLASS__, 'add_body_class' ), 99 );
@@ -23,8 +24,6 @@ class Theme_Mf2 {
 		add_filter( 'post_thumbnail_html', array( __CLASS__, 'add_thumbnail_class' ) );
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
 		add_filter( 'pre_get_avatar', array( __CLASS__, 'get_avatar_html' ), 10, 3 );
-
-		add_action( 'init', array( __CLASS__, 'filter_core_blocks' ) );
 	}
 
 	/**
@@ -142,13 +141,11 @@ class Theme_Mf2 {
 	 * @return string       Updated HTML.
 	 */
 	public static function add_thumbnail_class( $html ) {
-		if ( preg_match( '~class=("|\')~', $html, $matches ) ) {
-			$html = str_replace( "class={$matches[1]}", "class={$matches[1]}u-featured ", $html );
-		} else {
-			$html = str_replace( '<img ', '<img class="u-featured" ', $html );
-		}
+		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'img' );
+		$processor->add_class( 'u-featured' );
 
-		return $html;
+		return $processor->get_updated_html();
 	}
 
 	/**

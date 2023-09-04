@@ -1,5 +1,6 @@
 #!/bin/sh
 php-scoper add-prefix -f
+sed -i "s|blocks|..\\\/blocks|g" build/composer.json
 sed -i "s|includes|..\\\/includes|g" build/composer.json
 composer dump-autoload --working-dir build --classmap-authoritative
 find ./build/vendor -type d -name bin -prune -exec rm -rf {} \;

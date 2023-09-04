@@ -6,7 +6,8 @@
     },
     "autoload": {
         "classmap": [
-            "..\/includes\/"
+            "..\/includes\/",
+            "..\/blocks\/"
         ],
         "files": [
             "..\/includes\/functions.php"

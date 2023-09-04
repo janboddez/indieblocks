@@ -26,7 +26,7 @@
 			var icons      = props.attributes.icons;
 
 			var imgProps = {
-				src: indieblocks_common_obj.assets_url + 'mystery-man.jpg',
+				src: indieblocks_common_obj.assets_url + 'mm.png',
 				className: 'avatar photo',
 				width: avatarSize,
 				height: avatarSize,

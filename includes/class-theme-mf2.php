@@ -266,36 +266,32 @@ class Theme_Mf2 {
 	public static function render_block_core_post_excerpt( $content, $block, $instance ) {
 		$post_types = (array) apply_filters( 'indieblocks_short-form_post_types', array( 'indieblocks_like', 'indieblocks_note' ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
+		$options = get_options();
 		if (
-			empty( $instance->context['postId'] ) ||
-			empty( $instance->context['postType'] ) ||
-			! in_array( $instance->context['postType'], $post_types, true )
+			! empty( $options['full_content'] ) &&
+			! empty( $instance->context['postId'] ) &&
+			! empty( $instance->context['postType'] ) &&
+			in_array( $instance->context['postType'], $post_types, true )
 		) {
-			// *Not* a short-form post type, so we keep the default content and
-			// only add some microformats.
-			$processor = new \WP_HTML_Tag_Processor( $content );
-			$processor->next_tag( 'div' );
-			$processor->add_class( 'p-summary' );
-
-			return $processor->get_updated_html();
+			// Return a (rendered) Post Content block instead.
+			/** @see Theme_Mf2::render_block_core_post_content() */
+			return (
+				new \WP_Block(
+					array( 'blockName' => 'core/post-content' ),
+					array(
+						'postId'   => $instance->context['postId'],
+						'postType' => $instance->context['postType'],
+					)
+				)
+			)->render();
 		}
 
-		// Show full content instead. So while we *want* an excerpt block,
-		// like, in theme templates, we're *still* going to dynamically turn
-		// it into, essentially, a `post-content` block (for *these* post
-		// types and only when this option's enabled).
-		/** @todo: Make this configurable. */
-		$output = (
-			new \WP_Block(
-				array( 'blockName' => 'core/post-content' ),
-				array(
-					'postId'   => $instance->context['postId'],
-					'postType' => $instance->context['postType'],
-				)
-			)
-		)->render();
+		// Add a `p-summary` class.
+		$processor = new \WP_HTML_Tag_Processor( $content );
+		$processor->next_tag( 'div' );
+		$processor->add_class( 'p-summary' );
 
-		return $output;
+		return $processor->get_updated_html();
 	}
 
 	/**

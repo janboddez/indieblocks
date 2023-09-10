@@ -23,6 +23,22 @@ class Options_Handler {
 			'type'    => 'boolean',
 			'default' => false,
 		),
+		'hide_titles'            => array(
+			'type'    => 'boolean',
+			'default' => true,
+		),
+		'unhide_bookmark_titles' => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'unhide_like_titles'     => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'full_content'           => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
 		'enable_notes'           => array(
 			'type'    => 'boolean',
 			'default' => false,
@@ -76,18 +92,6 @@ class Options_Handler {
 			'default' => false,
 		),
 		'like_titles'            => array(
-			'type'    => 'boolean',
-			'default' => false,
-		),
-		'hide_titles'            => array(
-			'type'    => 'boolean',
-			'default' => true,
-		),
-		'unhide_bookmark_titles' => array(
-			'type'    => 'boolean',
-			'default' => false,
-		),
-		'unhide_like_titles'     => array(
 			'type'    => 'boolean',
 			'default' => false,
 		),
@@ -259,8 +263,12 @@ class Options_Handler {
 		switch ( $active_tab ) {
 			case 'blocks':
 				$options = array(
-					'enable_blocks' => isset( $settings['enable_blocks'] ) ? true : false,
-					'add_mf2'       => isset( $settings['add_mf2'] ) ? true : false,
+					'enable_blocks'          => isset( $settings['enable_blocks'] ) ? true : false,
+					'add_mf2'                => isset( $settings['add_mf2'] ) ? true : false,
+					'hide_titles'            => isset( $settings['hide_titles'] ) ? true : false,
+					'unhide_bookmark_titles' => isset( $settings['unhide_bookmark_titles'] ) ? true : false,
+					'unhide_like_titles'     => isset( $settings['unhide_like_titles'] ) ? true : false,
+					'full_content'           => isset( $settings['full_content'] ) ? true : false,
 				);
 
 				$this->options = array_merge( $this->options, $options );
@@ -268,25 +276,22 @@ class Options_Handler {
 
 			case 'post_types':
 				$options = array(
-					'enable_notes'           => isset( $settings['enable_notes'] ) ? true : false,
-					'notes_in_author'        => isset( $settings['notes_in_author'] ) ? true : false,
-					'notes_in_feed'          => isset( $settings['notes_in_feed'] ) ? true : false,
-					'notes_in_home'          => isset( $settings['notes_in_home'] ) ? true : false,
-					'note_taxonomies'        => isset( $settings['note_taxonomies'] ) ? true : false,
-					'enable_likes'           => isset( $settings['enable_likes'] ) ? true : false,
-					'likes_in_author'        => isset( $settings['likes_in_author'] ) ? true : false,
-					'likes_in_feed'          => isset( $settings['likes_in_feed'] ) ? true : false,
-					'likes_in_home'          => isset( $settings['likes_in_home'] ) ? true : false,
-					'like_taxonomies'        => isset( $settings['like_taxonomies'] ) ? true : false,
-					'random_slugs'           => isset( $settings['random_slugs'] ) ? true : false,
-					'automatic_titles'       => isset( $settings['automatic_titles'] ) ? true : false,
-					'bookmark_titles'        => isset( $settings['bookmark_titles'] ) ? true : false,
-					'like_titles'            => isset( $settings['like_titles'] ) ? true : false,
-					'hide_titles'            => isset( $settings['hide_titles'] ) ? true : false,
-					'unhide_bookmark_titles' => isset( $settings['unhide_bookmark_titles'] ) ? true : false,
-					'unhide_like_titles'     => isset( $settings['unhide_like_titles'] ) ? true : false,
-					'date_archives'          => isset( $settings['date_archives'] ) ? true : false,
-					'modified_feeds'         => isset( $settings['modified_feeds'] ) ? true : false,
+					'enable_notes'     => isset( $settings['enable_notes'] ) ? true : false,
+					'notes_in_author'  => isset( $settings['notes_in_author'] ) ? true : false,
+					'notes_in_feed'    => isset( $settings['notes_in_feed'] ) ? true : false,
+					'notes_in_home'    => isset( $settings['notes_in_home'] ) ? true : false,
+					'note_taxonomies'  => isset( $settings['note_taxonomies'] ) ? true : false,
+					'enable_likes'     => isset( $settings['enable_likes'] ) ? true : false,
+					'likes_in_author'  => isset( $settings['likes_in_author'] ) ? true : false,
+					'likes_in_feed'    => isset( $settings['likes_in_feed'] ) ? true : false,
+					'likes_in_home'    => isset( $settings['likes_in_home'] ) ? true : false,
+					'like_taxonomies'  => isset( $settings['like_taxonomies'] ) ? true : false,
+					'random_slugs'     => isset( $settings['random_slugs'] ) ? true : false,
+					'automatic_titles' => isset( $settings['automatic_titles'] ) ? true : false,
+					'bookmark_titles'  => isset( $settings['bookmark_titles'] ) ? true : false,
+					'like_titles'      => isset( $settings['like_titles'] ) ? true : false,
+					'date_archives'    => isset( $settings['date_archives'] ) ? true : false,
+					'modified_feeds'   => isset( $settings['modified_feeds'] ) ? true : false,
 				);
 
 				$permalink_format = '/%postname%/';
@@ -380,9 +385,27 @@ class Options_Handler {
 							<p class="description"><?php esc_html_e( 'Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Microformats', 'indieblocks' ); ?></th>
+							<th scope="row" rowspan="3"><?php esc_html_e( 'Block Theme Enhancements', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[add_mf2]" value="1" <?php checked( ! empty( $this->options['add_mf2'] ) ); ?>/> <?php esc_html_e( 'Enable microformats', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor.', 'indieblocks' ); ?></p></td>
+						</tr>
+						<tr valign="top">
+							<td>
+								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Site Editor.', 'indieblocks' ); ?></p>
+								<div style="margin-inline-start: 1.25em; margin-block-start: 0.5em;">
+									<label><input type="checkbox" name="indieblocks_settings[unhide_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt bookmark titles', 'indieblocks' ); ?></label>
+									<p class="description"><?php _e( 'Do <em>not</em> hide bookmark titles, <em>and</em> have them link to the bookmarked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
+									<label style="display: inline-block; margin-block-start: 0.5em;"><input type="checkbox" name="indieblocks_settings[unhide_like_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like titles', 'indieblocks' ); ?></label>
+									<p class="description"><?php _e( 'Do <em>not</em> hide like titles, <em>and</em> have them link to the liked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
+								</div>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>
+								<label><input type="checkbox" name="indieblocks_settings[full_content]" value="1" <?php checked( ! empty( $this->options['full_content'] ) ); ?>/> <?php _e( '<em>Always</em> show notes and likes in full', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></label>
+								<p class="description"><?php esc_html_e( 'Attempts to dynamically replace instances of the Post Excerpt block for a Post Content block, but only for short-form post types such as notes and likes.', 'indieblocks' ); ?></p>
+							</td>
 						</tr>
 					</table>
 				<?php endif; ?>
@@ -430,19 +453,6 @@ class Options_Handler {
 							<th scope="row"><?php esc_html_e( 'Web Feeds', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[modified_feeds]" value="1" <?php checked( ! empty( $this->options['modified_feeds'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Remove note (and like) titles from RSS and Atom feeds. This may help feed readers recognize them as &ldquo;notes,&rdquo; but might conflict with existing custom feed templates.', 'indieblocks' ); ?></p></td>
-						</tr>
-						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Hide (or Show) Titles', 'indieblocks' ); ?></th>
-							<td>
-								<label><input type="checkbox" name="indieblocks_settings[hide_titles]" value="1" <?php checked( ! empty( $this->options['hide_titles'] ) ); ?>/> <?php esc_html_e( 'Hide note and like titles', 'indieblocks' ); ?></label>
-								<p class="description"><?php esc_html_e( '(Experimental) Attempts to (visually) hide note and like titles, if you have enabled microformats and your theme supports the Site Editor.', 'indieblocks' ); ?></p>
-								<div style="margin-inline-start: 1.25em; margin-block-start: 0.5em;">
-									<label><input type="checkbox" name="indieblocks_settings[unhide_bookmark_titles]" value="1" <?php checked( ! empty( $this->options['unhide_bookmark_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt bookmark titles', 'indieblocks' ); ?></label>
-									<p class="description"><?php _e( 'Do <em>not</em> hide bookmark titles, <em>and</em> have them link to the bookmarked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
-									<label style="display: inline-block; margin-block-start: 0.5em;"><input type="checkbox" name="indieblocks_settings[unhide_like_titles]" value="1" <?php checked( ! empty( $this->options['unhide_like_titles'] ) ); ?>/> <?php esc_html_e( 'Exempt like titles', 'indieblocks' ); ?></label>
-									<p class="description"><?php _e( 'Do <em>not</em> hide like titles, <em>and</em> have them link to the liked page.', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></p>
-								</div>
-							</td>
 						</tr>
 						<?php if ( get_option( 'permalink_structure' ) ) : ?>
 							<tr valign="top">

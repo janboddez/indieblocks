@@ -165,7 +165,7 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Adds `p-author` and `h-card` (and so on) to the post author name block.
+	 * Adds `u-author` and `h-card` (and so on) to the post author name block.
 	 *
 	 * @param string    $content  Rendered block HTML.
 	 * @param array     $block    Parsed block.
@@ -175,13 +175,15 @@ class Theme_Mf2 {
 	public static function render_block_core_post_author( $content, $block, $instance ) {
 		$processor = new \WP_HTML_Tag_Processor( $content );
 		$processor->next_tag( 'div' );
-		$processor->add_class( 'h-card' );
-		$processor->add_class( 'p-author' );
+		$processor->add_class( 'h-card u-author' );
 
 		if ( ! empty( $instance->attributes['avatarSize'] ) ) {
 			$processor->next_tag( 'img' );
 			$processor->add_class( 'u-photo' );
 		}
+
+		$processor->next_tag( array( 'class_name' => 'wp-block-post-author__name' ) );
+		$processor->add_class( 'p-name' );
 
 		if ( ! empty( $instance->attributes['isLink'] ) ) {
 			$processor->next_tag( 'a' );

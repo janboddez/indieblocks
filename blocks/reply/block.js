@@ -136,11 +136,11 @@
 			( ! props.attributes.url || 'undefined' === props.attributes.url )
 				? null // Can't do much without a URL.
 				: IndieBlocks.hCite( 'u-in-reply-to', props.attributes ),
-				! props.attributes.empty
-					? el( 'div', { className: 'e-content' },
-						el( InnerBlocks.Content )
-					)
-					: null,
+			! props.attributes.empty
+				? el( 'div', { className: 'e-content' },
+					el( InnerBlocks.Content )
+				)
+				: null,
 		),
 		transforms: {
 			from: [

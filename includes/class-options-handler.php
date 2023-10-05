@@ -382,12 +382,12 @@ class Options_Handler {
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Blocks', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[enable_blocks]" value="1" <?php checked( ! empty( $this->options['enable_blocks'] ) ); ?>/> <?php esc_html_e( 'Enable blocks', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( 'Introduces a &ldquo;Context&rdquo; block that helps ensure replies, likes, etc., are microformatted correctly. More such &ldquo;IndieWeb&rdquo; blocks will surely follow!', 'indieblocks' ); ?></p></td>
+							<p class="description"><?php esc_html_e( 'Introduces several blocks that help ensure replies, likes, etc., are microformatted correctly.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" rowspan="3"><?php esc_html_e( 'Block Theme Enhancements', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[add_mf2]" value="1" <?php checked( ! empty( $this->options['add_mf2'] ) ); ?>/> <?php esc_html_e( 'Enable microformats', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor.', 'indieblocks' ); ?></p></td>
+							<p class="description"><?php esc_html_e( 'Adds microformats2 to your site&rsquo;s front end. Requires the active theme to support WordPress&rsquo; new Site Editor.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
 							<td>
@@ -404,7 +404,7 @@ class Options_Handler {
 						<tr valign="top">
 							<td>
 								<label><input type="checkbox" name="indieblocks_settings[full_content]" value="1" <?php checked( ! empty( $this->options['full_content'] ) ); ?>/> <?php _e( '<em>Always</em> show notes and likes in full', 'indieblocks' ); // phpcs:ignore WordPress.Security.EscapeOutput.UnsafePrintingFunction ?></label>
-								<p class="description"><?php esc_html_e( 'Attempts to dynamically replace instances of the Post Excerpt block for a Post Content block, but only for short-form post types such as notes and likes.', 'indieblocks' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Attempts to dynamically replace instances of the Post Excerpt block with a Post Content block, but only for short-form post types such as notes and likes.', 'indieblocks' ); ?></p>
 							</td>
 						</tr>
 					</table>

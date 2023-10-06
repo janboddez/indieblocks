@@ -1,10 +1,11 @@
 ( function ( blocks, element, blockEditor, components, i18n ) {
-	var el = element.createElement;
+	var el       = element.createElement;
+	var useState = element.useState;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	// var ColorPicker = components.ColorPicker;
+	var ColorPicker   = components.ColorPicker;
 	var RangeControl  = components.RangeControl;
 	var ToggleControl = components.ToggleControl;
 
@@ -23,10 +24,11 @@
 		edit: ( props ) => {
 			var avatarSize = props.attributes.avatarSize || 2;
 			var color      = props.attributes.color || '#000';
+			var bgColor    = props.attributes.backgroundColor || '#fff';
 			var icons      = props.attributes.icons;
 
 			var imgProps = {
-				src: indieblocks_common_obj.assets_url + 'mm.png',
+				src: indieblocks_common_obj.assets_url + 'mm.png', // "Fallback" avatar.
 				className: 'avatar photo',
 				width: avatarSize,
 				height: avatarSize,
@@ -62,16 +64,21 @@
 							max: 4,
 							onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						} ),
+						el( ColorPicker, {
+							label: __( 'Background color', 'indieblocks' ),
+							color: bgColor,
+							onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
+						} ),
 						el( ToggleControl, {
 							label: __( 'Show icons', 'indieblocks' ),
 							checked: icons,
 							onChange: ( value ) => { props.setAttributes( { icons: value } ) },
 						} ),
-						// el( ColorPicker, {
-						// 	label: __( 'Icon color', 'indieblocks' ),
-						// 	color: color,
-						// 	onChange: ( value ) => { props.setAttributes( { color: value } ) },
-						// } ),
+						el( ColorPicker, {
+							label: __( 'Icon color', 'indieblocks' ),
+							color: color,
+							onChange: ( value ) => { props.setAttributes( { color: value } ) },
+						} ),
 					)
 				),
 				el( 'ul', { className: 'indieblocks-avatar-size-' + avatarSize },

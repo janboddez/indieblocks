@@ -57,14 +57,22 @@ class Facepile_Content_Block {
 				continue;
 			}
 
+			$processor = new \WP_HTML_Tag_Processor( $avatar );
+			$processor->next_tag( 'img' );
+
+			if ( ! empty( $attributes['backgroundColor'] ) ) {
+				$processor->set_attribute( 'style', 'background:' . esc_attr( $attributes['backgroundColor'] ) ); // Even though `WP_HTML_Tag_Processor::set_attribute()` will run, e.g., `esc_attr()` for us.
+			}
+
 			// Add author name as `alt` text.
 			if ( preg_match( '~ alt=("|\'){2}~', $avatar, $matches ) ) {
-				$avatar = str_replace(
-					" alt={$matches[1]}{$matches[1]}",
-					" alt={$matches[1]}" . esc_attr( get_comment_author( $comment ) ) . "{$matches[1]}",
-					$avatar
-				);
+				$alt = $processor->get_attribute( 'alt' );
+				$alt = ! empty( $alt ) ? $alt : '';
+
+				$processor->set_attribute( 'alt', esc_attr( get_comment_author( $comment ) ) );
 			}
+
+			$avatar = $processor->get_updated_html();
 
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );

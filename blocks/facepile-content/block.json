@@ -10,6 +10,10 @@
 			"type": "integer",
 			"default": 2
 		},
+		"backgroundColor": {
+			"type": "string",
+			"default": "#fff"
+		},
 		"color": {
 			"type": "string",
 			"default": "#000"

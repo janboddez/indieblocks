@@ -43,7 +43,6 @@
 }
 
 .wp-block-indieblocks-facepile-content .avatar {
-	background: var(--wp--preset--color--base, white);
 	display: block;
 	width: var(--indieblocks-avatar-size);
 	height: var(--indieblocks-avatar-size);

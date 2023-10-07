@@ -4,6 +4,7 @@
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
+	var useSetting    = blockEditor.useSetting;
 
 	var BaseControl   = components.BaseControl;
 	var ColorPalette  = components.ColorPalette;
@@ -11,7 +12,6 @@
 	var ToggleControl = components.ToggleControl;
 
 	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
 
 	blocks.registerBlockType( 'indieblocks/facepile-content', {
 		icon: el( 'svg', {
@@ -27,6 +27,7 @@
 			var color      = props.attributes.color || '#000';
 			var bgColor    = props.attributes.backgroundColor || '#fff';
 			var icons      = props.attributes.icons;
+			var colors     = useSetting( 'color.palette' );
 
 			var imgProps = {
 				src: indieblocks_common_obj.assets_url + 'mm.png', // "Fallback" avatar.
@@ -68,10 +69,7 @@
 						} ),
 						el( BaseControl, { label: __( 'Background color', 'indieblocks' ) },
 							el( ColorPalette, {
-								colors: [
-									{ name: 'black', color: '#000' },
-									{ name: 'white', color: '#fff' },
-								],
+								colors: colors,
 								value: bgColor,
 								onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
 							} )
@@ -83,10 +81,7 @@
 						} ),
 						el( BaseControl, { label: __( 'Icon color', 'indieblocks' ) },
 							el( ColorPalette, {
-								colors: [
-									{ name: 'black', color: '#000' },
-									{ name: 'white', color: '#fff' },
-								],
+								colors: colors,
 								value: color,
 								onChange: ( value ) => { props.setAttributes( { color: value } ) },
 							} )

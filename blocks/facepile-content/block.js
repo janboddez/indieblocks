@@ -5,7 +5,8 @@
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var ColorPicker   = components.ColorPicker;
+	var BaseControl   = components.BaseControl;
+	var ColorPalette  = components.ColorPalette;
 	var RangeControl  = components.RangeControl;
 	var ToggleControl = components.ToggleControl;
 
@@ -33,19 +34,20 @@
 				width: avatarSize,
 				height: avatarSize,
 				alt: '',
+				style: { backgroundColor: bgColor },
 			};
 
 			// SVG sprites.
 			var html = `<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 				<defs>
 				<symbol id="indieblocks-icon-bookmark" viewBox="0 0 24 24">
-					<path d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
+					<path fill="currentColor" d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
 				</symbol>
 				<symbol id="indieblocks-icon-like" viewBox="0 0 24 24">
-					<path d="M7.785 5.24A4.536 4.536 0 0 0 3.25 9.777C3.25 14.314 9 17 12 19.5c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.15-4.215 2.781-.675-1.632-2.334-2.78-4.215-2.78z"/>
+					<path fill="currentColor" d="M7.785 5.24A4.536 4.536 0 0 0 3.25 9.777C3.25 14.314 9 17 12 19.5c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.15-4.215 2.781-.675-1.632-2.334-2.78-4.215-2.78z"/>
 				</symbol>
 				<symbol id="indieblocks-icon-repost" viewBox="0 0 24 24">
-					<path d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
+					<path fill="currentColor" d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
 				</symbol>
 				</defs>
 			</svg>`;
@@ -64,25 +66,35 @@
 							max: 4,
 							onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						} ),
-						el( ColorPicker, {
-							label: __( 'Background color', 'indieblocks' ),
-							color: bgColor,
-							onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
-						} ),
+						el( BaseControl, { label: __( 'Background color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: [
+									{ name: 'black', color: '#000' },
+									{ name: 'white', color: '#fff' },
+								],
+								value: bgColor,
+								onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
+							} )
+						),
 						el( ToggleControl, {
 							label: __( 'Show icons', 'indieblocks' ),
 							checked: icons,
 							onChange: ( value ) => { props.setAttributes( { icons: value } ) },
 						} ),
-						el( ColorPicker, {
-							label: __( 'Icon color', 'indieblocks' ),
-							color: color,
-							onChange: ( value ) => { props.setAttributes( { color: value } ) },
-						} ),
+						el( BaseControl, { label: __( 'Icon color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: [
+									{ name: 'black', color: '#000' },
+									{ name: 'white', color: '#fff' },
+								],
+								value: color,
+								onChange: ( value ) => { props.setAttributes( { color: value } ) },
+							} )
+						)
 					)
 				),
 				el( 'ul', { className: 'indieblocks-avatar-size-' + avatarSize },
-					el( 'li', {}, el( 'span', {},
+					el( 'li', {}, el( 'span', { style: { color: color } },
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {
@@ -97,7 +109,7 @@
 							)
 							: null
 						) ),
-					el( 'li', {}, el( 'span', {},
+					el( 'li', {}, el( 'span', { style: { color: color } },
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {
@@ -112,7 +124,7 @@
 							)
 							: null
 					) ),
-					el( 'li', {}, el( 'span', {},
+					el( 'li', {}, el( 'span', { style: { color: color } },
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {

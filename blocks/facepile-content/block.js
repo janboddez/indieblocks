@@ -23,11 +23,12 @@
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var avatarSize = props.attributes.avatarSize || 2;
-			var color      = props.attributes.color || '#000';
-			var bgColor    = props.attributes.backgroundColor || '#fff';
-			var icons      = props.attributes.icons;
-			var colors     = useSetting( 'color.palette' );
+			var avatarSize  = props.attributes.avatarSize || 2;
+			var bgColor     = props.attributes.backgroundColor || 'transparent';
+			var icons       = props.attributes.icons;
+			var color       = props.attributes.color || '#000';
+			var iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+			var colors      = useSetting( 'color.palette' );
 
 			var imgProps = {
 				src: indieblocks_common_obj.assets_url + 'mm.png', // "Fallback" avatar.
@@ -69,7 +70,7 @@
 						} ),
 						el( BaseControl, { label: __( 'Background color', 'indieblocks' ) },
 							el( ColorPalette, {
-								colors: colors,
+								colors: [ { name: 'None', color: 'transparent' }, ...colors ],
 								value: bgColor,
 								onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
 							} )
@@ -85,17 +86,25 @@
 								value: color,
 								onChange: ( value ) => { props.setAttributes( { color: value } ) },
 							} )
+						),
+						el( BaseControl, { label: __( 'Icon background color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: [ { name: 'None', color: 'transparent' }, ...colors ],
+								value: iconBgColor,
+								onChange: ( value ) => { props.setAttributes( { iconBackgroundColor: value } ) },
+							} )
 						)
 					)
 				),
 				el( 'ul', { className: 'indieblocks-avatar-size-' + avatarSize },
-					el( 'li', {}, el( 'span', { style: { color: color } },
+					el( 'li', {}, el( 'span', {},
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {
 									className: 'icon indieblocks-icon-repost',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-repost',
@@ -104,13 +113,14 @@
 							)
 							: null
 						) ),
-					el( 'li', {}, el( 'span', { style: { color: color } },
+					el( 'li', {}, el( 'span', {},
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {
 									className: 'icon indieblocks-icon-bookmark',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-bookmark',
@@ -119,13 +129,14 @@
 							)
 							: null
 					) ),
-					el( 'li', {}, el( 'span', { style: { color: color } },
+					el( 'li', {}, el( 'span', {},
 						el( 'img', imgProps ),
 						icons
 							? el( 'svg', {
 									className: 'icon indieblocks-icon-like',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-like',

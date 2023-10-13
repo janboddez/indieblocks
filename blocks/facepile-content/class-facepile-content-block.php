@@ -112,11 +112,19 @@ class Facepile_Content_Block {
 				"</li>\n";
 			}
 
+			$icon_style = '';
 			if ( ! empty( $attributes['color'] ) ) {
+				$icon_style .= "color:{$attributes['color']};";
+			}
+			if ( ! empty( $attributes['iconBackgroundColor'] ) ) {
+				$icon_style .= "background-color:{$attributes['iconBackgroundColor']};";
+			}
+
+			if ( ! empty( $icon_style ) ) {
 				$processor = new \WP_HTML_Tag_Processor( $el );
 				$processor->next_tag( 'svg' );
-				$processor->set_attribute( 'style', esc_attr( "color:{$attributes['color']}" ) );
 
+				$processor->set_attribute( 'style', esc_attr( $icon_style ) );
 				$el = $processor->get_updated_html();
 			}
 

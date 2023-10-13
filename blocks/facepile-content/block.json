@@ -12,14 +12,18 @@
 		},
 		"backgroundColor": {
 			"type": "string",
-			"default": "#fff"
+			"default": "transparent"
+		},
+		"icons": {
+			"type": "boolean"
 		},
 		"color": {
 			"type": "string",
 			"default": "#000"
 		},
-		"icons": {
-			"type": "boolean"
+		"iconBackgroundColor": {
+			"type": "string",
+			"default": "#fff"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

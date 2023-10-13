@@ -1,15 +1,17 @@
 ( function ( blocks, element, blockEditor, components, i18n ) {
-	var el = element.createElement;
+	var el       = element.createElement;
+	var useState = element.useState;
 
 	var BlockControls = blockEditor.BlockControls;
 	var useBlockProps = blockEditor.useBlockProps;
+	var useSetting    = blockEditor.useSetting;
 
-	// var ColorPicker = components.ColorPicker;
+	var BaseControl   = components.BaseControl;
+	var ColorPalette  = components.ColorPalette;
 	var RangeControl  = components.RangeControl;
 	var ToggleControl = components.ToggleControl;
 
 	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
 
 	blocks.registerBlockType( 'indieblocks/facepile-content', {
 		icon: el( 'svg', {
@@ -21,29 +23,33 @@
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var avatarSize = props.attributes.avatarSize || 2;
-			var color      = props.attributes.color || '#000';
-			var icons      = props.attributes.icons;
+			var avatarSize  = props.attributes.avatarSize || 2;
+			var bgColor     = props.attributes.backgroundColor || 'transparent';
+			var icons       = props.attributes.icons;
+			var color       = props.attributes.color || '#000';
+			var iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+			var colors      = useSetting( 'color.palette' );
 
 			var imgProps = {
-				src: indieblocks_common_obj.assets_url + 'mm.png',
+				src: indieblocks_common_obj.assets_url + 'mm.png', // "Fallback" avatar.
 				className: 'avatar photo',
 				width: avatarSize,
 				height: avatarSize,
 				alt: '',
+				style: { backgroundColor: bgColor },
 			};
 
 			// SVG sprites.
 			var html = `<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 				<defs>
 				<symbol id="indieblocks-icon-bookmark" viewBox="0 0 24 24">
-					<path d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
+					<path fill="currentColor" d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
 				</symbol>
 				<symbol id="indieblocks-icon-like" viewBox="0 0 24 24">
-					<path d="M7.785 5.24A4.536 4.536 0 0 0 3.25 9.777C3.25 14.314 9 17 12 19.5c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.15-4.215 2.781-.675-1.632-2.334-2.78-4.215-2.78z"/>
+					<path fill="currentColor" d="M7.785 5.24A4.536 4.536 0 0 0 3.25 9.777C3.25 14.314 9 17 12 19.5c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.15-4.215 2.781-.675-1.632-2.334-2.78-4.215-2.78z"/>
 				</symbol>
 				<symbol id="indieblocks-icon-repost" viewBox="0 0 24 24">
-					<path d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
+					<path fill="currentColor" d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
 				</symbol>
 				</defs>
 			</svg>`;
@@ -62,16 +68,32 @@
 							max: 4,
 							onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						} ),
+						el( BaseControl, { label: __( 'Background color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: [ { name: 'None', color: 'transparent' }, ...colors ],
+								value: bgColor,
+								onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },
+							} )
+						),
 						el( ToggleControl, {
 							label: __( 'Show icons', 'indieblocks' ),
 							checked: icons,
 							onChange: ( value ) => { props.setAttributes( { icons: value } ) },
 						} ),
-						// el( ColorPicker, {
-						// 	label: __( 'Icon color', 'indieblocks' ),
-						// 	color: color,
-						// 	onChange: ( value ) => { props.setAttributes( { color: value } ) },
-						// } ),
+						el( BaseControl, { label: __( 'Icon color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: colors,
+								value: color,
+								onChange: ( value ) => { props.setAttributes( { color: value } ) },
+							} )
+						),
+						el( BaseControl, { label: __( 'Icon background color', 'indieblocks' ) },
+							el( ColorPalette, {
+								colors: [ { name: 'None', color: 'transparent' }, ...colors ],
+								value: iconBgColor,
+								onChange: ( value ) => { props.setAttributes( { iconBackgroundColor: value } ) },
+							} )
+						)
 					)
 				),
 				el( 'ul', { className: 'indieblocks-avatar-size-' + avatarSize },
@@ -82,6 +104,7 @@
 									className: 'icon indieblocks-icon-repost',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-repost',
@@ -97,6 +120,7 @@
 									className: 'icon indieblocks-icon-bookmark',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-bookmark',
@@ -112,6 +136,7 @@
 									className: 'icon indieblocks-icon-like',
 									width: avatarSize,
 									height: avatarSize,
+									style: { backgroundColor: iconBgColor, color: color }
 								},
 								el( 'use', {
 									href: '#indieblocks-icon-like',

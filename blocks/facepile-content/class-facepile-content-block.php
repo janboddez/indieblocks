@@ -57,14 +57,19 @@ class Facepile_Content_Block {
 				continue;
 			}
 
-			// Add author name as `alt` text.
-			if ( preg_match( '~ alt=("|\'){2}~', $avatar, $matches ) ) {
-				$avatar = str_replace(
-					" alt={$matches[1]}{$matches[1]}",
-					" alt={$matches[1]}" . esc_attr( get_comment_author( $comment ) ) . "{$matches[1]}",
-					$avatar
-				);
+			$processor = new \WP_HTML_Tag_Processor( $avatar );
+			$processor->next_tag( 'img' );
+
+			if ( ! empty( $attributes['backgroundColor'] ) ) {
+				$processor->set_attribute( 'style', 'background:' . esc_attr( $attributes['backgroundColor'] ) ); // Even though `WP_HTML_Tag_Processor::set_attribute()` will run, e.g., `esc_attr()` for us.
 			}
+
+			$alt = $processor->get_attribute( 'alt' );
+			$alt = ! empty( $alt ) ? $alt : get_comment_author( $comment );
+
+			$processor->set_attribute( 'alt', esc_attr( $alt ) );
+
+			$avatar = $processor->get_updated_html();
 
 			$source = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true );
 			$kind   = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_kind', true );
@@ -90,7 +95,7 @@ class Facepile_Content_Block {
 			$title  = isset( $titles[ $kind ] ) ? esc_attr( $titles[ $kind ] ) : '';
 
 			if ( ! empty( $source ) ) {
-				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
+				$el = '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . '</span>' .
 				( ! empty( $attributes['icons'] ) && ! empty( $kind )
 					? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
@@ -98,7 +103,7 @@ class Facepile_Content_Block {
 				) .
 				"</a></li>\n";
 			} else {
-				$output .= '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
+				$el = '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title ) ? ' title="' . $title . '"' : '' ) . '>' .
 				'<span class="p-author h-card">' . $avatar . '</span>' .
 				( ! empty( $attributes['icons'] ) && ! empty( $kind )
 					? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
@@ -106,6 +111,24 @@ class Facepile_Content_Block {
 				) .
 				"</li>\n";
 			}
+
+			$icon_style = '';
+			if ( ! empty( $attributes['color'] ) ) {
+				$icon_style .= "color:{$attributes['color']};";
+			}
+			if ( ! empty( $attributes['iconBackgroundColor'] ) ) {
+				$icon_style .= "background-color:{$attributes['iconBackgroundColor']};";
+			}
+
+			if ( ! empty( $icon_style ) ) {
+				$processor = new \WP_HTML_Tag_Processor( $el );
+				$processor->next_tag( 'svg' );
+
+				$processor->set_attribute( 'style', esc_attr( $icon_style ) );
+				$el = $processor->get_updated_html();
+			}
+
+			$output .= $el;
 		}
 
 		if ( ! empty( $attributes['avatarSize'] ) ) {

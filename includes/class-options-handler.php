@@ -478,7 +478,7 @@ class Options_Handler {
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Webmention', 'indieblocks' ); ?></th>
 							<td><label><input type="checkbox" name="indieblocks_settings[webmention]" value="1" <?php checked( ! empty( $this->options['webmention'] ) ); ?>/> <?php esc_html_e( 'Enable Webmention', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same.', 'indieblocks' ); ?></p></td>
+							<p class="description"><?php esc_html_e( '(Experimental) Automatically notify pages you&rsquo;ve linked to, and allow other websites to do the same. You&rsquo;ll probably want to leave this disabled if you&rsquo;re already using a different Webmention plugin.', 'indieblocks' ); ?></p></td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Post Types', 'indieblocks' ); ?></th>

@@ -278,7 +278,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 
 			if ( $file_path !== $result['path'] ) {
 				// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
-				unlink( $file_path ); // Delete "old" image.
+				wp_delete_file( $file_path ); // Delete "old" image.
 				$file_path = $result['path'];
 			}
 		} else {

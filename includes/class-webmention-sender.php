@@ -406,7 +406,7 @@ class Webmention_Sender {
 							}
 						}
 
-						$i++;
+						++$i;
 					}
 					?>
 				</p>

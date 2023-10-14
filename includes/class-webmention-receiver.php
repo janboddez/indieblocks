@@ -371,7 +371,7 @@ class Webmention_Receiver {
 
 			// Delete file.
 			if ( is_file( $file_path ) ) {
-				unlink( $file_path );
+				wp_delete_file( $file_path );
 			}
 
 			// Delete reference in database.

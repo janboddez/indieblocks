@@ -1,13 +1,13 @@
 <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <symbol id="indieblocks-icon-bookmark" viewBox="0 0 24 24">
-	<path d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
+	<path fill="currentColor" d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
 </symbol>
 <symbol id="indieblocks-icon-like" viewBox="0 0 24 24">
-	<path d="M7.785 5.49a4.536 4.536 0 0 0-4.535 4.537C3.25 14.564 9 17.25 12 19.75c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.128-4.215 2.76-.675-1.632-2.334-2.76-4.215-2.76z"/>
+	<path fill="currentColor" d="M7.785 5.49a4.536 4.536 0 0 0-4.535 4.537C3.25 14.564 9 17.25 12 19.75c3-2.5 8.75-5.186 8.75-9.723a4.536 4.536 0 0 0-4.535-4.537c-1.881 0-3.54 1.128-4.215 2.76-.675-1.632-2.334-2.76-4.215-2.76z"/>
 </symbol>
 <symbol id="indieblocks-icon-repost" viewBox="0 0 24 24">
-	<path d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
+	<path fill="currentColor" d="M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z"/>
 </symbol>
 </defs>
 </svg>

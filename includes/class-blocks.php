@@ -19,6 +19,7 @@ class Blocks {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoint' ) );
 		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
 		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
+		add_filter( 'the_excerpt_rss', array( __CLASS__, 'excerpt_feed' ) );
 
 		$options = get_options();
 		if ( ! empty( $options['webmention_facepile'] ) ) {
@@ -166,6 +167,35 @@ class Blocks {
 		$excerpt_allowed_blocks[] = 'indieblocks/context';
 
 		return $excerpt_allowed_blocks;
+	}
+
+	/**
+	 * Allows, well, everything in feed excerpts.
+	 *
+	 * @param  string $excerpt Current post excerpt.
+	 * @return string          Filtered excerpt.
+	 */
+	public static function excerpt_feed( $excerpt ) {
+		global $post;
+
+		if ( empty( $post->post_content ) ) {
+			return $excerpt;
+		}
+
+		$post_types = (array) apply_filters( 'indieblocks_short-form_post_types', array( 'indieblocks_like', 'indieblocks_note' ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
+		if ( ! in_array( $post->post_type, $post_types, true ) ) {
+			return $excerpt;
+		}
+
+		$content = apply_filters( 'the_content', $post->post_content );
+		$content = str_replace( ']]>', ']]&gt;', $content );
+
+		$excerpt_length = (int) apply_filters( 'excerpt_length', 55 );
+		$excerpt_more   = apply_filters( 'excerpt_more', ' [&hellip;]' );
+		$excerpt        = wp_trim_words( $content, $excerpt_length, $excerpt_more );
+
+		return $excerpt;
 	}
 
 	/**

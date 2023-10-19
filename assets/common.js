@@ -28,12 +28,22 @@ var IndieBlocks = {
 			'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 		};
 
+		var message = ( ! attributes.author || 'undefined' === attributes.author )
+			? messages[ className ]
+			: messagesWithByline[ className ];
+	
+		var name = attributes.title || attributes.url;
+	
+		if ( name.match( /\p{P}$/gu ) ) {
+			message = message.slice( 0, -1 ); // Remove the period.
+		}
+
 		return el( 'div', { className: className + ' h-cite' },
 			el( 'p', {}, // Adding paragraphs this time around.
 				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
 					( ! attributes.author || 'undefined' === attributes.author )
 						? interpolate(
-							sprintf( messages[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>' ),
+							sprintf(  message, '<a>' + name + '</a>' ),
 							{
 								a: el( 'a', {
 									className: attributes.title && attributes.url !== attributes.title
@@ -44,7 +54,7 @@ var IndieBlocks = {
 							}
 						)
 						: interpolate(
-							sprintf( messagesWithByline[ className ], '<a>' + ( attributes.title || attributes.url ) + '</a>', '<span>' + attributes.author + '</span>' ),
+							sprintf( message, '<a>' + name + '</a>', '<span>' + attributes.author + '</span>' ),
 							{
 								a: el( 'a', {
 									className: attributes.title && attributes.url !== attributes.title

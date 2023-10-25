@@ -459,7 +459,7 @@ class Location {
 	public static function get_meta( $params ) {
 		$post_id = $params['id'];
 
-		if ( empty( $post_id ) || ! ctype_digit( $post_id ) ) {
+		if ( empty( $post_id ) || ! is_int( $post_id ) ) {
 			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
 		}
 

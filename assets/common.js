@@ -34,7 +34,7 @@ var IndieBlocks = {
 	
 		var name = attributes.title || attributes.url;
 	
-		if ( name.match( /(?!\)|\]|\})\p{P}$/gu ) ) {
+		if ( name.match( /(?![\(\)\[\]\{\}])\p{P}$/gu ) ) {
 			message = message.slice( 0, -1 ); // Remove the period.
 		}
 

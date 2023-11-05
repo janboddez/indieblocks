@@ -324,6 +324,11 @@ class Webmention_Sender {
 		}
 
 		$contents = wp_remote_retrieve_body( $response );
+
+		if ( empty( $contents ) ) {
+			return null;
+		}
+
 		$contents = mb_convert_encoding( $contents, 'HTML-ENTITIES', mb_detect_encoding( $contents ) );
 
 		libxml_use_internal_errors( true );

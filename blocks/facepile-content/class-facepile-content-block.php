@@ -81,7 +81,7 @@ class Facepile_Content_Block {
 					$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
 				}
 
-				$kind   = $comment->comment_type;
+				$kind = $comment->comment_type;
 			}
 
 			$classes = array(

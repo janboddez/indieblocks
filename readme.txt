@@ -27,6 +27,8 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
 == Changelog ==
+= 0.9.1 =
+Fix Webmention backlinks in Facepile block, add avatar background and icon color pickers.
 = 0.9.0 =
 Overhaul theme microformats functionality.
 = 0.8.1 =

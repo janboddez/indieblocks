@@ -76,7 +76,11 @@ class Facepile_Content_Block {
 
 			if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
 				// Mentions initiated by the Webmention plugin use a slightly different data structure.
-				$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
+				$source = get_comment_meta( $comment->comment_ID, 'url', true );
+				if ( empty( $source ) ) {
+					$source = get_comment_meta( $comment->comment_ID, 'webmention_source_url', true );
+				}
+
 				$kind   = $comment->comment_type;
 			}
 

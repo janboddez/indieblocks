@@ -31,12 +31,8 @@ var IndieBlocks = {
 		var message = ( ! attributes.author || 'undefined' === attributes.author )
 			? messages[ className ]
 			: messagesWithByline[ className ];
-	
+
 		var name = attributes.title || attributes.url;
-	
-		// if ( name.match( /(?![\(\)\[\]\{\}])\p{P}$/gu ) ) {
-		// 	message = message.slice( 0, -1 ); // Remove the period.
-		// }
 
 		return el( 'div', { className: className + ' h-cite' },
 			el( 'p', {}, // Adding paragraphs this time around.

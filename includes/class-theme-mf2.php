@@ -177,7 +177,7 @@ class Theme_Mf2 {
 		$processor->next_tag( 'div' );
 		$processor->add_class( 'h-card u-author' );
 
-		if ( ! empty( $instance->attributes['avatarSize'] ) ) {
+		if ( ! empty( $instance->attributes['avatarSize'] ) && ! empty( $instance->attributes['showAvatar'] ) ) {
 			$processor->next_tag( 'img' );
 			$processor->add_class( 'u-photo' );
 		}

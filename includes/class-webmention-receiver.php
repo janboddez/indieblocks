@@ -372,8 +372,17 @@ class Webmention_Receiver {
 			// Delete file.
 			wp_delete_file( $file_path );
 
-			// Delete reference in database.
-			delete_comment_meta( $comment_id, 'indieblocks_webmention_avatar' );
+			// Delete _all_ references to this file (i.e., not just this
+			// comment's meta field).
+			global $wpdb;
+
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"DELETE FROM $wpdb->commentmeta WHERE meta_key = %s AND meta_value = %s",
+					'indieblocks_webmention_avatar',
+					$url
+				)
+			);
 		}
 
 		wp_die();

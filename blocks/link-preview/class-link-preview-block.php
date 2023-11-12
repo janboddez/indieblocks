@@ -71,7 +71,7 @@ class Link_Preview_Block {
 				$upload_dir = wp_upload_dir();
 				$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
 
-				if ( is_file( $file_path ) ) :
+				if ( file_exists( $file_path ) ) :
 					?>
 					<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
 					<?php

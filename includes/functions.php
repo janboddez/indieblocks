@@ -282,7 +282,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 				$file_path = $result['path'];
 			}
 		} else {
-			debug_log( '[IndieBlocks] Could not reisize ' . $file_path . ': ' . $image->get_error_message() . '.' );
+			debug_log( '[IndieBlocks] Could not resize ' . $file_path . ': ' . $image->get_error_message() . '.' );
 		}
 
 		// And return the local URL.

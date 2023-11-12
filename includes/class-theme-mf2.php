@@ -480,13 +480,6 @@ class Theme_Mf2 {
 			return null;
 		}
 
-		$upload_dir = wp_upload_dir();
-		$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
-
-		if ( ! is_file( $file_path ) ) {
-			return null;
-		}
-
 		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );
 		$height = (int) ( ! empty( $args['height'] ) ? $args['height'] : 96 );
 

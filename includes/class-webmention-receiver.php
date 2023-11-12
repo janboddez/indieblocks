@@ -380,7 +380,7 @@ class Webmention_Receiver {
 				$wpdb->prepare(
 					"DELETE FROM $wpdb->commentmeta WHERE meta_key = %s AND meta_value = %s",
 					'indieblocks_webmention_avatar',
-					$url
+					esc_url_raw( $url )
 				)
 			);
 		}

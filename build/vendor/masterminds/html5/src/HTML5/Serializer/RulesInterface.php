@@ -11,6 +11,7 @@ namespace IndieBlocks\Masterminds\HTML5\Serializer;
  * The resulting class can be specified in the options with the key of rules.
  *
  * For an example implementation see Serializer\OutputRules.
+ * @internal
  */
 interface RulesInterface
 {

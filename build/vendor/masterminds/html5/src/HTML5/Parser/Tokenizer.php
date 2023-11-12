@@ -22,6 +22,7 @@ use IndieBlocks\Masterminds\HTML5\Elements;
  * This refers to section 8.2.4.1 of the HTML5 CR specification.
  *
  * @see http://www.w3.org/TR/2012/CR-html5-20121217/
+ * @internal
  */
 class Tokenizer
 {

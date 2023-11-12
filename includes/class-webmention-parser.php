@@ -65,7 +65,7 @@ class Webmention_Parser {
 			$commentdata['comment_date_gmt'] = date( 'Y-m-d H:i:s', strtotime( $published ) );
 		}
 
-		$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+		$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		$hentry_kind = $parser->get_type();
 		if ( ! empty( $hentry_kind ) ) {

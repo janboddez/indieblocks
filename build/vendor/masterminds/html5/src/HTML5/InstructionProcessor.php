@@ -16,6 +16,7 @@ namespace IndieBlocks\Masterminds\HTML5;
  *
  * One could, for example, use this mechanism to execute well-formed PHP
  * code embedded inside of an HTML5 document.
+ * @internal
  */
 interface InstructionProcessor
 {

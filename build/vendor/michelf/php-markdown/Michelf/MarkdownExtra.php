@@ -12,6 +12,7 @@ namespace IndieBlocks\Michelf;
 
 /**
  * Markdown Extra Parser Class
+ * @internal
  */
 class MarkdownExtra extends \IndieBlocks\Michelf\Markdown
 {

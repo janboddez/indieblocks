@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit19353fabf872393046d3c8146bd8f63a
+class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
 {
     public static $files = array (
         '757772e28a0943a9afe83def8db95bdf' => __DIR__ . '/..' . '/mf2/mf2/Mf2/Parser.php',
@@ -14,12 +14,17 @@ class ComposerStaticInit19353fabf872393046d3c8146bd8f63a
     public static $prefixLengthsPsr4 = array (
         'I' => 
         array (
+            'IndieBlocks\\Mimey\\' => 18,
             'IndieBlocks\\Michelf\\' => 20,
             'IndieBlocks\\Masterminds\\' => 24,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'IndieBlocks\\Mimey\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ralouphie/mimey/src',
+        ),
         'IndieBlocks\\Michelf\\' => 
         array (
             0 => __DIR__ . '/..' . '/michelf/php-markdown/Michelf',
@@ -63,6 +68,9 @@ class ComposerStaticInit19353fabf872393046d3c8146bd8f63a
         'IndieBlocks\\Michelf\\MarkdownExtra' => __DIR__ . '/..' . '/michelf/php-markdown/Michelf/MarkdownExtra.php',
         'IndieBlocks\\Michelf\\MarkdownInterface' => __DIR__ . '/..' . '/michelf/php-markdown/Michelf/MarkdownInterface.php',
         'IndieBlocks\\Micropub_Compat' => __DIR__ . '/../..' . '/../includes/class-micropub-compat.php',
+        'IndieBlocks\\Mimey\\MimeMappingGenerator' => __DIR__ . '/..' . '/ralouphie/mimey/src/MimeMappingGenerator.php',
+        'IndieBlocks\\Mimey\\MimeTypes' => __DIR__ . '/..' . '/ralouphie/mimey/src/MimeTypes.php',
+        'IndieBlocks\\Mimey\\MimeTypesInterface' => __DIR__ . '/..' . '/ralouphie/mimey/src/MimeTypesInterface.php',
         'IndieBlocks\\Options_Handler' => __DIR__ . '/../..' . '/../includes/class-options-handler.php',
         'IndieBlocks\\Parser' => __DIR__ . '/../..' . '/../includes/class-parser.php',
         'IndieBlocks\\Plugin' => __DIR__ . '/../..' . '/../includes/class-plugin.php',
@@ -79,9 +87,9 @@ class ComposerStaticInit19353fabf872393046d3c8146bd8f63a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit19353fabf872393046d3c8146bd8f63a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit19353fabf872393046d3c8146bd8f63a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit19353fabf872393046d3c8146bd8f63a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita41f68a5b79b4678cf41c80073cd864a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita41f68a5b79b4678cf41c80073cd864a::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInita41f68a5b79b4678cf41c80073cd864a::$classMap;
 
         }, null, ClassLoader::class);
     }

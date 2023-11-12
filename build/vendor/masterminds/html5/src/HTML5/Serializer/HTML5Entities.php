@@ -15,6 +15,7 @@ namespace IndieBlocks\Masterminds\HTML5\Serializer;
  * A mapping of entities to their html5 representation.
  * Used for older PHP
  * versions that don't have the mapping.
+ * @internal
  */
 class HTML5Entities
 {

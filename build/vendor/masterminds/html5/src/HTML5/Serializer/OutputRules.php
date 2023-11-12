@@ -12,6 +12,7 @@ namespace IndieBlocks\Masterminds\HTML5\Serializer;
 use IndieBlocks\Masterminds\HTML5\Elements;
 /**
  * Generate the output html5 based on element rules.
+ * @internal
  */
 class OutputRules implements RulesInterface
 {

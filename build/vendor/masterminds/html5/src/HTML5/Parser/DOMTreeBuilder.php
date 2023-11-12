@@ -21,6 +21,7 @@ use IndieBlocks\Masterminds\HTML5\InstructionProcessor;
  * for insert modes as outlined in the HTML5 spec. The processor needs to be
  * re-written to accomodate this. See, for example, the Go language HTML5
  * parser.
+ * @internal
  */
 class DOMTreeBuilder implements EventHandler
 {

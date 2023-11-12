@@ -15,6 +15,7 @@ namespace IndieBlocks\Masterminds\HTML5;
  * @todo consider using a bitmask table lookup. There is enough overlap in
  *       naming that this could significantly shrink the size and maybe make it
  *       faster. See the Go teams implementation at https://code.google.com/p/go/source/browse/html/atom.
+ * @internal
  */
 class Elements
 {

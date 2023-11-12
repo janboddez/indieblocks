@@ -5,6 +5,7 @@ namespace IndieBlocks\Masterminds\HTML5;
 /**
  * Entity lookup tables.
  * This class is automatically generated.
+ * @internal
  */
 class Entities
 {

@@ -7,6 +7,7 @@ use IndieBlocks\Masterminds\HTML5\Entities;
  * Manage entity references.
  *
  * This is a simple resolver for HTML5 character reference entitites. See Entities for the list of supported entities.
+ * @internal
  */
 class CharacterReference
 {

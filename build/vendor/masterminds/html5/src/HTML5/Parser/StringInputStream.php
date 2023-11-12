@@ -35,6 +35,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // - // indicates regular comments
 /**
  * @deprecated since 2.4, to remove in 3.0. Use a string in the scanner instead.
+ * @internal
  */
 class StringInputStream implements InputStream
 {

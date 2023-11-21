@@ -83,6 +83,18 @@ class Parser {
 		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
 
 		if ( empty( $mf2 ) ) {
+			if ( ! empty( $fragment ) ) {
+				// If the URL contains a fragment, parse only the corresponding
+				// page section.
+				// @todo: Do this for `$this->dom`, too?
+				$xpath = new \DOMXPath( $this->dom );
+
+				foreach ( $xpath->query( "//*[@id='$fragment']" ) as $el ) {
+					$html = $doc->saveHTML( $el );
+					break;
+				}
+			}
+
 			$mf2 = Mf2\parse( $content, $this->url );
 			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
 		}

@@ -130,7 +130,7 @@ class Webmention_Receiver {
 						array(
 							'key'     => 'indieblocks_webmention_source',
 							'compare' => '=',
-							'value'   => esc_url( $webmention->source ),
+							'value'   => esc_url_raw( $webmention->source ),
 						),
 					),
 				)

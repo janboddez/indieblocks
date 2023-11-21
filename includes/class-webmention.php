@@ -24,6 +24,8 @@ class Webmention {
 
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
 		add_action( 'transition_post_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
+		add_action( 'transition_comment_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
+
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );

@@ -375,3 +375,72 @@ function get_facepile_comments( $post_id ) {
 
 	return $facepile_comments;
 }
+
+/**
+ * Get post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj      Post or comment.
+ * @param  string               $meta_key The meta key.
+ * @return string                         The meta value (or an empty) string.
+ */
+function get_meta( $obj, $meta_key ) {
+	if ( $obj instanceof \WP_Post ) {
+		return get_post_meta( $obj->ID, $meta_key, true );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		return get_comment_meta( $obj->comment_ID, $meta_key, true );
+	}
+
+	return '';
+}
+
+/**
+ * Update post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj        Post or comment.
+ * @param  string               $meta_key   The meta key.
+ * @param  mixed                $meta_value The value.
+ */
+function add_meta( $obj, $meta_key, $meta_value ) {
+	if ( $obj instanceof \WP_Post ) {
+		add_post_meta( $obj->ID, $meta_key, $meta_value );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		add_comment_meta( $obj->comment_ID, $meta_key, $meta_value );
+	}
+}
+
+/**
+ * Update post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj        Post or comment.
+ * @param  string               $meta_key   The meta key.
+ * @param  mixed                $meta_value The value.
+ */
+function update_meta( $obj, $meta_key, $meta_value ) {
+	if ( $obj instanceof \WP_Post ) {
+		update_post_meta( $obj->ID, $meta_key, $meta_value );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		update_comment_meta( $obj->comment_ID, $meta_key, $meta_value );
+	}
+}
+
+/**
+ * Delete post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj      Post or comment.
+ * @param  string               $meta_key The meta key.
+ */
+function delete_meta( $obj, $meta_key ) {
+	if ( $obj instanceof \WP_Post ) {
+		delete_post_meta( $obj->ID, $meta_key );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		delete_comment_meta( $obj->comment_ID, $meta_key );
+	}
+}

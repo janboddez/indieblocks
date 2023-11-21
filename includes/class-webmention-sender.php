@@ -27,7 +27,6 @@ class Webmention_Sender {
 			return;
 		}
 
-
 		if ( $obj instanceof \WP_Post ) {
 			if ( 'publish' !== $new_status ) {
 				// Do not send webmention on delete/unpublish, for now.
@@ -62,8 +61,6 @@ class Webmention_Sender {
 			$html = apply_filters( 'the_content', $obj->post_content );
 		} else {
 			$html = make_clickable( get_comment_text( $obj ) );
-			debug_log( $html );
-			debug_log( $obj );
 
 			if ( ! empty( $obj->comment_parent ) ) {
 				// Add in the parent's, if any, Webmention source.
@@ -91,7 +88,6 @@ class Webmention_Sender {
 		}
 
 		$urls = array_unique( $urls );
-		debug_log( $urls );
 
 		$schedule = false;
 
@@ -160,7 +156,7 @@ class Webmention_Sender {
 		if ( $obj instanceof \WP_Post ) {
 			$html = apply_filters( 'the_content', $obj->post_content );
 		} else {
-			$html = get_comment_text( $obj );
+			$html = make_clickable( get_comment_text( $obj ) );
 
 			if ( ! empty( $obj->comment_parent ) ) {
 				// Add in the parent's, if any, Webmention source.
@@ -207,6 +203,7 @@ class Webmention_Sender {
 
 			if ( empty( $endpoint ) || false === wp_http_validate_url( $endpoint ) ) {
 				// Skip.
+				error_log( '[Indieblocks/Webmention] Could not find a Webmention endpoint for target ' . esc_url_raw( $url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				continue;
 			}
 

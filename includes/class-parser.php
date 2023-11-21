@@ -91,7 +91,7 @@ class Parser {
 				$xpath = new \DOMXPath( $this->dom );
 
 				foreach ( $xpath->query( "//*[@id='$fragment']" ) as $el ) {
-					$html = $doc->saveHTML( $el );
+					$content = $this->dom->saveHTML( $el );
 					break;
 				}
 			}

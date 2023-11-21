@@ -83,6 +83,7 @@ class Parser {
 		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
 
 		if ( empty( $mf2 ) ) {
+			$fragment = wp_parse_url( $this->url, PHP_URL_FRAGMENT );
 			if ( ! empty( $fragment ) ) {
 				// If the URL contains a fragment, parse only the corresponding
 				// page section.

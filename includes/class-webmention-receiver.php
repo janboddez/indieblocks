@@ -132,6 +132,15 @@ class Webmention_Receiver {
 							'compare' => '=',
 							'value'   => esc_url_raw( $webmention->source ),
 						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => 'EXISTS',
+						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => '=',
+							'value'   => esc_url_raw( $webmention->target ),
+						),
 					),
 				)
 			);
@@ -219,6 +228,7 @@ class Webmention_Receiver {
 				'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
 				'comment_meta'         => array(
 					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
+					'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
 				),
 			);
 

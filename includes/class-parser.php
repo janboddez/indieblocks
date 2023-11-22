@@ -311,6 +311,8 @@ class Parser {
 			return $this->mf2['items'][0]['properties']['content'][0]['html'];
 		} elseif ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['text'] ) ) {
 			return $this->mf2['items'][0]['properties']['content'][0]['text'];
+		} elseif ( ! empty( $this->mf2['items'][0]['properties']['content'][0] && is_string( $this->mf2['items'][0]['properties']['content'][0] ) ) ) {
+			return $this->mf2['items'][0]['properties']['content'][0];
 		}
 
 		return '';

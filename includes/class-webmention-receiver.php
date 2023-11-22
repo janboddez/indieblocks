@@ -102,7 +102,7 @@ class Webmention_Receiver {
 		global $wpdb;
 
 		$table_name  = $wpdb->prefix . 'indieblocks_webmentions';
-		$webmentions = $wpdb->get_results( "SELECT id, source, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$webmentions = $wpdb->get_results( "SELECT id, source, target, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( empty( $webmentions ) || ! is_array( $webmentions ) ) {
 			// Empty queue.
@@ -130,7 +130,16 @@ class Webmention_Receiver {
 						array(
 							'key'     => 'indieblocks_webmention_source',
 							'compare' => '=',
-							'value'   => esc_url( $webmention->source ),
+							'value'   => esc_url_raw( $webmention->source ),
+						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => 'EXISTS',
+						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => '=',
+							'value'   => esc_url_raw( $webmention->target ),
 						),
 					),
 				)
@@ -219,6 +228,7 @@ class Webmention_Receiver {
 				'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
 				'comment_meta'         => array(
 					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
+					'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
 				),
 			);
 

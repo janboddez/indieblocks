@@ -25,7 +25,7 @@ class Webmention {
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
 
 		foreach ( static::get_supported_post_types() as $post_type ) {
-			add_action( "publish_post_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
+			add_action( "publish_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
 		}
 
 		// When a comment is first inserted into the database.

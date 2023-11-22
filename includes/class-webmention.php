@@ -27,6 +27,10 @@ class Webmention {
 		foreach ( static::get_supported_post_types() as $post_type ) {
 			add_action( "publish_post_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
 		}
+
+		// When a comment is first inserted into the database.
+		add_action( 'comment_post', array( Webmention_Sender::class, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
+		// When a comment is approved. Or a previously approved comment updated.
 		add_action( 'comment_approved_comment', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
 
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );

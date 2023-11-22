@@ -21,7 +21,7 @@ class Webmention_Sender {
 	 * @param \WP_Post|\WP_Comment $obj        Post or comment object.
 	 * @param mixed                $deprecated Used to be the post object, now deprecated.
 	 */
-	public static function schedule_webmention( $obj_id, $obj, $deprecated = null ) {
+	public static function schedule_webmention( $obj_id, $obj = null, $deprecated = null ) {
 		if ( null !== $deprecated ) {
 			_deprecated_argument( 'post', '0.10.0', 'Passing a third argument to `\IndieBlocks\Webmention_Sender::schedule_webmention()` is deprecated.' );
 		}
@@ -29,6 +29,10 @@ class Webmention_Sender {
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
 			// Disabled.
 			return;
+		}
+
+		if ( 'comment_post' === current_filter() ) {
+			$obj = get_comment( $obj_id );
 		}
 
 		if ( $obj instanceof \WP_Post ) {

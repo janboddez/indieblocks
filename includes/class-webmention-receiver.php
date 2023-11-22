@@ -215,8 +215,8 @@ class Webmention_Receiver {
 
 			// Look for a target URL fragment (and possible parent comment).
 			$fragment = wp_parse_url( $webmention->target, PHP_URL_FRAGMENT );
-			if ( ! empty( $fragment ) && ctype_digit( $fragment ) ) {
-				$parent = get_comment( $fragment );
+			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
+				$parent = get_comment( str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) );
 			}
 
 			// Some defaults.
@@ -227,7 +227,7 @@ class Webmention_Receiver {
 				'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
 				'comment_author_IP'    => $webmention->ip,
 				'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
-				'comment_parent'       => ! empty( $parent ) && $webmention->post_id === $parent->comment_post_ID ? $parent->comment_post_ID : 0,
+				'comment_parent'       => ! empty( $parent ) && $webmention->post_id === $parent->comment_post_ID ? $parent->comment_ID : 0,
 				'user_id'              => 0,
 				'comment_date'         => $webmention->created_at,
 				'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),

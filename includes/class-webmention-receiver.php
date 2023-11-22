@@ -102,7 +102,7 @@ class Webmention_Receiver {
 		global $wpdb;
 
 		$table_name  = $wpdb->prefix . 'indieblocks_webmentions';
-		$webmentions = $wpdb->get_results( "SELECT id, source, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$webmentions = $wpdb->get_results( "SELECT id, source, target, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( empty( $webmentions ) || ! is_array( $webmentions ) ) {
 			// Empty queue.

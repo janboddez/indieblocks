@@ -23,8 +23,11 @@ class Webmention {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
-		add_action( 'transition_post_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
-		add_action( 'transition_comment_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
+
+		foreach ( static::get_supported_post_types() as $post_type ) {
+			add_action( "publish_post_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
+		}
+		add_action( 'comment_approved_comment', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
 
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
 

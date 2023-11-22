@@ -17,18 +17,22 @@ class Webmention_Sender {
 	 * Scans for outgoing links, but leaves fetching Webmention endpoints to the
 	 * callback function queued in the background.
 	 *
-	 * @param string               $new_status New post status.
-	 * @param string               $old_status Old post status.
+	 * @param int                  $obj_id     Post or comment ID.
 	 * @param \WP_Post|\WP_Comment $obj        Post or comment object.
+	 * @param mixed                $deprecated Used to be the post object, now deprecated.
 	 */
-	public static function schedule_webmention( $new_status, $old_status, $obj ) {
+	public static function schedule_webmention( $obj_id, $obj, $deprecated = null ) {
+		if ( null !== $deprecated ) {
+			_deprecated_argument( 'post', '0.10.0', 'Passing a third argument to `\IndieBlocks\Webmention_Sender::schedule_webmention()` is deprecated.' );
+		}
+
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
 			// Disabled.
 			return;
 		}
 
 		if ( $obj instanceof \WP_Post ) {
-			if ( 'publish' !== $new_status ) {
+			if ( 'publish' !== $obj->post_status ) {
 				// Do not send webmention on delete/unpublish, for now.
 				return;
 			}
@@ -47,12 +51,10 @@ class Webmention_Sender {
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				return;
 			}
-		} elseif ( 'approved' !== $new_status ) {
+		} elseif ( '1' !== $obj->comment_approved ) {
 			// Do not send webmention on delete/unpublish, for now.
 			return;
 		}
-
-		debug_log( $new_status );
 
 		$urls = array();
 
@@ -500,7 +502,7 @@ class Webmention_Sender {
 		}
 
 		$post = get_post( $post_id );
-		static::schedule_webmention( $post->post_status, $post->post_status, $post );
+		static::schedule_webmention( $post_id, $post );
 
 		wp_die();
 	}

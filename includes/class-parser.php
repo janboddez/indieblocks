@@ -100,7 +100,7 @@ class Parser {
 			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
 		}
 
-		$this->mf2 = Mf2\parse( $content, $this->url );
+		$this->mf2 = $mf2;
 	}
 
 	/**

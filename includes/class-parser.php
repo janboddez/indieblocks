@@ -309,6 +309,8 @@ class Parser {
 	public function get_content() {
 		if ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['html'] ) ) {
 			return $this->mf2['items'][0]['properties']['content'][0]['html'];
+		} elseif ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['text'] ) ) {
+			return $this->mf2['items'][0]['properties']['content'][0]['text'];
 		}
 
 		return '';

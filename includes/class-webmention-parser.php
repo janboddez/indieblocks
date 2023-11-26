@@ -62,10 +62,10 @@ class Webmention_Parser {
 		$published = $parser->get_published();
 		if ( ! empty( $published ) ) {
 			$commentdata['comment_date']     = get_date_from_gmt( $published, 'Y-m-d H:i:s' );
-			$commentdata['comment_date_gmt'] = date( 'Y-m-d H:i:s', strtotime( $published ) );
+			$commentdata['comment_date_gmt'] = date( 'Y-m-d H:i:s', strtotime( $published ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 		}
 
-		$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore WordPress.PHP.DisallowShortTernary.Found
+		$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 
 		$hentry_kind = $parser->get_type();
 		if ( ! empty( $hentry_kind ) ) {

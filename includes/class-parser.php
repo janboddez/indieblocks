@@ -83,11 +83,24 @@ class Parser {
 		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );
 
 		if ( empty( $mf2 ) ) {
+			$fragment = wp_parse_url( $this->url, PHP_URL_FRAGMENT );
+			if ( ! empty( $fragment ) ) {
+				// If the URL contains a fragment, parse only the corresponding
+				// page section.
+				// @todo: Do this for `$this->dom`, too?
+				$xpath = new \DOMXPath( $this->dom );
+
+				foreach ( $xpath->query( "//*[@id='$fragment']" ) as $el ) {
+					$content = $this->dom->saveHTML( $el );
+					break;
+				}
+			}
+
 			$mf2 = Mf2\parse( $content, $this->url );
 			set_transient( 'indieblocks:mf2:' . $hash, $mf2, 3600 );
 		}
 
-		$this->mf2 = Mf2\parse( $content, $this->url );
+		$this->mf2 = $mf2;
 	}
 
 	/**
@@ -296,6 +309,10 @@ class Parser {
 	public function get_content() {
 		if ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['html'] ) ) {
 			return $this->mf2['items'][0]['properties']['content'][0]['html'];
+		} elseif ( ! empty( $this->mf2['items'][0]['properties']['content'][0]['text'] ) ) {
+			return $this->mf2['items'][0]['properties']['content'][0]['text'];
+		} elseif ( ! empty( $this->mf2['items'][0]['properties']['content'][0] && is_string( $this->mf2['items'][0]['properties']['content'][0] ) ) ) {
+			return $this->mf2['items'][0]['properties']['content'][0];
 		}
 
 		return '';

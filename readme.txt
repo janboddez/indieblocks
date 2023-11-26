@@ -28,6 +28,12 @@ After activation, head over to *Settings > IndieBlocks*, and enable or disable i
 
 More details can be found on [https://indieblocks.xyz/](https://indieblocks.xyz/). Issues may be filed at [https://github.com/janboddez/indieblocks](https://github.com/janboddez/indieblocks).
 
+== Frequently Asked Questions ==
+= How does this plugin interact with the various other IndieWeb plugins? =
+While IndieBlocks does not depend on _any_ other plugin, it is compatible with, and extends, the Micropub plugin for WordPress. See [https://indieblocks.xyz/documentation/micropub-and-indieauth/](https://indieblocks.xyz/documentation/micropub-and-indieauth/) for some more information.
+
+IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
+
 == Changelog ==
 = 0.10.0 =
 Send webmentions also for comments, to mentioned sites and the comment parent, if it exists and itself originated as a webmention.

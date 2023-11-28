@@ -62,23 +62,19 @@ class Webmention_Sender {
 
 		$urls = array();
 
-		// Fetch our post or comment's HTML.
 		if ( $obj instanceof \WP_Post ) {
+			// Fetch our post's HTML.
 			$html = apply_filters( 'the_content', $obj->post_content );
-		} else {
-			$html = make_clickable( get_comment_text( $obj ) );
 
-			if ( ! empty( $obj->comment_parent ) ) {
-				// Add in the parent's, if any, Webmention source.
-				$source = get_comment_meta( $obj->comment_parent, 'indieblocks_webmention_source', true );
-				if ( ! empty( $source ) ) {
-					$urls[] = $source;
-				}
+			// Scan it for outgoing links.
+			$urls = static::find_outgoing_links( $html );
+		} elseif ( ! empty( $obj->comment_parent ) ) {
+			// Add in the parent's, if any, Webmention source.
+			$source = get_comment_meta( $obj->comment_parent, 'indieblocks_webmention_source', true );
+			if ( ! empty( $source ) ) {
+				$urls[] = $source;
 			}
 		}
-
-		// Scan it for outgoing links.
-		$urls = array_merge( $urls, static::find_outgoing_links( $html ) );
 
 		// Parse in targets that may have been there previously, but don't
 		// delete them, yet.
@@ -93,8 +89,7 @@ class Webmention_Sender {
 			return;
 		}
 
-		$urls = array_unique( $urls );
-
+		$urls     = array_unique( $urls );
 		$schedule = false;
 
 		foreach ( $urls as $url ) {
@@ -158,23 +153,19 @@ class Webmention_Sender {
 
 		$urls = array();
 
-		// Fetch our post or comment's HTML.
 		if ( $obj instanceof \WP_Post ) {
+			// Fetch our post's HTML.
 			$html = apply_filters( 'the_content', $obj->post_content );
-		} else {
-			$html = make_clickable( get_comment_text( $obj ) );
 
-			if ( ! empty( $obj->comment_parent ) ) {
-				// Add in the parent's, if any, Webmention source.
-				$source = get_comment_meta( $obj->comment_parent, 'indieblocks_webmention_source', true );
-				if ( ! empty( $source ) ) {
-					$urls[] = $source;
-				}
+			// Scan it for outgoing links.
+			$urls = static::find_outgoing_links( $html );
+		} elseif ( ! empty( $obj->comment_parent ) ) {
+			// Add in the parent's, if any, Webmention source.
+			$source = get_comment_meta( $obj->comment_parent, 'indieblocks_webmention_source', true );
+			if ( ! empty( $source ) ) {
+				$urls[] = $source;
 			}
 		}
-
-		// Scan it for outgoing links.
-		$urls = array_merge( $urls, static::find_outgoing_links( $html ) );
 
 		// Parse in (_and_ then forget) targets that may have been there before.
 		// This also means that "historic" targets are excluded from retries!

@@ -10,6 +10,10 @@
 		<exclude name="WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound" />
 	</rule>
 
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>*\.asset\.php</exclude-pattern>
+	</rule>
+
 	<exclude-pattern>tests/*</exclude-pattern>
 	<exclude-pattern>build/*</exclude-pattern>
 	<exclude-pattern>bootstrap\.php$</exclude-pattern>

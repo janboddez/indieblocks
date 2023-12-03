@@ -292,7 +292,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 
 		if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
 			// Somehow not a valid image. Delete it.
-			unlink( $file_path );
+			wp_delete_file( $file_path );
 
 			debug_log( '[IndieBlocks] Invalid image file: ' . esc_url_raw( $url ) . '.' );
 			return null;

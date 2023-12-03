@@ -10,6 +10,7 @@ use IndieBlocks\Masterminds\HTML5\Serializer\Traverser;
 /**
  * This class offers convenience methods for parsing and serializing HTML5.
  * It is roughly designed to mirror the \DOMDocument native class.
+ * @internal
  */
 class HTML5
 {

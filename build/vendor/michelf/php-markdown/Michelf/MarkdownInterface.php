@@ -12,6 +12,7 @@ namespace IndieBlocks\Michelf;
 
 /**
  * Markdown Parser Interface
+ * @internal
  */
 interface MarkdownInterface
 {

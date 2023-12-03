@@ -12,6 +12,7 @@ namespace IndieBlocks\Masterminds\HTML5\Parser;
  *
  * @todo - colgroup and col special behaviors
  *       - body and head special behaviors
+ * @internal
  */
 class TreeBuildingRules
 {

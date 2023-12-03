@@ -5,6 +5,7 @@ namespace IndieBlocks\Masterminds\HTML5\Parser;
 use IndieBlocks\Masterminds\HTML5\Exception;
 /**
  * The scanner scans over a given data input to react appropriately to characters.
+ * @internal
  */
 class Scanner
 {

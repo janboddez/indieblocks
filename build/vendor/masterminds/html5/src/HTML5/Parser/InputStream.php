@@ -12,6 +12,7 @@ namespace IndieBlocks\Masterminds\HTML5\Parser;
  * FileInputStream and StringInputStream.
  *
  * @deprecated since 2.4, to remove in 3.0. Use a string in the scanner instead.
+ * @internal
  */
 interface InputStream extends \Iterator
 {

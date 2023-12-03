@@ -39,6 +39,7 @@ use stdClass;
  * @param string $url The URL the input document was found at, for relative URL resolution
  * @param bool $convertClassic whether or not to convert classic microformats
  * @return array Canonical MF2 array structure
+ * @internal
  */
 function parse($input, $url = null, $convertClassic = \true)
 {
@@ -60,6 +61,7 @@ function parse($input, $url = null, $convertClassic = \true)
  * @param bool $convertClassic (optional, default true) whether or not to convert classic microformats
  * @param &array $curlInfo (optional) the results of curl_getinfo will be placed in this variable for debugging
  * @return array|null canonical microformats2 array structure on success, null on failure
+ * @internal
  */
 function fetch($url, $convertClassic = \true, &$curlInfo = null)
 {
@@ -85,6 +87,7 @@ function fetch($url, $convertClassic = \true, &$curlInfo = null)
  * Unicode to HTML Entities
  * @param string $input String containing characters to convert into HTML entities
  * @return string
+ * @internal
  */
 function unicodeToHtmlEntities($input)
 {
@@ -99,11 +102,13 @@ function unicodeToHtmlEntities($input)
  * @deprecated since v0.2.3
  * @param string $str
  * @return string
+ * @internal
  */
 function collapseWhitespace($str)
 {
     return \preg_replace('/[\\s|\\n]+/', ' ', $str);
 }
+/** @internal */
 function unicodeTrim($str)
 {
     // this is cheating. TODO: find a better way if this causes any problems
@@ -120,6 +125,7 @@ function unicodeTrim($str)
  * @param string $class A space delimited list of classnames
  * @param string $prefix The prefix to look for
  * @return string|array The prefixed name of the first microfomats class found or false
+ * @internal
  */
 function mfNamesFromClass($class, $prefix = 'h-')
 {
@@ -144,6 +150,7 @@ function mfNamesFromClass($class, $prefix = 'h-')
  *
  * @param string $class
  * @return array
+ * @internal
  */
 function nestedMfPropertyNamesFromClass($class)
 {
@@ -170,6 +177,7 @@ function nestedMfPropertyNamesFromClass($class)
  * @param DOMElement $e The element to get the classname for
  * @param string $prefix The prefix to look for
  * @return mixed See return value of mf2\Parser::mfNameFromClass()
+ * @internal
  */
 function mfNamesFromElement(\DOMElement $e, $prefix = 'h-')
 {
@@ -178,6 +186,7 @@ function mfNamesFromElement(\DOMElement $e, $prefix = 'h-')
 }
 /**
  * Wraps nestedMfPropertyNamesFromClass to handle an element as input
+ * @internal
  */
 function nestedMfPropertyNamesFromElement(\DOMElement $e)
 {
@@ -188,6 +197,7 @@ function nestedMfPropertyNamesFromElement(\DOMElement $e)
  * Converts various time formats to HH:MM
  * @param string $time The time to convert
  * @return string
+ * @internal
  */
 function convertTimeFormat($time)
 {
@@ -225,6 +235,7 @@ function convertTimeFormat($time)
  * matches regex \d{4}-\d{2}
  * @param string $dtValue
  * @return string
+ * @internal
  */
 function normalizeOrdinalDate($dtValue)
 {
@@ -244,6 +255,7 @@ function normalizeOrdinalDate($dtValue)
  * If a date value has a timezone offset, normalize it.
  * @param string $dtValue
  * @return string isolated, normalized TZ offset for implied TZ for other dt- properties
+ * @internal
  */
 function normalizeTimezoneOffset(&$dtValue)
 {
@@ -265,6 +277,7 @@ function normalizeTimezoneOffset(&$dtValue)
     }
     return $timezoneOffset;
 }
+/** @internal */
 function applySrcsetUrlTransformation($srcset, $transformation)
 {
     return \implode(', ', \array_filter(\array_map(function ($srcsetPart) use($transformation) {
@@ -287,6 +300,7 @@ function applySrcsetUrlTransformation($srcset, $transformation)
  *     use Mf2;
  *     $parser = new Mf2\Parser('<p class="h-card">Barnaby Walters</p>');
  *     $output = $parser->parse();
+ * @internal
  */
 class Parser
 {
@@ -1553,6 +1567,7 @@ class Parser
         'category' => array('replace' => 'p-category'),
     ), 'hproduct' => array('fn' => array('replace' => 'p-name'), 'photo' => array('replace' => 'u-photo'), 'brand' => array('replace' => 'p-brand'), 'category' => array('replace' => 'p-category'), 'description' => array('replace' => 'p-description'), 'identifier' => array('replace' => 'u-identifier'), 'url' => array('replace' => 'u-url'), 'review' => array('replace' => 'p-review h-review'), 'price' => array('replace' => 'p-price')), 'item' => array('fn' => array('replace' => 'p-name'), 'url' => array('replace' => 'u-url'), 'photo' => array('replace' => 'u-photo')), 'adr' => array('post-office-box' => array('replace' => 'p-post-office-box'), 'extended-address' => array('replace' => 'p-extended-address'), 'street-address' => array('replace' => 'p-street-address'), 'locality' => array('replace' => 'p-locality'), 'region' => array('replace' => 'p-region'), 'postal-code' => array('replace' => 'p-postal-code'), 'country-name' => array('replace' => 'p-country-name')), 'geo' => array('latitude' => array('replace' => 'p-latitude'), 'longitude' => array('replace' => 'p-longitude')));
 }
+/** @internal */
 function parseUriToComponents($uri)
 {
     $result = array('scheme' => null, 'authority' => null, 'path' => null, 'query' => null, 'fragment' => null);
@@ -1586,6 +1601,7 @@ function parseUriToComponents($uri)
     }
     return $result;
 }
+/** @internal */
 function resolveUrl($baseURI, $referenceURI)
 {
     $target = array('scheme' => null, 'authority' => null, 'path' => null, 'query' => null, 'fragment' => null);
@@ -1658,6 +1674,7 @@ function resolveUrl($baseURI, $referenceURI)
     return $result;
 }
 # 5.2.3 Merge Paths
+/** @internal */
 function mergePaths($base, $reference)
 {
     # If the base URI has a defined authority component and an empty
@@ -1682,6 +1699,7 @@ function mergePaths($base, $reference)
     return $merged;
 }
 # 5.2.4.A Remove leading ../ or ./
+/** @internal */
 function removeLeadingDotSlash(&$input)
 {
     if (\substr($input, 0, 3) == '../') {
@@ -1691,6 +1709,7 @@ function removeLeadingDotSlash(&$input)
     }
 }
 # 5.2.4.B Replace leading /. with /
+/** @internal */
 function removeLeadingSlashDot(&$input)
 {
     if (\substr($input, 0, 3) == '/./') {
@@ -1700,6 +1719,7 @@ function removeLeadingSlashDot(&$input)
     }
 }
 # 5.2.4.C Given leading /../ remove component from output buffer
+/** @internal */
 function removeOneDirLevel(&$input, &$output)
 {
     if (\substr($input, 0, 4) == '/../') {
@@ -1710,6 +1730,7 @@ function removeOneDirLevel(&$input, &$output)
     $output = \substr($output, 0, \strrpos($output, '/'));
 }
 # 5.2.4.D Remove . and .. if it's the only thing in the input
+/** @internal */
 function removeLoneDotDot(&$input)
 {
     if ($input == '.') {
@@ -1719,6 +1740,7 @@ function removeLoneDotDot(&$input)
     }
 }
 # 5.2.4.E Move one segment from input to output
+/** @internal */
 function moveOneSegmentFromInput(&$input, &$output)
 {
     if (\substr($input, 0, 1) != '/') {
@@ -1735,6 +1757,7 @@ function moveOneSegmentFromInput(&$input, &$output)
     }
 }
 # 5.2.4 Remove Dot Segments
+/** @internal */
 function removeDotSegments($path)
 {
     # 1.  The input buffer is initialized with the now-appended path

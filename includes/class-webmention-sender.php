@@ -276,7 +276,7 @@ class Webmention_Sender {
 			return array();
 		}
 
-		$html = '<div>' . mb_convert_encoding( $html, 'HTML-ENTITIES', mb_detect_encoding( $html ) ) . '</div>';
+		$html = '<div>' . convert_encoding( $html ) . '</div>';
 
 		libxml_use_internal_errors( true );
 
@@ -353,23 +353,19 @@ class Webmention_Sender {
 		// Now do a GET since we're going to look in the HTML headers (and we're
 		// sure its not a binary file).
 		$response = remote_get( $url );
-
 		if ( is_wp_error( $response ) ) {
 			return null;
 		}
 
-		$contents = wp_remote_retrieve_body( $response );
-
-		if ( empty( $contents ) ) {
+		$content = wp_remote_retrieve_body( $response );
+		if ( empty( $content ) ) {
 			return null;
 		}
 
-		$contents = mb_convert_encoding( $contents, 'HTML-ENTITIES', mb_detect_encoding( $contents ) );
-
+		$content = convert_encoding( $content );
 		libxml_use_internal_errors( true );
-
 		$doc = new \DOMDocument();
-		$doc->loadHTML( $contents );
+		$doc->loadHTML( $content );
 
 		$xpath = new \DOMXPath( $doc );
 

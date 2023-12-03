@@ -42,6 +42,35 @@ function debug_log( $item ) {
 }
 
 /**
+ * Wrapper around PHP's built-in `mb_detect_encoding()`.
+ *
+ * @param  string $text The string being inspected.
+ * @return string       Detected encoding.
+ */
+function detect_encoding( $text ) {
+	$encoding = mb_detect_encoding( $text );
+
+	if ( 'ASCII' === $encoding ) {
+		$encoding = 'UTF-8';
+	}
+
+	return $encoding;
+}
+
+/**
+ * Converts HTML entities in a text string.
+ *
+ * @param  string $text The string being converted.
+ * @return string       Entity-encoded string.
+ */
+function convert_encoding( $text ) {
+	$text = mb_convert_encoding( $text, 'UTF-8', detect_encoding( $content ) );
+	$text = mb_encode_numericentity( htmlentities( $text, ENT_QUOTES, 'UTF-8' ), array( 0x80, 0x10FFFF, 0, ~0 ), 'UTF-8' );
+
+	return $text;
+}
+
+/**
  * Wrapper around `wp_remote_get()`.
  *
  * @param  string $url          URL to fetch.

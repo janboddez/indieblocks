@@ -75,7 +75,7 @@ class Parser {
 		}
 
 		// Load DOM.
-		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', mb_detect_encoding( $content ) );
+		$content = convert_encoding( $content );
 		libxml_use_internal_errors( true );
 		$this->dom->loadHTML( $content );
 

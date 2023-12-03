@@ -64,10 +64,7 @@ function detect_encoding( $text ) {
  * @return string       Entity-encoded string.
  */
 function convert_encoding( $text ) {
-	$text = mb_convert_encoding( $text, 'UTF-8', detect_encoding( $text ) );
-	$text = mb_encode_numericentity( htmlentities( $text, ENT_QUOTES, 'UTF-8' ), array( 0x80, 0x10FFFF, 0, ~0 ), 'UTF-8' );
-
-	return $text;
+	return mb_encode_numericentity( $text, array( 0x80, 0x10FFFF, 0, ~0 ), detect_encoding( $text ) );
 }
 
 /**

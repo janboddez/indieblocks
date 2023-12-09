@@ -251,69 +251,102 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 	$file_path = trailingslashit( $dir ) . sanitize_file_name( $filename );
 
 	if ( file_exists( $file_path ) && ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
-		// File exists and is under a month old.
-		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
-	} else {
-		// Attempt to download the image.
-		$response = remote_get(
-			esc_url_raw( $url ),
-			false,
-			array( 'headers' => array( 'Accept' => 'image/*' ) )
-		);
-
-		$body = wp_remote_retrieve_body( $response );
-
-		if ( empty( $body ) ) {
-			debug_log( '[IndieBlocks] Could not download the image at ' . esc_url_raw( $url ) . '.' );
-			return null;
-		}
-
-		// Now store it locally.
-		global $wp_filesystem;
-
-		if ( empty( $wp_filesystem ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
-
-		// Write image data.
-		if ( ! $wp_filesystem->put_contents( $file_path, $body, 0644 ) ) {
-			debug_log( '[IndieBlocks] Could not save image file: ' . $file_path . '.' );
-			return null;
-		}
-
-		if ( ! function_exists( 'wp_crop_image' ) ) {
-			// Load WordPress' image functions.
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
-
-		if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
-			// Somehow not a valid image. Delete it.
-			wp_delete_file( $file_path );
-
-			debug_log( '[IndieBlocks] Invalid image file: ' . esc_url_raw( $url ) . '.' );
-			return null;
-		}
-
-		// Try to scale down and crop it.
-		$image = wp_get_image_editor( $file_path );
-
-		if ( ! is_wp_error( $image ) ) {
-			$image->resize( $width, $height, true );
-			$result = $image->save( $file_path );
-
-			if ( $file_path !== $result['path'] ) {
-				// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
-				wp_delete_file( $file_path ); // Delete "old" image.
-				$file_path = $result['path'];
-			}
-		} else {
-			debug_log( '[IndieBlocks] Could not resize ' . $file_path . ': ' . $image->get_error_message() . '.' );
-		}
-
-		// And return the local URL.
+		// File exists and is under a month old. We're done here.
 		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 	}
+
+	// Not all image URLs end in a file extension. (Gravatar's URLs come to
+	// mind.) We used to store them like that (without extension), but, e.g., S3
+	// Uploads doesn't play 100% nice with such images, and we now try to give
+	// 'em an extension after all.
+	// Look for an existing file, but allow an(y) additional extension.
+	foreach ( glob( "$file_path.*" ) as $match ) {
+		$file_path = $match;
+
+		if ( ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
+			// So, _this_ file exists and is under a month old. Let's return it.
+			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+		}
+
+		break; // Either way, stop after the first match.
+	}
+
+	// OK, so either the file doesn't exist or is over a month old. Attempt to
+	// download the image.
+	$response = remote_get(
+		esc_url_raw( $url ),
+		false,
+		array( 'headers' => array( 'Accept' => 'image/*' ) )
+	);
+
+	$body = wp_remote_retrieve_body( $response );
+
+	if ( empty( $body ) ) {
+		debug_log( '[IndieBlocks] Could not download the image at ' . esc_url_raw( $url ) . '.' );
+		return null;
+	}
+
+	// Now store it locally.
+	global $wp_filesystem;
+
+	if ( empty( $wp_filesystem ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		WP_Filesystem();
+	}
+
+	// Write image data.
+	if ( ! $wp_filesystem->put_contents( $file_path, $body, 0644 ) ) {
+		debug_log( '[IndieBlocks] Could not save image file: ' . $file_path . '.' );
+		return null;
+	}
+
+	$ext = pathinfo( $file_path, PATHINFO_EXTENSION );
+	if ( empty( $ext ) ) {
+		// Attempt to add a file extension (to work around possible future
+		// issues).
+		$mime = mime_content_type( $file_path );
+
+		if ( is_string( $mime ) ) {
+			$mimes = new Mimey\MimeTypes();
+			$ext   = $mimes->getExtension( $mime );
+
+			if ( ! empty( $ext ) && $wp_filesystem->move( $file_path, "$file_path.$ext" ) ) {
+				$file_path .= ".$ext"; // Our new file path from here on out.
+			}
+		}
+	}
+
+	if ( ! function_exists( 'wp_crop_image' ) ) {
+		// Load WordPress' image functions.
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+	}
+
+	if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
+		// Somehow not a valid image. Delete it.
+		wp_delete_file( $file_path );
+
+		debug_log( '[IndieBlocks] Invalid image file: ' . esc_url_raw( $url ) . '.' );
+		return null;
+	}
+
+	// Try to scale down and crop it.
+	$image = wp_get_image_editor( $file_path );
+
+	if ( ! is_wp_error( $image ) ) {
+		$image->resize( $width, $height, true );
+		$result = $image->save( $file_path );
+
+		if ( $file_path !== $result['path'] ) {
+			// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
+			wp_delete_file( $file_path ); // Delete "old" image.
+			$file_path = $result['path']; // And update the file path (and name).
+		}
+	} else {
+		debug_log( '[IndieBlocks] Could not resize ' . $file_path . ': ' . $image->get_error_message() . '.' );
+	}
+
+	// And return the local URL.
+	return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 }
 
 /**

@@ -102,7 +102,7 @@ class Webmention_Receiver {
 		global $wpdb;
 
 		$table_name  = $wpdb->prefix . 'indieblocks_webmentions';
-		$webmentions = $wpdb->get_results( "SELECT id, source, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$webmentions = $wpdb->get_results( "SELECT id, source, target, post_id, ip, created_at FROM $table_name WHERE status = 'draft' LIMIT 5" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( empty( $webmentions ) || ! is_array( $webmentions ) ) {
 			// Empty queue.
@@ -130,7 +130,16 @@ class Webmention_Receiver {
 						array(
 							'key'     => 'indieblocks_webmention_source',
 							'compare' => '=',
-							'value'   => esc_url( $webmention->source ),
+							'value'   => esc_url_raw( $webmention->source ),
+						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => 'EXISTS',
+						),
+						array(
+							'key'     => 'indieblocks_webmention_target',
+							'compare' => '=',
+							'value'   => esc_url_raw( $webmention->target ),
 						),
 					),
 				)
@@ -204,6 +213,12 @@ class Webmention_Receiver {
 			// Grab source domain.
 			$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
 
+			// Look for a target URL fragment (and possible parent comment).
+			$fragment = wp_parse_url( $webmention->target, PHP_URL_FRAGMENT );
+			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
+				$parent = get_comment( str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) );
+			}
+
 			// Some defaults.
 			$commentdata = array(
 				'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
@@ -212,13 +227,14 @@ class Webmention_Receiver {
 				'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
 				'comment_author_IP'    => $webmention->ip,
 				'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
-				'comment_parent'       => 0,
+				'comment_parent'       => ! empty( $parent ) && $webmention->post_id === $parent->comment_post_ID ? $parent->comment_ID : 0,
 				'user_id'              => 0,
 				'comment_date'         => $webmention->created_at,
 				'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
 				'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
 				'comment_meta'         => array(
 					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
+					'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
 				),
 			);
 
@@ -332,7 +348,15 @@ class Webmention_Receiver {
 			return;
 		}
 
-		if ( is_singular() && webmentions_open() ) {
+		if ( ! is_singular() || ! webmentions_open() ) {
+			return;
+		}
+
+		if ( 'template_redirect' === current_filter() ) {
+			// Add `Link` header.
+			header( 'Link: <' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '>; rel="webmention"', false );
+		} elseif ( 'wp_head' === current_filter() ) {
+			// Output `link` tag.
 			echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
 		}
 	}
@@ -380,7 +404,7 @@ class Webmention_Receiver {
 				$wpdb->prepare(
 					"DELETE FROM $wpdb->commentmeta WHERE meta_key = %s AND meta_value = %s",
 					'indieblocks_webmention_avatar',
-					$url
+					esc_url_raw( $url )
 				)
 			);
 		}

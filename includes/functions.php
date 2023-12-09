@@ -42,6 +42,32 @@ function debug_log( $item ) {
 }
 
 /**
+ * Wrapper around PHP's built-in `mb_detect_encoding()`.
+ *
+ * @param  string $text The string being inspected.
+ * @return string       Detected encoding.
+ */
+function detect_encoding( $text ) {
+	$encoding = mb_detect_encoding( $text );
+
+	if ( 'ASCII' === $encoding ) {
+		$encoding = 'UTF-8';
+	}
+
+	return $encoding;
+}
+
+/**
+ * Converts HTML entities in a text string.
+ *
+ * @param  string $text The string being converted.
+ * @return string       Entity-encoded string.
+ */
+function convert_encoding( $text ) {
+	return mb_encode_numericentity( $text, array( 0x80, 0x10FFFF, 0, ~0 ), detect_encoding( $text ) );
+}
+
+/**
  * Wrapper around `wp_remote_get()`.
  *
  * @param  string $url          URL to fetch.
@@ -285,7 +311,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 			$ext   = $mimes->getExtension( $mime );
 
 			if ( ! empty( $ext ) && $wp_filesystem->move( $file_path, "$file_path.$ext" ) ) {
-				$file_path .= ".$ext"; // Our new file path for here on out.
+				$file_path .= ".$ext"; // Our new file path from here on out.
 			}
 		}
 	}
@@ -407,4 +433,73 @@ function get_facepile_comments( $post_id ) {
 	wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
 
 	return $facepile_comments;
+}
+
+/**
+ * Get post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj      Post or comment.
+ * @param  string               $meta_key The meta key.
+ * @return string                         The meta value (or an empty) string.
+ */
+function get_meta( $obj, $meta_key ) {
+	if ( $obj instanceof \WP_Post ) {
+		return get_post_meta( $obj->ID, $meta_key, true );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		return get_comment_meta( $obj->comment_ID, $meta_key, true );
+	}
+
+	return '';
+}
+
+/**
+ * Update post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj        Post or comment.
+ * @param  string               $meta_key   The meta key.
+ * @param  mixed                $meta_value The value.
+ */
+function add_meta( $obj, $meta_key, $meta_value ) {
+	if ( $obj instanceof \WP_Post ) {
+		add_post_meta( $obj->ID, $meta_key, $meta_value );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		add_comment_meta( $obj->comment_ID, $meta_key, $meta_value );
+	}
+}
+
+/**
+ * Update post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj        Post or comment.
+ * @param  string               $meta_key   The meta key.
+ * @param  mixed                $meta_value The value.
+ */
+function update_meta( $obj, $meta_key, $meta_value ) {
+	if ( $obj instanceof \WP_Post ) {
+		update_post_meta( $obj->ID, $meta_key, $meta_value );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		update_comment_meta( $obj->comment_ID, $meta_key, $meta_value );
+	}
+}
+
+/**
+ * Delete post or comment meta.
+ *
+ * @param  \WP_Post|\WP_Comment $obj      Post or comment.
+ * @param  string               $meta_key The meta key.
+ */
+function delete_meta( $obj, $meta_key ) {
+	if ( $obj instanceof \WP_Post ) {
+		delete_post_meta( $obj->ID, $meta_key );
+	}
+
+	if ( $obj instanceof \WP_Comment ) {
+		delete_comment_meta( $obj->comment_ID, $meta_key );
+	}
 }

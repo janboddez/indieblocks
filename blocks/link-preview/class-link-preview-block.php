@@ -67,15 +67,9 @@ class Link_Preview_Block {
 			printf( '<div class="indieblocks-card-thumbnail" style="%s">', esc_attr( trim( $border_style . ' border-block:none;border-inline-start:none;border-radius:0 !important;' ) ) );
 
 			if ( ! empty( $card['thumbnail'] ) ) :
-				// Check if file still exists.
-				$upload_dir = wp_upload_dir();
-				$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
-
-				if ( is_file( $file_path ) ) :
-					?>
-					<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
-					<?php
-				endif;
+				?>
+				<img src="<?php echo esc_url_raw( $card['thumbnail'] ); ?>" width="90" height="90" alt="">
+				<?php
 			endif;
 
 			echo '</div>';

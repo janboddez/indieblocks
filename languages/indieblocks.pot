@@ -2,16 +2,16 @@
 # This file is distributed under the GNU General Public License v3.
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.9.1\n"
+"Project-Id-Version: IndieBlocks 0.10.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-08T20:41:32+00:00\n"
+"POT-Creation-Date: 2023-11-26T22:12:55+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: indieblocks\n"
 
 #. Plugin Name of the plugin
@@ -164,8 +164,8 @@ msgstr ""
 
 #: includes/class-options-handler.php:376
 #: includes/class-options-handler.php:479
-#: includes/class-webmention-receiver.php:288
-#: includes/class-webmention-sender.php:372
+#: includes/class-webmention-receiver.php:304
+#: includes/class-webmention-sender.php:416
 msgid "Webmention"
 msgstr ""
 
@@ -547,75 +547,75 @@ msgstr ""
 msgid "&hellip; (wants to) read this!"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:214
+#: includes/class-webmention-receiver.php:229
 msgid "&hellip; commented on this."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:307
+#: includes/class-webmention-receiver.php:323
 msgid "Source"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:310
+#: includes/class-webmention-receiver.php:326
 #: blocks/context/block.js:67
 msgid "Type"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:314
+#: includes/class-webmention-receiver.php:330
 msgid "Avatar"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:318
+#: includes/class-webmention-receiver.php:334
 msgid "Delete"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:348
-#: includes/class-webmention-sender.php:439
+#: includes/class-webmention-receiver.php:364
+#: includes/class-webmention-sender.php:483
 msgid "Missing or invalid nonce."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:354
+#: includes/class-webmention-receiver.php:370
 msgid "Invalid comment ID."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:362
-#: includes/class-webmention-sender.php:453
+#: includes/class-webmention-receiver.php:378
+#: includes/class-webmention-sender.php:497
 msgid "Insufficient rights."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:404
+#: includes/class-webmention-sender.php:448
 msgid "Sent to %1$s on %2$s. Response code: %3$d."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:404
+#: includes/class-webmention-sender.php:448
 msgid "M j, Y \\a\\t H:i"
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:407
+#: includes/class-webmention-sender.php:451
 msgid "Could not send webmention to %s."
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:410
+#: includes/class-webmention-sender.php:454
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr ""
 
-#: includes/class-webmention-sender.php:420
+#: includes/class-webmention-sender.php:464
 msgid "Resend"
 msgstr ""
 
-#: includes/class-webmention-sender.php:424
-#: includes/class-webmention.php:143
+#: includes/class-webmention-sender.php:468
+#: includes/class-webmention.php:152
 msgid "Webmention scheduled."
 msgstr ""
 
-#: includes/class-webmention-sender.php:426
+#: includes/class-webmention-sender.php:470
 msgid "No endpoints found."
 msgstr ""
 
-#: includes/class-webmention-sender.php:445
+#: includes/class-webmention-sender.php:489
 msgid "Invalid post ID."
 msgstr ""
 

@@ -23,7 +23,16 @@ class Webmention {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
-		add_action( 'transition_post_status', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 3 );
+
+		foreach ( static::get_supported_post_types() as $post_type ) {
+			add_action( "publish_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
+		}
+
+		// When a comment is first inserted into the database.
+		add_action( 'comment_post', array( Webmention_Sender::class, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
+		// When a comment is approved. Or a previously approved comment updated.
+		add_action( 'comment_approved_comment', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
+
 		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
@@ -33,6 +42,7 @@ class Webmention {
 		add_action( 'add_meta_boxes_comment', array( Webmention_Receiver::class, 'add_meta_box' ) );
 		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_api_endpoint' ) );
 		add_action( 'wp_head', array( Webmention_Receiver::class, 'webmention_link' ) );
+		add_action( 'template_redirect', array( Webmention_Receiver::class, 'webmention_link' ) );
 		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
 
 		add_filter( 'wp_kses_allowed_html', array( Webmention_Receiver::class, 'allowed_html' ), 10, 2 );

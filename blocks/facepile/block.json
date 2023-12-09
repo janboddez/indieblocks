@@ -28,6 +28,11 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"spacing": {
+			"margin": ["top", "bottom"],
+			"padding": false,
+			"blockGap": false
 		}
 	}
 }

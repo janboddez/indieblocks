@@ -229,19 +229,24 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 	}
 
+	// Not all image URLs end in a file extension. (Gravatar's URLs come to
+	// mind.) We used to store them like that (without extension), but, e.g., S3
+	// Uploads doesn't play 100% nice with such images, and we now try to give
+	// 'em an extension after all.
 	// Look for an existing file, but allow an(y) additional extension.
 	foreach ( glob( "$file_path.*" ) as $match ) {
 		$file_path = $match;
 
 		if ( ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
-			// So, _this_ file exists and is under a month old.
+			// So, _this_ file exists and is under a month old. Let's return it.
 			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 		}
 
 		break; // Either way, stop after the first match.
 	}
 
-	// Attempt to download the image.
+	// OK, so either the file doesn't exist or is over a month old. Attempt to
+	// download the image.
 	$response = remote_get(
 		esc_url_raw( $url ),
 		false,
@@ -274,8 +279,8 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		// Attempt to add a file extension (to work around possible future
 		// issues).
 		$mime = mime_content_type( $file_path );
+
 		if ( is_string( $mime ) ) {
-			// @todo: Convert mime type to extension.
 			$mimes = new Mimey\MimeTypes();
 			$ext   = $mimes->getExtension( $mime );
 
@@ -308,7 +313,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		if ( $file_path !== $result['path'] ) {
 			// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
 			wp_delete_file( $file_path ); // Delete "old" image.
-			$file_path = $result['path'];
+			$file_path = $result['path']; // And update the file path (and name).
 		}
 	} else {
 		debug_log( '[IndieBlocks] Could not resize ' . $file_path . ': ' . $image->get_error_message() . '.' );

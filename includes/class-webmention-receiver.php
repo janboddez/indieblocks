@@ -348,7 +348,15 @@ class Webmention_Receiver {
 			return;
 		}
 
-		if ( is_singular() && webmentions_open() ) {
+		if ( ! is_singular() || ! webmentions_open() ) {
+			return;
+		}
+
+		if ( 'template_redirect' === current_filter() ) {
+			// Add `Link` header.
+			header( 'Link: <' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '>; rel="webmention"', false );
+		} elseif ( 'wp_head' === current_filter() ) {
+			// Output `link` tag.
 			echo '<link rel="webmention" href="' . esc_url( get_rest_url( null, '/indieblocks/v1/webmention' ) ) . '" />' . PHP_EOL;
 		}
 	}

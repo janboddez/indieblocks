@@ -24,8 +24,23 @@ class Webmention_Parser {
 		$parser->parse( $html );
 
 		$kind = $parser->get_type();
-		if ( empty( $kind ) || 'h-feed' === $kind ) {
-			// Nothing to see here.
+		if ( empty( $kind ) || 'feed' === $kind ) {
+			// Source doesn't appear to be a "h-entry" (or similar). Still, we
+			// can attempt to set a (better) comment content.
+			$comment_content = $commentdata['comment_content'];
+
+			$content = $parser->get_content();
+			$context = static::fetch_context( $content, $target );
+
+			if ( '' !== $context ) {
+				$comment_content = $context; // Already sanitized (and escaped).
+			} elseif ( ! empty( $content ) ) {
+				// Simply show an excerpt.
+				$comment_content = wp_trim_words( $content, 25, ' [&hellip;]' );
+			}
+
+			$commentdata['comment_content'] = apply_filters( 'indieblocks_webmention_comment', $comment_content, $source, $target );
+
 			return;
 		}
 

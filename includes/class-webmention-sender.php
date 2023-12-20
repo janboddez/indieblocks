@@ -116,9 +116,9 @@ class Webmention_Sender {
 
 				// Schedule sending out the actual webmentions.
 				if ( $obj instanceof \WP_Post ) {
-					error_log( "[Indieblocks/Webmention] Scheduling webmention for post {$obj->ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					debug_log( "[Indieblocks/Webmention] Scheduling webmention for post {$obj->ID}." );
 				} else {
-					error_log( "[Indieblocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					debug_log( "[Indieblocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." );
 				}
 
 				add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
@@ -140,14 +140,17 @@ class Webmention_Sender {
 		if ( $obj instanceof \WP_Post ) {
 			if ( 'publish' !== $obj->post_status ) {
 				// Do not send webmention on delete/unpublish, for now.
+				debug_log( '[Indieblocks/Webmention] Post ' . $obj->ID . ' is not published.' );
 				return;
 			}
 
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				// This post type doesn't support Webmention.
+				debug_log( '[Indieblocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
 		} elseif ( '1' !== $obj->comment_approved ) {
+			debug_log( '[Indieblocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
 			return;
 		}
 
@@ -180,6 +183,7 @@ class Webmention_Sender {
 
 		if ( empty( $urls ) ) {
 			// One or more links must've been removed. Nothing to do. Bail.
+			debug_log( '[Indieblocks/Webmention] No outgoing URLs found.' );
 			return;
 		}
 
@@ -200,7 +204,7 @@ class Webmention_Sender {
 
 			if ( empty( $endpoint ) || false === wp_http_validate_url( $endpoint ) ) {
 				// Skip.
-				error_log( '[Indieblocks/Webmention] Could not find a Webmention endpoint for target ' . esc_url_raw( $url ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( '[Indieblocks/Webmention] Could not find a Webmention endpoint for target ' . esc_url_raw( $url ) . '.' );
 				continue;
 			}
 
@@ -214,7 +218,7 @@ class Webmention_Sender {
 				// resending after an update quite a bit. In a future version,
 				// we could store a hash of the post content, too, and use that
 				// to send webmentions on actual updates.
-				error_log( '[Indieblocks/Webmention] Previously sent webmention for target ' . esc_url_raw( $url ) . '. Skipping.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( '[Indieblocks/Webmention] Previously sent webmention for target ' . esc_url_raw( $url ) . '. Skipping.' );
 				continue;
 			}
 
@@ -224,7 +228,7 @@ class Webmention_Sender {
 
 			if ( $retries >= 3 ) {
 				// Stop here.
-				error_log( '[Indieblocks/Webmention] Sending webmention to ' . esc_url_raw( $url ) . ' failed 3 times before. Not trying again.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( '[Indieblocks/Webmention] Sending webmention to ' . esc_url_raw( $url ) . ' failed 3 times before. Not trying again.' );
 				continue;
 			}
 
@@ -242,8 +246,8 @@ class Webmention_Sender {
 
 			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 500 ) {
 				// Something went wrong.
-				error_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				error_log( print_r( $response, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				debug_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() );
+				debug_log( $response );
 
 				$webmention[ $hash ]['retries'] = $retries + 1;
 
@@ -259,7 +263,7 @@ class Webmention_Sender {
 			$webmention[ $hash ]['sent'] = current_time( 'mysql' );
 			$webmention[ $hash ]['code'] = wp_remote_retrieve_response_code( $response );
 
-			error_log( '[Indieblocks/Webmention] Sent webmention to ' . esc_url_raw( $endpoint ) . '. Response code: ' . wp_remote_retrieve_response_code( $response ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( '[Indieblocks/Webmention] Sent webmention to ' . esc_url_raw( $endpoint ) . '. Response code: ' . wp_remote_retrieve_response_code( $response ) . '.' );
 		}
 
 		update_meta( $obj, '_indieblocks_webmention', $webmention );
@@ -306,7 +310,7 @@ class Webmention_Sender {
 
 		if ( ! empty( $endpoint ) ) {
 			// We've previously established the endpoint for this web page.
-			error_log( '[Indieblocks/Webmention] Found endpoint (' . esc_url_raw( $endpoint ) . ') for ' . esc_url_raw( $url ) . ' in cache.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( '[Indieblocks/Webmention] Found endpoint (' . esc_url_raw( $endpoint ) . ') for ' . esc_url_raw( $url ) . ' in cache.' );
 			return $endpoint;
 		}
 
@@ -452,7 +456,13 @@ class Webmention_Sender {
 				</button>
 			</div>
 		<?php elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) : // Unsure why `wp_next_scheduled()` won't work. ?>
-			<p style="margin: 0 0 6px;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>
+			<div style="display: flex; gap: 1em; align-items: start; justify-content: space-between;">
+				<p style="margin: 0 0 6px;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>
+
+				<button type="button" class="button indieblocks-resend-webmention" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID ) ); ?>">
+					<?php esc_html_e( 'Resend', 'indieblocks' ); ?>
+				</button>
+			</div>
 		<?php else : ?>
 			<p style="margin: 0 0 6px;"><?php esc_html_e( 'No endpoints found.', 'indieblocks' ); ?></p>
 			<?php

@@ -459,6 +459,21 @@ class Parser {
 	}
 
 	/**
+	 * Returns the current page's comments.
+	 *
+	 * @return array Comments.
+	 */
+	public function get_comments() {
+		$props = $this->mf2['items'][0]['properties'];
+
+		if ( empty( $props['comment'] ) || ! is_array( $props['comment'] ) ) {
+			return array();
+		}
+
+		return $props['comment'];
+	}
+
+	/**
 	 * Returns the current page's parsed microformats array.
 	 *
 	 * @return array Mf2 array.

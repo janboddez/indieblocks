@@ -14,10 +14,11 @@ class Webmention_Parser {
 	/**
 	 * Updates comment (meta)data using microformats.
 	 *
-	 * @param array  $commentdata Comment (meta)data.
-	 * @param string $html        HTML of the webmention source.
-	 * @param string $source      Webmention source URL.
-	 * @param string $target      Webmention target URL.
+	 * @param  array  $commentdata Comment (meta)data.
+	 * @param  string $html        HTML of the webmention source.
+	 * @param  string $source      Webmention source URL.
+	 * @param  string $target      Webmention target URL.
+	 * @return \IndieBlocks\Parser "Parser" instance for the source page.
 	 */
 	public static function parse_microformats( &$commentdata, $html, $source, $target ) {
 		$parser = new Parser( $source );
@@ -41,10 +42,14 @@ class Webmention_Parser {
 
 			$commentdata['comment_content'] = apply_filters( 'indieblocks_webmention_comment', $comment_content, $source, $target );
 
-			return;
+			// Stop here.
+			return $parser;
 		}
 
+		// Use microformats to update `$commentdata`.
 		static::parse_hentry( $commentdata, $parser, $source, $target );
+
+		return $parser;
 	}
 
 	/**

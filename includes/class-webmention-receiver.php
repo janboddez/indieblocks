@@ -218,62 +218,66 @@ class Webmention_Receiver {
 				: 'created';
 
 			if ( ! is_wp_error( $result ) ) {
-				$replies = $parser->get_comments();
+				if ( defined( 'INDIEBLOCKS_SALMENTION' ) && INDIEBLOCKS_SALMENTION ) {
+					/*
+					* Not really "Salmention," as we don't yet look for replies on
+					* "duplicates" (i.e., updates where the original comment itself
+					* did not actually change)! Also, we only go one level deep,
+					* and we don't yet support salmentions' updates (which could
+					* lead to lots of duplicates, potentially) or deletes.
+					*/
+					$replies = $parser->get_comments();
 
-				/*
-				 * If we supported "salmentions," this is where we'd loop over
-				 * the comments and create, update or delete them as necessary.
-				 */
-				foreach ( $replies as $reply ) {
-					if ( empty( $reply['properties']['content'][0] ) || ! is_string( $reply['properties']['content'][0] ) ) {
-						debug_log( '[Indieblocks/Webmention] Empty or invalid reply.' );
-						continue;
+					foreach ( $replies as $reply ) {
+						if ( empty( $reply['properties']['content'][0] ) || ! is_string( $reply['properties']['content'][0] ) ) {
+							debug_log( '[Indieblocks/Webmention] Empty or invalid reply.' );
+							continue;
+						}
+
+						if ( empty( $reply['properties']['url'][0] ) || false === wp_http_validate_url( $reply['properties']['url'][0] ) ) {
+							debug_log( '[Indieblocks/Webmention] Invalid reply URL.' );
+							continue;
+						}
+
+						$reply_url = esc_url_raw( $reply['properties']['url'][0] );
+
+						debug_log( "[Indieblocks/Webmention] Attempting to create a reply for {$reply_url}." );
+
+						$reply_host = wp_parse_url( $reply_url, PHP_URL_HOST );
+						$published  = ! empty( $reply['published'][0] )
+							? get_date_from_gmt( $reply['published'][0], 'Y-m-d H:i:s' )
+							: $commentdata['comment_date'];
+
+						// Some defaults.
+						$replydata = array(
+							'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
+							'comment_author'       => $reply_host,
+							'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
+							'comment_author_url'   => esc_url_raw( wp_parse_url( $reply_url, PHP_URL_SCHEME ) . '://' . $reply_host ),
+							'comment_author_IP'    => $webmention->ip,
+							'comment_content'      => $reply['properties']['content'][0],
+							'comment_parent'       => ctype_digit( (string) $result ) ? (int) $result : 0,
+							'user_id'              => 0,
+							'comment_date'         => $published,
+							'comment_date_gmt'     => date( 'Y-m-d H:i:s', strtotime( $published ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+							'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
+							'comment_meta'         => array(
+								'indieblocks_webmention_source' => esc_url_raw( $reply_url ),
+								'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
+								'indieblocks_salmention_source' => esc_url_raw( $webmention->source ),
+							),
+						);
+
+						// Create reply. Note that this only goes one level deep.
+						wp_new_comment( $replydata, true ); // Not sure if WP autodetects duplicates!
 					}
-
-					if ( empty( $reply['properties']['url'][0] ) || false === wp_http_validate_url( $reply['properties']['url'][0] ) ) {
-						debug_log( '[Indieblocks/Webmention] Invalid reply URL.' );
-						continue;
-					}
-
-					$reply_url = esc_url_raw( $reply['properties']['url'][0] );
-
-					debug_log( "[Indieblocks/Webmention] Attempting to create a reply for {$reply_url}." );
-
-					$reply_host = wp_parse_url( $reply_url, PHP_URL_HOST );
-					$published  = ! empty( $reply['published'][0] )
-						? get_date_from_gmt( $reply['published'][0], 'Y-m-d H:i:s' )
-						: $commentdata['comment_date'];
-
-					// Some defaults.
-					$replydata = array(
-						'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
-						'comment_author'       => $reply_host,
-						'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
-						'comment_author_url'   => esc_url_raw( wp_parse_url( $reply_url, PHP_URL_SCHEME ) . '://' . $reply_host ),
-						'comment_author_IP'    => $webmention->ip,
-						'comment_content'      => $reply['properties']['content'][0],
-						'comment_parent'       => ctype_digit( (string) $result ) ? (int) $result : 0,
-						'user_id'              => 0,
-						'comment_date'         => $published,
-						'comment_date_gmt'     => date( 'Y-m-d H:i:s', strtotime( $published ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-						'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
-						'comment_meta'         => array(
-							'indieblocks_webmention_source' => esc_url_raw( $reply_url ),
-							'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
-							'indieblocks_salmention_source' => esc_url_raw( $webmention->source ),
-						),
-					);
-
-					// Create reply. Note that this only goes one level deep.
-					wp_new_comment( $replydata, true ); // Not sure if WP autodetects duplicates!
 				}
 			} else {
 				// For troubleshooting.
 				error_log( print_r( $result, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 				if ( in_array( 'comment_duplicate', $result->get_error_codes(), true ) ) {
-					// Log if deemed duplicate. Could come in useful if we ever
-					// wanna support "updated" webmentions.
+					// Log if deemed duplicate.
 					$status = 'duplicate';
 				}
 			}
@@ -325,7 +329,7 @@ class Webmention_Receiver {
 			'user_id'              => 0,
 			'comment_date'         => $webmention->created_at,
 			'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
-			'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
+			'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed inside WP Admin.
 			'comment_meta'         => array(
 				'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
 				'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),

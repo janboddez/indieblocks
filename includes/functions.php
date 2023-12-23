@@ -241,6 +241,11 @@ function get_linked_url( $post ) {
  * @return string|null      Local image URL, or nothing on failure.
  */
 function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
+	if ( 0 === strpos( $url, home_url() ) ) {
+		// Not a remote URL.
+		return $url;
+	}
+
 	$upload_dir = wp_upload_dir();
 	$dir        = trailingslashit( $upload_dir['basedir'] ) . trim( $dir, '/' );
 

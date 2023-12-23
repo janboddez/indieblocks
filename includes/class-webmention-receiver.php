@@ -187,7 +187,9 @@ class Webmention_Receiver {
 			}
 
 			$html   = wp_remote_retrieve_body( $response );
-			$target = ! empty( $webmention->target ) ? $webmention->target : get_permalink( $webmention->post_id );
+			$target = ! empty( $webmention->target )
+				? $webmention->target
+				: get_permalink( $webmention->post_id );
 
 			if ( false === stripos( $html, $target ) ) {
 				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ({$target})." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -209,63 +211,11 @@ class Webmention_Receiver {
 			}
 
 			error_log( "[Indieblocks/Webmention] The page at {$webmention->source} seems to mention our target URL (" . get_permalink( $webmention->post_id ) . '); creating new comment.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			$result = static::update_or_create_comment( $webmention, $html, $update, ! empty( $comment_id ) ? $comment_id : 0 );
 
-			// Grab source domain.
-			$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
-
-			// Look for a target URL fragment (and possible parent comment).
-			$fragment = wp_parse_url( $webmention->target, PHP_URL_FRAGMENT );
-			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
-				$parent = get_comment( str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) );
-			}
-
-			// Some defaults.
-			$commentdata = array(
-				'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
-				'comment_author'       => $host,
-				'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
-				'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
-				'comment_author_IP'    => $webmention->ip,
-				'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
-				'comment_parent'       => ! empty( $parent ) && $webmention->post_id === $parent->comment_post_ID ? $parent->comment_ID : 0,
-				'user_id'              => 0,
-				'comment_date'         => $webmention->created_at,
-				'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
-				'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
-				'comment_meta'         => array(
-					'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
-					'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
-				),
-			);
-
-			// Search source for supported microformats, and update
-			// `$commentdata` accordingly.
-			$parser = Webmention_Parser::parse_microformats( $commentdata, $html, $webmention->source, get_permalink( $webmention->post_id ) );
-
-			// Disable comment flooding check.
-			remove_action( 'check_comment_flood', 'check_comment_flood_db' );
-
-			// Update or insert comment.
-			if ( $update ) {
-				$commentdata['comment_ID'] = $comment_id;
-
-				$comment  = get_comment( $comment_id );
-				$original = preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) );
-
-				$commentdata['comment_approved'] = '0';
-
-				if ( ! empty( $commentdata['comment_content'] ) && preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) ) === $original ) {
-					$commentdata['comment_approved'] = '1';
-				}
-
-				error_log( "[Indieblocks/Webmention] Updating comment {$comment_id}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				$result = wp_update_comment( $commentdata, true );
-			} else {
-				error_log( '[Indieblocks/Webmention] Creating new comment.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				$result = wp_new_comment( $commentdata, true );
-			}
-
-			$status = $update ? 'updated' : 'created';
+			$status = $update
+				? 'updated'
+				: 'created';
 
 			if ( ! is_wp_error( $result ) ) {
 				$replies = $parser->get_comments();
@@ -275,16 +225,19 @@ class Webmention_Receiver {
 				 * the comments and create, update or delete them as necessary.
 				 */
 				foreach ( $replies as $reply ) {
-					if ( empty( $reply['content'][0] ) ) {
+					if ( empty( $reply['properties']['content'][0] ) || ! is_string( $reply['properties']['content'][0] ) ) {
+						debug_log( '[Indieblocks/Webmention] Empty or invalid reply.' );
 						continue;
 					}
 
-					if ( empty( $reply['url'][0] ) || false === wp_http_validate_url( $reply['url'][0] ) ) {
+					if ( empty( $reply['properties']['url'][0] ) || false === wp_http_validate_url( $reply['properties']['url'][0] ) ) {
+						debug_log( '[Indieblocks/Webmention] Invalid reply URL.' );
 						continue;
 					}
 
-					$reply_url = esc_url_raw( $reply['url'][0] );
-					error_log( "[Indieblocks/Webmention] Attempting to create a reply for {$reply_url}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					$reply_url = esc_url_raw( $reply['properties']['url'][0] );
+
+					debug_log( "[Indieblocks/Webmention] Attempting to create a reply for {$reply_url}." );
 
 					$reply_host = wp_parse_url( $reply_url, PHP_URL_HOST );
 					$published  = ! empty( $reply['published'][0] )
@@ -298,7 +251,7 @@ class Webmention_Receiver {
 						'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
 						'comment_author_url'   => esc_url_raw( wp_parse_url( $reply_url, PHP_URL_SCHEME ) . '://' . $reply_host ),
 						'comment_author_IP'    => $webmention->ip,
-						'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
+						'comment_content'      => $reply['properties']['content'][0],
 						'comment_parent'       => ctype_digit( (string) $result ) ? (int) $result : 0,
 						'user_id'              => 0,
 						'comment_date'         => $published,
@@ -307,7 +260,7 @@ class Webmention_Receiver {
 						'comment_meta'         => array(
 							'indieblocks_webmention_source' => esc_url_raw( $reply_url ),
 							'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
-							'indieblocks_salmention_source' => esc_url_raw( $reply_url ),
+							'indieblocks_salmention_source' => esc_url_raw( $webmention->source ),
 						),
 					);
 
@@ -338,8 +291,81 @@ class Webmention_Receiver {
 			);
 
 			error_log( "[Indieblocks/Webmention] And we're done parsing this particular mention." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-
 		}
+	}
+
+	/**
+	 * Creates a new comment, or updates an existing one.
+	 *
+	 * @param  \stdClass $webmention Webmention object.
+	 * @param  string    $html       Source page's HTML.
+	 * @param  bool      $update     Whether we're updating an existing comment.
+	 * @param  int       $comment_id Existing comment ID, if any.
+	 * @return int|\WP_Error         Comment ID, or `0`, or a `WP_Error` object.
+	 */
+	public static function update_or_create_comment( $webmention, $html, $update = false, $comment_id = 0 ) {
+		// Grab source domain.
+		$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
+
+		// Look for a target URL fragment (and possible parent comment).
+		$fragment = wp_parse_url( $webmention->target, PHP_URL_FRAGMENT );
+		if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
+			$parent = get_comment( str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) );
+		}
+
+		// Some defaults.
+		$commentdata = array(
+			'comment_post_ID'      => apply_filters( 'indieblocks_webmention_post_id', $webmention->post_id ),
+			'comment_author'       => $host,
+			'comment_author_email' => '', // Stop setting this, as it might (?) auto-approve certain (or all?) mentions, depending on the Discussion settings.
+			'comment_author_url'   => esc_url_raw( wp_parse_url( $webmention->source, PHP_URL_SCHEME ) . '://' . $host ),
+			'comment_author_IP'    => $webmention->ip,
+			'comment_content'      => __( '&hellip; commented on this.', 'indieblocks' ),
+			'comment_parent'       => ! empty( $parent ) && $webmention->post_id === $parent->comment_post_ID ? $parent->comment_ID : 0,
+			'user_id'              => 0,
+			'comment_date'         => $webmention->created_at,
+			'comment_date_gmt'     => get_gmt_from_date( $webmention->created_at ),
+			'comment_type'         => '', // We don't currently set this to, e.g., `webmention`, as doing so affects how reactions are displayed insice WP Admin.
+			'comment_meta'         => array(
+				'indieblocks_webmention_source' => esc_url_raw( $webmention->source ),
+				'indieblocks_webmention_target' => esc_url_raw( $webmention->target ),
+			),
+		);
+
+		// Search source for supported microformats, and update
+		// `$commentdata` accordingly.
+		$parser = Webmention_Parser::parse_microformats( $commentdata, $html, $webmention->source, get_permalink( $webmention->post_id ) );
+
+		// Disable comment flooding check.
+		remove_action( 'check_comment_flood', 'check_comment_flood_db' );
+
+		// Update or insert comment.
+		if ( $update ) {
+			$commentdata['comment_ID'] = $comment_id;
+
+			$comment  = get_comment( $comment_id );
+			$original = preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) );
+
+			$commentdata['comment_approved'] = '0';
+
+			if ( ! empty( $commentdata['comment_content'] ) && preg_replace( '~\s+~', ' ', wp_strip_all_tags( (string) $comment->comment_text ) ) === $original ) {
+				$commentdata['comment_approved'] = '1';
+			}
+
+			debug_log( "[Indieblocks/Webmention] Updating comment {$comment_id}." );
+
+			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+			$result = wp_update_comment( $commentdata, true ); // Returns `1`, `0`, or an error.
+
+			if ( 1 === $result ) {
+				$result = $comment_id;
+			}
+		} else {
+			debug_log( '[Indieblocks/Webmention] Creating new comment.' );
+			$result = wp_new_comment( $commentdata, true ); // Returns the comment ID or `0`, or an error.
+		}
+
+		return $result;
 	}
 
 	/**

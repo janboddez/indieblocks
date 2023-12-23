@@ -149,9 +149,16 @@ class Webmention_Sender {
 				debug_log( '[Indieblocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
-		} elseif ( '1' !== $obj->comment_approved ) {
-			debug_log( '[Indieblocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
-			return;
+		} else {
+			if ( '1' !== $obj->comment_approved ) {
+				debug_log( '[Indieblocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
+				return;
+			}
+
+			if ( '' !== get_comment_meta( $obj->comment_ID, 'indieblocks_salmention_source', true ) ) {
+				debug_log( '[Indieblocks/Webmention] Not sending out webmentions for comments that originated as a "salmention."' );
+				return;
+			}
 		}
 
 		$urls = array();

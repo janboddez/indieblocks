@@ -407,6 +407,8 @@ class Webmention_Receiver {
 					esc_url_raw( $url )
 				)
 			);
+
+			wp_cache_flush();
 		}
 
 		wp_die();

@@ -45,6 +45,10 @@ class Micropub_Compat {
 				// want to use them also in (supported) Micropub posts, let's
 				// stick this, too, behind the `micropub` setting.
 				add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
+
+				// Prevent the Micropub plugin from altering post content
+				// dynamically.
+				add_filter( 'micropub_dynamic_render', '__return_false', 99 );
 			}
 		}
 	}

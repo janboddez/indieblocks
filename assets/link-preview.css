@@ -19,6 +19,7 @@
 
 .wp-block-indieblocks-link-preview .indieblocks-card-thumbnail img {
 	display: block;
+	object-fit: cover;
 }
 
 .wp-block-indieblocks-link-preview .indieblocks-card-body {

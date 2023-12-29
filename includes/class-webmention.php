@@ -237,10 +237,15 @@ class Webmention {
 		$commentmeta = $wpdb->prefix . 'commentmeta';
 
 		$sql = "SELECT COUNT(c.comment_ID) FROM $comments AS c
-			 LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
-			 WHERE c.comment_post_ID = %d
-			 AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))";
-		$sql = $wpdb->prepare( $sql, $post_id, get_current_user_id() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			LEFT JOIN $commentmeta AS m ON c.comment_ID = m.comment_id AND m.meta_key = 'indieblocks_webmention_kind'
+			WHERE c.comment_post_ID = %d
+			AND (c.comment_approved = '1' OR (c.comment_approved = '0' AND c.user_id = %d AND c.user_id <> 0))
+			AND (c.comment_parent = 0 OR EXISTS (
+				SELECT 1 FROM $comments AS p
+				WHERE p.comment_ID = c.comment_parent AND (p.comment_approved = '1' OR (p.comment_approved = '0' AND p.user_id = %d AND p.user_id <> 0))
+			))";
+
+		$sql = $wpdb->prepare( $sql, $post_id, get_current_user_id(), get_current_user_id() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( ! empty( $comment_types ) ) {
 			$sql .= $wpdb->prepare(
@@ -253,7 +258,9 @@ class Webmention {
 		}
 
 		$count = $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
-		$count = is_null( $count ) ? 0 : (string) $count; // Has to be a string, or literal `0`!
+		$count = is_null( $count )
+			? 0
+			: (string) $count; // Has to be a string, or literal `0`!
 
 		return $count;
 	}

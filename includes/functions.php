@@ -241,6 +241,11 @@ function get_linked_url( $post ) {
  * @return string|null      Local image URL, or nothing on failure.
  */
 function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
+	if ( 0 === strpos( $url, home_url() ) ) {
+		// Not a remote URL.
+		return $url;
+	}
+
 	$upload_dir = wp_upload_dir();
 	$dir        = trailingslashit( $upload_dir['basedir'] ) . trim( $dir, '/' );
 
@@ -307,12 +312,24 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		$mime = mime_content_type( $file_path );
 
 		if ( is_string( $mime ) ) {
-			$mimes = new Mimey\MimeTypes();
+			$mimes = new Mimey\MimeTypes(); // A MIME type to file extension map, essentially.
 			$ext   = $mimes->getExtension( $mime );
+		}
 
-			if ( ! empty( $ext ) && $wp_filesystem->move( $file_path, "$file_path.$ext" ) ) {
+		if ( ! empty( $ext ) ) {
+			if ( $wp_filesystem->move( $file_path, "$file_path.$ext" ) ) {
+				// Successfully renamed the file.
+				$file_path .= ".$ext"; // Our new file path from here on out.
+			} elseif ( $wp_filesystem->put_contents( "$file_path.$ext", $body, 0644 ) ) {
+				// Successfully re-saved the file under the new name. This is
+				// here mainly because plugins like "S3 Uploads," or rather, the
+				// AWS SDK for PHP, doesn't always play nice with
+				// `$wp_filesystem::move()`.
+				wp_delete_file( $file_path ); // Delete the original.
 				$file_path .= ".$ext"; // Our new file path from here on out.
 			}
+
+			/** @todo: Use the temp upload folder before writing the file to its final destination. */
 		}
 	}
 

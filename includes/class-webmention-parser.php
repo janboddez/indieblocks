@@ -80,7 +80,11 @@ class Webmention_Parser {
 			$commentdata['comment_date_gmt'] = date( 'Y-m-d H:i:s', strtotime( $published ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 		}
 
-		$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+		// Overwrite the source URL only for mentions sent by Bridgy.
+		$host = wp_parse_url( $source, PHP_URL_HOST );
+		if ( false !== stripos( $host, 'brid.gy' ) ) {
+			$commentdata['comment_meta']['indieblocks_webmention_source'] = esc_url_raw( $parser->get_url() ?: $source ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+		}
 
 		$hentry_kind = $parser->get_type();
 		if ( ! empty( $hentry_kind ) ) {

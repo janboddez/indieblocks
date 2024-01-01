@@ -232,6 +232,15 @@ class Webmention_Sender {
 				continue;
 			}
 
+			// Look for a target URL fragment (and possible parent comment).
+			$fragment = wp_parse_url( $url, PHP_URL_FRAGMENT );
+			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
+				$url = add_query_arg(
+					array( 'replytocom' => str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) ),
+					$url
+				);
+			}
+
 			// Send the webmention.
 			$response = remote_post(
 				esc_url_raw( $endpoint ),

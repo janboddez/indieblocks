@@ -187,10 +187,15 @@ class Webmention_Receiver {
 			}
 
 			$html   = wp_remote_retrieve_body( $response );
-			$target = ! empty( $webmention->target ) ? $webmention->target : get_permalink( $webmention->post_id );
+			$target = ! empty( $webmention->target )
+				? $webmention->target
+				: get_permalink( $webmention->post_id );
 
-			if ( false === stripos( $html, $target ) ) {
-				error_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ({$target})." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			$target   = remove_query_arg( 'replytocom', $target ); // Just in case.
+			$fragment = strval( wp_parse_url( $target, PHP_URL_FRAGMENT ) );
+
+			if ( false === stripos( $html, preg_replace( "~#$fragment$~", '', $target ) ) ) { // Strip fragment when comparing.
+				debug_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ($target)." );
 
 				// Target URL not (or no longer) mentioned by source. Mark webmention as processed.
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -208,13 +213,13 @@ class Webmention_Receiver {
 				continue;
 			}
 
-			error_log( "[Indieblocks/Webmention] The page at {$webmention->source} seems to mention our target URL (" . get_permalink( $webmention->post_id ) . '); creating new comment.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( "[Indieblocks/Webmention] The page at {$webmention->source} seems to mention our target URL ($target); creating new comment." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 			// Grab source domain.
 			$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
 
-			// Look for a target URL fragment (and possible parent comment).
-			$fragment = wp_parse_url( $webmention->target, PHP_URL_FRAGMENT );
+			// Look for a possible parent comment. We could _also_ look at the
+			// `replytocom` query argument, but ... I'm not sure we should?
 			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
 				$parent = get_comment( str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) );
 			}
@@ -240,7 +245,7 @@ class Webmention_Receiver {
 
 			// Search source for supported microformats, and update
 			// `$commentdata` accordingly.
-			Webmention_Parser::parse_microformats( $commentdata, $html, $webmention->source, get_permalink( $webmention->post_id ) );
+			Webmention_Parser::parse_microformats( $commentdata, $html, $webmention->source, $target );
 
 			// Disable comment flooding check.
 			remove_action( 'check_comment_flood', 'check_comment_flood_db' );

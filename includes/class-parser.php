@@ -133,7 +133,7 @@ class Parser {
 	public function get_name( $mf2 = true ) {
 		if (
 			$mf2 &&
-			! empty( $this->mf2['items'][0]['type'] ) && array_intersect( (array) $this->mf2['items'][0]['type'], array( 'h-entry', 'h-recipe', 'h-review' ) ) &&
+			! empty( $this->mf2['items'][0]['type'] ) && array_intersect( (array) $this->mf2['items'][0]['type'], array( 'h-entry', 'h-cite', 'h-recipe', 'h-review' ) ) &&
 			! empty( $this->mf2['items'][0]['properties'] )
 		) {
 			// Microformats.

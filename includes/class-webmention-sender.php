@@ -404,6 +404,18 @@ class Webmention_Sender {
 			return;
 		}
 
+		global $post;
+
+		if ( empty( $post->ID ) ) {
+			return;
+		}
+
+		if ( '' === get_post_meta( $post->ID, '_indieblocks_webmention', true ) ) {
+			return;
+		}
+
+		// We may no longer need this, because if the `_indieblocks_webmention`
+		// custom field is non-empty, we'll likely want to show it.
 		$supported_post_types = Webmention::get_supported_post_types();
 
 		if ( empty( $supported_post_types ) ) {

@@ -304,6 +304,16 @@ class Webmention_Receiver {
 	 * Adds comment meta box.
 	 */
 	public static function add_meta_box() {
+		global $comment;
+
+		if ( empty( $comment->comment_ID ) ) {
+			return;
+		}
+
+		if ( '' === get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_source', true ) ) {
+			return;
+		}
+
 		add_meta_box(
 			'indieblocks',
 			__( 'Webmention', 'indieblocks' ),

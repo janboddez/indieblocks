@@ -156,7 +156,12 @@ class Parser {
 			}
 
 			$content = preg_replace( '~\s+~', ' ', strtolower( sanitize_textarea_field( $content ) ) ); // Also strips tags.
-			$check   = preg_replace( '~\s+~', ' ', strtolower( $name ) );
+			$check   = preg_replace( '~\s+~', ' ', strtolower( sanitize_textarea_field( $name ) ) );
+
+			if ( $name === $content ) {
+				// We can stop here.
+				return '';
+			}
 
 			if ( '...' === substr( $check, -3 ) ) {
 				$check = substr( $check, 0, -3 );

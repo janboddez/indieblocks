@@ -404,48 +404,75 @@ class Webmention_Sender {
 			return;
 		}
 
-		global $post;
+		if ( 'add_meta_boxes' === current_action() ) {
+			global $post;
 
-		if ( empty( $post->ID ) ) {
-			return;
+			if ( empty( $post->ID ) ) {
+				return;
+			}
+
+			if ( '' === get_post_meta( $post->ID, '_indieblocks_webmention', true ) ) {
+				return;
+			}
+
+			// We may no longer need this, because if the `_indieblocks_webmention`
+			// custom field is non-empty, we'll likely want to show it.
+			$supported_post_types = Webmention::get_supported_post_types();
+
+			if ( empty( $supported_post_types ) ) {
+				return;
+			}
+
+			// Add meta box, for those post types that are supported.
+			add_meta_box(
+				'indieblocks-webmention',
+				__( 'Webmention', 'indieblocks' ),
+				array( __CLASS__, 'render_meta_box' ),
+				$supported_post_types,
+				'normal',
+				'default'
+			);
+		} elseif ( 'add_meta_boxes_comment' === current_action() ) {
+			global $comment;
+
+			if ( empty( $comment->comment_ID ) ) {
+				return;
+			}
+
+			if ( '' === get_comment_meta( $comment->comment_ID, '_indieblocks_webmention', true ) ) {
+				return;
+			}
+
+			add_meta_box(
+				'indieblocks-webmention',
+				__( 'Webmention', 'indieblocks' ),
+				array( __CLASS__, 'render_meta_box' ),
+				'comment',
+				'normal',
+				'default'
+			);
 		}
-
-		if ( '' === get_post_meta( $post->ID, '_indieblocks_webmention', true ) ) {
-			return;
-		}
-
-		// We may no longer need this, because if the `_indieblocks_webmention`
-		// custom field is non-empty, we'll likely want to show it.
-		$supported_post_types = Webmention::get_supported_post_types();
-
-		if ( empty( $supported_post_types ) ) {
-			return;
-		}
-
-		// Add meta box, for those post types that are supported.
-		add_meta_box(
-			'indieblocks-webmention',
-			__( 'Webmention', 'indieblocks' ),
-			array( __CLASS__, 'render_meta_box' ),
-			$supported_post_types,
-			'normal',
-			'default'
-		);
 	}
 
 	/**
 	 * Renders meta box.
 	 *
-	 * @param WP_Post $post Post being edited.
+	 * @param \WP_Post|\WP_Comment $obj Post or comment being edited.
 	 */
-	public static function render_meta_box( $post ) {
-		// Webmention data.
-		$webmention = get_post_meta( $post->ID, '_indieblocks_webmention', true );
+	public static function render_meta_box( $obj ) {
+		if ( $obj instanceof \WP_Post ) {
+			// Webmention data.
+			$webmention = get_post_meta( $obj->ID, '_indieblocks_webmention', true );
+			$type       = 'post';
+		} elseif ( $obj instanceof \WP_Comment ) {
+			$webmention = get_comment_meta( $obj->comment_ID, '_indieblocks_webmention', true );
+			$type       = 'comment';
+		}
 
 		if ( ! empty( $webmention ) && is_array( $webmention ) ) :
 			?>
 			<div style="display: flex; gap: 1em; align-items: start; justify-content: space-between;">
-				<p style="margin: 0 0 6px;">
+				<p style="margin: 6px 0;">
 					<?php
 					$i = 0;
 
@@ -472,20 +499,20 @@ class Webmention_Sender {
 					?>
 				</p>
 
-				<button type="button" class="button indieblocks-resend-webmention" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID ) ); ?>">
+				<button type="button" class="button indieblocks-resend-webmention" data-type="<?php echo esc_attr( $type ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:resend-webmention:' . ( 'post' === $type ? $obj->ID : $obj->comment_ID ) ) ); ?>">
 					<?php esc_html_e( 'Resend', 'indieblocks' ); ?>
 				</button>
 			</div>
 		<?php elseif ( ! empty( $webmention ) && 'scheduled' === $webmention ) : // Unsure why `wp_next_scheduled()` won't work. ?>
 			<div style="display: flex; gap: 1em; align-items: start; justify-content: space-between;">
-				<p style="margin: 0 0 6px;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>
+				<p style="margin: 6px 0;"><?php esc_html_e( 'Webmention scheduled.', 'indieblocks' ); ?></p>
 
-				<button type="button" class="button indieblocks-resend-webmention" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID ) ); ?>">
+				<button type="button" class="button indieblocks-resend-webmention" data-type="<?php echo esc_attr( $type ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'indieblocks:resend-webmention:' . ( 'post' === $type ? $obj->ID : $obj->comment_ID ) ) ); ?>">
 					<?php esc_html_e( 'Resend', 'indieblocks' ); ?>
 				</button>
 			</div>
 		<?php else : ?>
-			<p style="margin: 0 0 6px;"><?php esc_html_e( 'No endpoints found.', 'indieblocks' ); ?></p>
+			<p style="margin: 6px 0;"><?php esc_html_e( 'No endpoints found.', 'indieblocks' ); ?></p>
 			<?php
 		endif;
 	}
@@ -496,35 +523,63 @@ class Webmention_Sender {
 	 * Should only ever be called through AJAX.
 	 */
 	public static function reschedule_webmention() {
-		if ( ! isset( $_POST['_wp_nonce'] ) || ! isset( $_POST['post_id'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wp_nonce'] ), 'indieblocks:resend-webmention:' . intval( $_POST['post_id'] ) ) ) {
+		if ( ! isset( $_POST['_wp_nonce'] ) ) {
 			status_header( 400 );
-			esc_html_e( 'Missing or invalid nonce.', 'indieblocks' );
+			esc_html_e( 'Missing nonce.', 'indieblocks' );
 			wp_die();
 		}
 
-		if ( ! ctype_digit( $_POST['post_id'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! isset( $_POST['type'] ) ) {
 			status_header( 400 );
-			esc_html_e( 'Invalid post ID.', 'indieblocks' );
+			esc_html_e( 'Missing webmention type.', 'indieblocks' );
 			wp_die();
 		}
 
-		$post_id = (int) $_POST['post_id'];
-
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! isset( $_POST['obj_id'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wp_nonce'] ), 'indieblocks:resend-webmention:' . intval( $_POST['obj_id'] ) ) ) {
 			status_header( 400 );
-			esc_html_e( 'Insufficient rights.', 'indieblocks' );
+			esc_html_e( 'Invalid nonce.', 'indieblocks' );
 			wp_die();
 		}
 
-		$history = get_post_meta( $post_id, '_indieblocks_webmention', true );
-
-		if ( '' !== $history && is_array( $history ) ) {
-			add_post_meta( $post_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
-			delete_post_meta( $post_id, '_indieblocks_webmention' );
+		if ( ! ctype_digit( $_POST['obj_id'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			status_header( 400 );
+			esc_html_e( 'Invalid object ID.', 'indieblocks' );
+			wp_die();
 		}
 
-		$post = get_post( $post_id );
-		static::schedule_webmention( $post_id, $post );
+		$obj_id = (int) $_POST['obj_id'];
+
+		if ( 'post' === $_POST['type'] ) {
+			if ( ! current_user_can( 'edit_post', $obj_id ) ) {
+				status_header( 400 );
+				esc_html_e( 'Insufficient rights.', 'indieblocks' );
+				wp_die();
+			}
+
+			$history = get_post_meta( $obj_id, '_indieblocks_webmention', true );
+
+			if ( '' !== $history && is_array( $history ) ) {
+				add_post_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
+				delete_post_meta( $obj_id, '_indieblocks_webmention' );
+			}
+
+			static::schedule_webmention( $obj_id, get_post( $obj_id ) );
+		} elseif ( 'comment' === $_POST['type'] ) {
+			if ( ! current_user_can( 'edit_comment', $obj_id ) ) {
+				status_header( 400 );
+				esc_html_e( 'Insufficient rights.', 'indieblocks' );
+				wp_die();
+			}
+
+			$history = get_comment_meta( $obj_id, '_indieblocks_webmention', true );
+
+			if ( '' !== $history && is_array( $history ) ) {
+				add_comment_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
+				delete_comment_meta( $obj_id, '_indieblocks_webmention' );
+			}
+
+			static::schedule_webmention( $obj_id, get_comment( $obj_id ) );
+		}
 
 		wp_die();
 	}

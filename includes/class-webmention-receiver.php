@@ -327,7 +327,7 @@ class Webmention_Receiver {
 	/**
 	 * Renders a (read-only) "Webmention" comment meta box.
 	 *
-	 * @param WP_Comment $comment Comment being edited.
+	 * @param \WP_Comment $comment Comment being edited.
 	 */
 	public static function render_meta_box( $comment ) {
 		// Webmention data.

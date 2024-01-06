@@ -23,6 +23,7 @@ class Webmention {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
+		add_action( 'add_meta_boxes_comment', array( Webmention_Sender::class, 'add_meta_box' ) );
 
 		foreach ( static::get_supported_post_types() as $post_type ) {
 			add_action( "publish_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );

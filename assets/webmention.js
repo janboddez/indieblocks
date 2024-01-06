@@ -1,15 +1,17 @@
 jQuery( document ).ready( function ( $ ) {
 	$( '#indieblocks-webmention .indieblocks-resend-webmention' ).click( function() {
 		var button = $( this );
+		var type   = button.data( 'type' );
 		var data   = {
 			'action': 'indieblocks_resend_webmention',
-			'post_id': $( '[name="post_ID"]' ).val(), // Current post ID.
+			'type': type, // Post or comment.
+			'obj_id': 'post' === type ? $( '[name="post_ID"]' ).val() : $( '[name="comment_ID"]' ).val(), // Current post or comment ID.
 			'_wp_nonce': button.data( 'nonce' ), // Nonce.
 		};
 
 		$.post( ajaxurl, data, function( response ) {
 			button.parent().find( 'p' ).remove();
-			button.parent().append( '<p style="margin: 0 0 6px;">' + indieblocks_webmention_obj.message + '</p>' );
+			button.parent().append( '<p style="margin: 6px 0;">' + indieblocks_webmention_obj.message + '</p>' );
 			button.remove();
 		} );
 	} );

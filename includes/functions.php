@@ -247,7 +247,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 	}
 
 	$upload_dir = wp_upload_dir();
-	$dir        = trailingslashit( $upload_dir['basedir'] ) . trailingslashit( $dir, '/' );
+	$dir        = trailingslashit( $upload_dir['basedir'] ) . trim( $dir, '/' );
 
 	if ( ! is_dir( $dir ) ) {
 		wp_mkdir_p( $dir ); // Recursive directory creation. Permissions are taken from the nearest parent folder.

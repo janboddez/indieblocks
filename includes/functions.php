@@ -247,12 +247,13 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 	}
 
 	$upload_dir = wp_upload_dir();
-	$dir        = trailingslashit( $upload_dir['basedir'] ) . trim( $dir, '/' );
+	$dir        = trailingslashit( $upload_dir['basedir'] ) . trailingslashit( $dir, '/' );
 
 	if ( ! is_dir( $dir ) ) {
 		wp_mkdir_p( $dir ); // Recursive directory creation. Permissions are taken from the nearest parent folder.
 	}
 
+	// Where we'll eventually store the image.
 	$file_path = trailingslashit( $dir ) . sanitize_file_name( $filename );
 
 	if ( file_exists( $file_path ) && ( time() - filectime( $file_path ) ) < MONTH_IN_SECONDS ) {
@@ -261,10 +262,10 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 	}
 
 	// Not all image URLs end in a file extension. (Gravatar's URLs come to
-	// mind.) We used to store them like that (without extension), but, e.g., S3
-	// Uploads doesn't play 100% nice with such images, and we now try to give
-	// 'em an extension after all.
-	// Look for an existing file, but allow an(y) additional extension.
+	// mind.) We used to store them like that (without extension), but, e.g.,
+	// the S3 Uploads plugin doesn't play 100% nice with such images, and we now
+	// try to give 'em an extension after all. Either way, look for an existing
+	// file, but allow an(y) additional extension.
 	foreach ( glob( "$file_path.*" ) as $match ) {
 		$file_path = $match;
 
@@ -273,64 +274,55 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
 		}
 
-		break; // Either way, stop after the first match.
+		break; // Stop after the first match.
 	}
 
-	// OK, so either the file doesn't exist or is over a month old. Attempt to
-	// download the image.
-	$response = remote_get(
-		esc_url_raw( $url ),
-		false,
-		array( 'headers' => array( 'Accept' => 'image/*' ) )
-	);
-
-	$body = wp_remote_retrieve_body( $response );
-
-	if ( empty( $body ) ) {
-		debug_log( '[IndieBlocks] Could not download the image at ' . esc_url_raw( $url ) . '.' );
-		return null;
-	}
-
-	// Now store it locally.
+	// To be able to move files around.
 	global $wp_filesystem;
 
-	if ( empty( $wp_filesystem ) ) {
+	if ( ! function_exists( 'download_url' ) || empty( $wp_filesystem ) ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		WP_Filesystem();
 	}
 
-	// Write image data.
-	if ( ! $wp_filesystem->put_contents( $file_path, $body, 0644 ) ) {
-		debug_log( '[IndieBlocks] Could not save image file: ' . $file_path . '.' );
+	// OK, so either the file doesn't exist or is over a month old. Attempt to
+	// download the image.
+	$temp_file = download_url( esc_url_raw( $url ) );
+
+	if ( is_wp_error( $temp_file ) ) {
+		debug_log( '[IndieBlocks] Could not download the image at ' . esc_url_raw( $url ) . '.' );
 		return null;
 	}
 
-	$ext = pathinfo( $file_path, PATHINFO_EXTENSION );
-	if ( empty( $ext ) ) {
-		// Attempt to add a file extension (to work around possible future
-		// issues).
-		$mime = mime_content_type( $file_path );
+	if ( '' === pathinfo( $file_path, PATHINFO_EXTENSION ) && function_exists( 'mime_content_type' ) ) {
+		// Some filesystem drivers--looking at you, S3 Uploads--take issue with
+		// extensionless files.
+		$mime = mime_content_type( $temp_file );
 
 		if ( is_string( $mime ) ) {
 			$mimes = new Mimey\MimeTypes(); // A MIME type to file extension map, essentially.
 			$ext   = $mimes->getExtension( $mime );
 		}
+	}
 
-		if ( ! empty( $ext ) ) {
-			if ( $wp_filesystem->move( $file_path, "$file_path.$ext" ) ) {
+	if ( ! empty( $ext ) ) {
+		if ( '' === pathinfo( $temp_file, PATHINFO_EXTENSION ) ) {
+			// If our temp file is missing an extension, too, rename it before
+			// attempting to run any image resizing functions on it.
+			if ( $wp_filesystem->move( $temp_file, "$temp_file.$ext" ) ) {
 				// Successfully renamed the file.
-				$file_path .= ".$ext"; // Our new file path from here on out.
-			} elseif ( $wp_filesystem->put_contents( "$file_path.$ext", $body, 0644 ) ) {
-				// Successfully re-saved the file under the new name. This is
-				// here mainly because plugins like "S3 Uploads," or rather, the
-				// AWS SDK for PHP, doesn't always play nice with
-				// `$wp_filesystem::move()`.
-				wp_delete_file( $file_path ); // Delete the original.
-				$file_path .= ".$ext"; // Our new file path from here on out.
+				$temp_file .= ".$ext";
+			} elseif ( $wp_filesystem->put_contents( "$temp_file.$ext", $wp_filesystem->get_contents( $temp_file ), 0644 ) ) {
+				// This here mainly because, once again,  plugins like S3
+				// Uploads, or rather, the AWS SDK for PHP, doesn't always play
+				// nice with `WP_Filesystem::move()`.
+				wp_delete_file( $temp_file ); // Delete the original.
+				$temp_file .= ".$ext"; // Our new file path from here on out.
 			}
-
-			/** @todo: Use the temp upload folder before writing the file to its final destination. */
 		}
+
+		// Tack our newly discovered extension onto our target file name, too.
+		$file_path .= ".$ext";
 	}
 
 	if ( ! function_exists( 'wp_crop_image' ) ) {
@@ -338,28 +330,42 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 	}
 
-	if ( ! file_is_valid_image( $file_path ) || ! file_is_displayable_image( $file_path ) ) {
-		// Somehow not a valid image. Delete it.
-		wp_delete_file( $file_path );
-
+	if ( ! file_is_valid_image( $temp_file ) || ! file_is_displayable_image( $temp_file ) ) {
 		debug_log( '[IndieBlocks] Invalid image file: ' . esc_url_raw( $url ) . '.' );
+
+		// Delete temp file and return.
+		wp_delete_file( $temp_file );
+
 		return null;
 	}
 
-	// Try to scale down and crop it.
+	// Move the altered file to its final destination.
+	if ( ! $wp_filesystem->move( $temp_file, $file_path ) ) {
+		// If `WP_Filesystem::move()` failed, do it this way.
+		$wp_filesystem->put_contents( $file_path, $wp_filesystem->get_contents( $temp_file ), 0644 );
+		wp_delete_file( $temp_file ); // Always delete the original.
+	}
+
+	// Try to scale down and crop it. Somehow, at least in combination with S3
+	// Uploads, `WP_Image_Editor::save()` attempts to write the image to S3
+	// storage, which I guess fails because, well, for one, the path doesn't
+	// match. Which is why we moved it before doing this.
 	$image = wp_get_image_editor( $file_path );
 
 	if ( ! is_wp_error( $image ) ) {
 		$image->resize( $width, $height, true );
 		$result = $image->save( $file_path );
 
-		if ( $file_path !== $result['path'] ) {
-			// The image editor's `save()` method has altered the file path (like, added an extension that wasn't there).
+		if ( isset( $result['path'] ) && $file_path !== $result['path'] ) {
+			// The image editor's `save()` method has altered our temp file's
+			// path (e.g., added an extension that wasn't there).
 			wp_delete_file( $file_path ); // Delete "old" image.
 			$file_path = $result['path']; // And update the file path (and name).
+		} elseif ( is_wp_error( $result ) ) {
+			debug_log( "[IndieBlocks] Could not resize $file_path: " . $result->get_error_message() . '.' );
 		}
 	} else {
-		debug_log( '[IndieBlocks] Could not resize ' . $file_path . ': ' . $image->get_error_message() . '.' );
+		debug_log( "[IndieBlocks] Could not load $file_path into WordPress' image editor: " . $image->get_error_message() . '.' );
 	}
 
 	// And return the local URL.

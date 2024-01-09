@@ -4,8 +4,7 @@
 	"name": "indieblocks/repost",
 	"category": "text",
 	"editorScript": "file:./block.js",
-	"editorStyle": "file:./editor.css",
-	"style": "file:../../assets/blocks.css",
+	"style": "file:./block.css",
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -41,7 +40,9 @@
 	},
 	"example": {
 		"attributes": {
-			"url": "https://example.org/"
+			"url": "https://example.org/",
+			"title": "Example Domain",
+			"author": "Alice"
 		}
 	},
 	"textdomain": "indieblocks"

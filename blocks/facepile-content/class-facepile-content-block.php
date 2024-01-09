@@ -41,9 +41,6 @@ class Facepile_Content_Block {
 
 		add_action( 'wp_footer', array( __CLASS__, 'print_icons' ), 999 );
 
-		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-facepile', plugins_url( '/assets/facepile.css', dirname( __DIR__ ) ), array(), Plugin::PLUGIN_VERSION, false );
-
 		// Limit comments. Might provide a proper option later.
 		$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $block->context['postId'] );
 		$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num );

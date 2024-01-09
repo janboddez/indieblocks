@@ -5,7 +5,8 @@
 	"category": "theme",
 	"icon": "admin-links",
 	"editorScript": "file:./block.js",
-	"editorStyle": "file:./editor.css",
+	"editorStyle": "file:./block.css",
+	"style": "file:./block.css",
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

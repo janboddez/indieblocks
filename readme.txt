@@ -35,7 +35,7 @@ While IndieBlocks does not depend on _any_ other plugin, it is compatible with, 
 IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
 
 == Changelog ==
-= 0.11.0 =
+= 0.11.1 =
 Improve avatar deletion, add meta box for outgoing "comment mentions," hide meta boxes if empty.
 
 = 0.10.0 =

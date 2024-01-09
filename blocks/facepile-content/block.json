@@ -4,7 +4,8 @@
 	"name": "indieblocks/facepile-content",
 	"category": "theme",
 	"editorScript": "file:./block.js",
-	"editorStyle": "file:./editor.css",
+	"editorStyle": "file:./block.css",
+	"style": "file:./block.css",
 	"attributes": {
 		"avatarSize": {
 			"type": "integer",

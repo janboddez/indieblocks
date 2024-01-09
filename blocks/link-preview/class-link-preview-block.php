@@ -39,9 +39,6 @@ class Link_Preview_Block {
 			return '';
 		}
 
-		// Enqueue front-end block styles.
-		wp_enqueue_style( 'indieblocks-link-preview', plugins_url( '/assets/link-preview.css', dirname( __DIR__ ) ), array(), Plugin::PLUGIN_VERSION, false );
-
 		$border_style = '';
 
 		if ( ! empty( $attributes['borderColor'] ) ) {

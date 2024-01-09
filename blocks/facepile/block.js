@@ -5,8 +5,7 @@
 	var InnerBlocks   = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
+	var __ = i18n.__;
 
 	blocks.registerBlockType( 'indieblocks/facepile', {
 		icon: el( 'svg', {
@@ -18,9 +17,6 @@
 		),
 		description: __( 'Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile.', 'indieblocks' ),
 		edit: ( props ) => {
-			var title        = props.attributes.title || '';
-			var titleElement = props.attributes.titleElement || '';
-
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
 				el( InnerBlocks, {

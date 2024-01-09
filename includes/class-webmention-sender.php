@@ -232,14 +232,16 @@ class Webmention_Sender {
 				continue;
 			}
 
+			// @codingStandardsIgnoreStart
 			// Look for a target URL fragment (and possible parent comment).
-			$fragment = wp_parse_url( $url, PHP_URL_FRAGMENT );
-			if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
-				$url = add_query_arg(
-					array( 'replytocom' => str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) ),
-					$url
-				);
-			}
+			// $fragment = wp_parse_url( $url, PHP_URL_FRAGMENT );
+			// if ( ! empty( $fragment ) && preg_match( '~^comment-\d+$~', $fragment ) ) {
+			// 	$url = add_query_arg(
+			// 		array( 'replytocom' => str_replace( 'comment-', '', str_replace( 'comment-', '', $fragment ) ) ),
+			// 		$url
+			// 	);
+			// }
+			// @codingStandardsIgnoreEnd
 
 			// Send the webmention.
 			$response = remote_post(

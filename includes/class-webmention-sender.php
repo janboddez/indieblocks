@@ -269,11 +269,12 @@ class Webmention_Sender {
 
 			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 500 ) {
 				// Something went wrong.
-				debug_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() );
+				if ( is_wp_error( $response ) ) {
+					debug_log( '[Indieblocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() );
+				}
 				debug_log( $response );
 
 				$webmention[ $hash ]['retries'] = $retries + 1;
-
 				update_meta( $obj, '_indieblocks_webmention', $webmention );
 
 				// Schedule a retry in 5 to 15 minutes.

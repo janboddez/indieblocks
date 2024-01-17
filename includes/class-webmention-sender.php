@@ -84,12 +84,24 @@ class Webmention_Sender {
 			$urls = array_merge( $urls, $history );
 		}
 
+		$urls = array_unique( $urls ); // For `array_search()` to work more reliably.
+
+		if ( ! empty( $obj->comment_post_ID ) ) {
+			// Prevent direct replies mentioning the post they're ... already
+			// replying to. This should still allow mentions being sent to the
+			// ssite itself, without sending one for each and every comment.
+			$key = array_search( get_permalink( $obj->comment_post_ID ), $urls, true );
+
+			if ( false !== $key ) {
+				unset( $urls[ $key ] );
+			}
+		}
+
 		if ( empty( $urls ) ) {
 			// Nothing to do. Bail.
 			return;
 		}
 
-		$urls     = array_unique( $urls );
 		$schedule = false;
 
 		foreach ( $urls as $url ) {

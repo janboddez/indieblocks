@@ -175,7 +175,7 @@ class Webmention {
 	 *
 	 * @todo: Use some kind of "comment taxonomy" instead?
 	 *
-	 * @param  WP_Comment_Query $query   Comment count.
+	 * @param  WP_Comment_Query $query Comment count.
 	 */
 	public static function comment_query( $query ) {
 		if ( is_admin() ) {

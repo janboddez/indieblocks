@@ -33,11 +33,11 @@ class Webmention_Receiver {
 	 * @return WP_REST_Response         API response.
 	 */
 	public static function store_webmention( $request ) {
-		error_log( '[Indieblocks/Webmention] Got request: ' . wp_json_encode( $request->get_params() ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		debug_log( '[IndieBlocks/Webmention] Got request: ' . wp_json_encode( $request->get_params() ) );
 
 		// Verify source nor target are invalid URLs.
 		if ( empty( $request['source'] ) || ! wp_http_validate_url( $request['source'] ) || empty( $request['target'] ) || ! wp_http_validate_url( $request['target'] ) ) {
-			error_log( '[Indieblocks/Webmention] Invalid source or target.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( '[IndieBlocks/Webmention] Invalid source or target.' );
 			return new \WP_Error( 'invalid_request', 'Invalid source or target', array( 'status' => 400 ) );
 		}
 
@@ -53,12 +53,12 @@ class Webmention_Receiver {
 
 		if ( empty( $post ) || 'publish' !== get_post_status( $post->ID ) ) {
 			// Not found.
-			error_log( '[Indieblocks/Webmention] Target post not found.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( '[IndieBlocks/Webmention] Target post not found.' );
 			return new \WP_Error( 'not_found', 'Not found', array( 'status' => 404 ) );
 		}
 
 		if ( ! webmentions_open( $post ) ) {
-			error_log( "[Indieblocks/Webmention] Webmentions closed for the post with ID {$post->ID}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( "[IndieBlocks/Webmention] Webmentions closed for the post with ID {$post->ID}." );
 			return new \WP_Error( 'invalid_request', 'Invalid target', array( 'status' => 400 ) );
 		}
 
@@ -82,7 +82,7 @@ class Webmention_Receiver {
 		);
 
 		if ( false !== $num_rows ) {
-			error_log( '[Indieblocks/Webmention] Stored mention for later processing.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( '[IndieBlocks/Webmention] Stored mention for later processing.' );
 
 			// Create an empty REST response and add an 'Accepted' status code.
 			$response = new \WP_REST_Response( array() );
@@ -91,7 +91,7 @@ class Webmention_Receiver {
 			return $response;
 		}
 
-		error_log( '[Indieblocks/Webmention] Could not insert mention into database.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		debug_log( '[IndieBlocks/Webmention] Could not insert mention into database.' );
 		return new \WP_Error( 'server_error', 'Internal server error', array( 'status' => 500 ) );
 	}
 
@@ -148,14 +148,12 @@ class Webmention_Receiver {
 			$comments = $query->comments;
 
 			// Fetch source HTML.
-			error_log( "[Indieblocks/Webmention] Fetching the page at {$webmention->source}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( "[IndieBlocks/Webmention] Fetching the page at {$webmention->source}." );
 			$response = remote_get( $webmention->source );
 
 			if ( is_wp_error( $response ) ) {
-				error_log( "[Indieblocks/Webmention] Something went wrong fetching the page at {$webmention->source}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-
 				// Something went wrong.
-				error_log( $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Webmention] Something went wrong fetching the page at {$webmention->source}:" . $response->get_error_message() . '.' );
 				continue;
 			}
 
@@ -163,7 +161,7 @@ class Webmention_Receiver {
 				$update     = true;
 				$comment_id = reset( $comments );
 
-				error_log( "[Indieblocks/Webmention] Found an existing comment ({$comment_id}) for this mention." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Webmention] Found an existing comment ({$comment_id}) for this mention." );
 
 				if ( in_array( wp_remote_retrieve_response_code( $response ), array( 404, 410 ), true ) ) {
 					// Delete instead.
@@ -179,7 +177,7 @@ class Webmention_Receiver {
 							array( '%d' )
 						);
 					} else {
-						error_log( "[Indieblocks/Webmention] Something went wrong deleting comment {$comment_id} for source URL (" . esc_url_raw( $webmention->source ) . '.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						debug_log( "[IndieBlocks/Webmention] Something went wrong deleting comment {$comment_id} for source URL (" . esc_url_raw( $webmention->source ) . '.' );
 					}
 
 					continue;
@@ -195,7 +193,7 @@ class Webmention_Receiver {
 			$fragment = strval( wp_parse_url( $target, PHP_URL_FRAGMENT ) );
 
 			if ( false === stripos( $html, preg_replace( "~#$fragment$~", '', $target ) ) ) { // Strip fragment when comparing.
-				debug_log( "[Indieblocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ($target)." );
+				debug_log( "[IndieBlocks/Webmention] The page at {$webmention->source} does not seem to mention our target URL ($target)." );
 
 				// Target URL not (or no longer) mentioned by source. Mark webmention as processed.
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -213,7 +211,7 @@ class Webmention_Receiver {
 				continue;
 			}
 
-			error_log( "[Indieblocks/Webmention] The page at {$webmention->source} seems to mention our target URL ($target); creating new comment." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			debug_log( "[IndieBlocks/Webmention] The page at {$webmention->source} seems to mention our target URL ($target); creating new comment." );
 
 			// Grab source domain.
 			$host = wp_parse_url( $webmention->source, PHP_URL_HOST );
@@ -263,10 +261,10 @@ class Webmention_Receiver {
 					$commentdata['comment_approved'] = '1';
 				}
 
-				error_log( "[Indieblocks/Webmention] Updating comment {$comment_id}." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Webmention] Updating comment {$comment_id}." );
 				$result = wp_update_comment( $commentdata, true );
 			} else {
-				error_log( '[Indieblocks/Webmention] Creating new comment.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( '[IndieBlocks/Webmention] Creating new comment.' );
 				$result = wp_new_comment( $commentdata, true );
 			}
 
@@ -274,7 +272,7 @@ class Webmention_Receiver {
 
 			if ( is_wp_error( $result ) ) {
 				// For troubleshooting.
-				error_log( print_r( $result, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				debug_log( $result );
 
 				if ( in_array( 'comment_duplicate', $result->get_error_codes(), true ) ) {
 					// Log if deemed duplicate. Could come in useful if we ever
@@ -295,8 +293,7 @@ class Webmention_Receiver {
 				array( '%d' )
 			);
 
-			error_log( "[Indieblocks/Webmention] And we're done parsing this particular mention." ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-
+			debug_log( "[IndieBlocks/Webmention] And we're done parsing this particular mention." );
 		}
 	}
 

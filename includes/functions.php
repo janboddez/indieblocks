@@ -70,9 +70,9 @@ function convert_encoding( $text ) {
 /**
  * Wrapper around `wp_remote_get()`.
  *
- * @param  string $url          URL to fetch.
- * @param  bool   $json         Whether to accept (only) JSON.
- * @return WP_Response|WP_Error Response.
+ * @param  string $url            URL to fetch.
+ * @param  bool   $json           Whether to accept (only) JSON.
+ * @return \WP_Response|\WP_Error Response.
  */
 function remote_get( $url, $json = false ) {
 	$args = array(
@@ -96,10 +96,10 @@ function remote_get( $url, $json = false ) {
 /**
  * Wrapper around `wp_remote_post()`.
  *
- * @param  string $url          URL to fetch.
- * @param  bool   $json         Whether to accept (only) JSON.
- * @param  array  $args         Arguments for `wp_remote_post()`.
- * @return WP_Response|WP_Error Response.
+ * @param  string $url            URL to fetch.
+ * @param  bool   $json           Whether to accept (only) JSON.
+ * @param  array  $args           Arguments for `wp_remote_post()`.
+ * @return \WP_Response|\WP_Error Response.
  */
 function remote_post( $url, $json = false, $args = array() ) {
 	$args = array_merge(

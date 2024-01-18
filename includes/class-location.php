@@ -228,14 +228,14 @@ class Location {
 			$response = remote_get( "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lon}&zoom=18&addressdetails=1", true );
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
-				error_log( "Failed to retrieve address data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Location] Failed to retrieve address data for {$lat}, {$lon}" );
 				return '';
 			}
 
 			$location = json_decode( $response['body'], true );
 
 			if ( empty( $location ) ) {
-				error_log( "Failed to decode address data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Location] Failed to decode address data for {$lat}, {$lon}" );
 				return '';
 			}
 
@@ -279,14 +279,14 @@ class Location {
 			$response = remote_get( "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid=" . OPEN_WEATHER_MAP_API_KEY, true );
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
-				error_log( "Failed to retrieve weather data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Location]  Failed to retrieve weather data for {$lat}, {$lon}" );
 				return array();
 			}
 
 			$weather = json_decode( $response['body'], true );
 
 			if ( empty( $weather ) ) {
-				error_log( "Failed to decode weather data for {$lat}, {$lon}" ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				debug_log( "[IndieBlocks/Location]  Failed to decode weather data for {$lat}, {$lon}" );
 				return array();
 			}
 

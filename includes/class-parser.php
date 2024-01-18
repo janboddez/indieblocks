@@ -62,7 +62,19 @@ class Parser {
 			if ( false === $content ) {
 				// Could not find a cached version. Download page.
 				$response = remote_get( $this->url );
-				$content  = wp_remote_retrieve_body( $response );
+				$content  = '';
+
+				$code = wp_remote_retrieve_response_code( $response );
+
+				if ( is_wp_error( $response ) ) {
+					// The remote server returned a (client or server) error.
+					debug_log( '[IndieBlocks] The server at ' . esc_url_raw( $this->url ) . ' responded with the following error: ' . $response->get_error_message() . '.' );
+				} elseif ( '' === $code || $code >= 400 ) {
+					// The remote server returned a (client or server) error.
+					debug_log( '[IndieBlocks] The server at ' . esc_url_raw( $this->url ) . " responded with the following HTTP status code: $code." );
+				} else {
+					$content = wp_remote_retrieve_body( $response );
+				}
 				set_transient( 'indieblocks:html:' . $hash, $content, 3600 ); // Cache, even if empty.
 			} else {
 				debug_log( '[IndieBlocks] Found HTML for ' . esc_url_raw( $this->url ) . ' in cache.' );

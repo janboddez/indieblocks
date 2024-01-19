@@ -89,7 +89,7 @@ class Webmention_Sender {
 		if ( ! empty( $obj->comment_post_ID ) ) {
 			// Prevent direct replies mentioning the post they're ... already
 			// replying to. This should still allow mentions being sent to the
-			// ssite itself, without sending one for each and every comment.
+			// site itself, without sending one for each and every comment.
 			$key = array_search( get_permalink( $obj->comment_post_ID ), $urls, true );
 
 			if ( false !== $key ) {

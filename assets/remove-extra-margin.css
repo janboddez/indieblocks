@@ -1,0 +1,3 @@
+.wp-block-post-title.screen-reader-text + * {
+	margin-block-start: 0 !important;
+}

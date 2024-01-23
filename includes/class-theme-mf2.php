@@ -324,6 +324,15 @@ class Theme_Mf2 {
 				$processor->add_class( 'p-name' );
 			} elseif ( ! empty( $options['hide_titles'] ) ) {
 				$processor->add_class( 'screen-reader-text' );
+				// I'd use `wp_add_inline_style()` but that just adds the styles
+				// over and over again for each block.
+				wp_enqueue_style(
+					'indieblocks-remove-extra-margin',
+					plugins_url( '/assets/remove-extra-margin.css', __DIR__ ),
+					array(),
+					Plugin::PLUGIN_VERSION,
+					false
+				);
 			}
 		}
 

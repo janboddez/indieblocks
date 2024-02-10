@@ -20,6 +20,25 @@ class Webmention_Parser {
 	 * @param string $target      Webmention target URL.
 	 */
 	public static function parse_microformats( &$commentdata, $html, $source, $target ) {
+		if ( preg_match( '~/\?c=\d+$~', $source ) ) {
+			$response = wp_remote_head(
+				esc_url_raw( $source ),
+				array(
+					'timeout'             => 11,
+					'limit_response_size' => 1048576,
+					'user-agent'          => get_user_agent(),
+				)
+			);
+
+			$url = ( (array) wp_remote_retrieve_header( $response, 'location' ) )[0];
+			if ( ! empty( $url ) && false !== filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				// If we were forwarded, use the (first) destination URL. If the
+				// source URL was for a WordPress comment, it _should_ forward
+				// to a URL that ends in a "comment fragment" instead.
+				$source = $url;
+			}
+		}
+
 		$parser = new Parser( $source );
 		$parser->parse( $html );
 

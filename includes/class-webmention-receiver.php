@@ -29,8 +29,8 @@ class Webmention_Receiver {
 	/**
 	 * Stores incoming webmentions and that's about it.
 	 *
-	 * @param  WP_REST_Request $request API request.
-	 * @return WP_REST_Response         API response.
+	 * @param  \WP_REST_Request $request API request.
+	 * @return \WP_REST_Response         API response.
 	 */
 	public static function store_webmention( $request ) {
 		debug_log( '[IndieBlocks/Webmention] Got request: ' . wp_json_encode( $request->get_params() ) );

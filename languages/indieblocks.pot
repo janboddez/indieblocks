@@ -1,15 +1,15 @@
-# Copyright (C) 2023 Jan Boddez
+# Copyright (C) 2024 Jan Boddez
 # This file is distributed under the GNU General Public License v3.
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.10.0\n"
+"Project-Id-Version: IndieBlocks 0.11.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-26T22:12:55+01:00\n"
+"POT-Creation-Date: 2024-02-11T11:48:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: indieblocks\n"
@@ -95,28 +95,28 @@ msgid "Location"
 msgstr ""
 
 #. translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page.
-#: includes/class-micropub-compat.php:276
+#: includes/class-micropub-compat.php:280
 #: assets/common.js:13
 msgid "Likes %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
-#: includes/class-micropub-compat.php:299
-#: includes/class-micropub-compat.php:314
+#: includes/class-micropub-compat.php:303
+#: includes/class-micropub-compat.php:318
 #: assets/common.js:24
 #: blocks/context/block.js:22
 msgid "Likes %s."
 msgstr ""
 
 #. translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page.
-#: includes/class-micropub-compat.php:339
+#: includes/class-micropub-compat.php:343
 #: assets/common.js:11
 msgid "Bookmarked %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
-#: includes/class-micropub-compat.php:362
-#: includes/class-micropub-compat.php:377
+#: includes/class-micropub-compat.php:366
+#: includes/class-micropub-compat.php:381
 #: assets/common.js:22
 #: blocks/context/block.js:20
 #: blocks/context/block.js:93
@@ -124,14 +124,14 @@ msgid "Bookmarked %s."
 msgstr ""
 
 #. translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to.
-#: includes/class-micropub-compat.php:402
+#: includes/class-micropub-compat.php:406
 #: assets/common.js:15
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the page being replied to.
-#: includes/class-micropub-compat.php:425
-#: includes/class-micropub-compat.php:440
+#: includes/class-micropub-compat.php:429
+#: includes/class-micropub-compat.php:444
 #: assets/common.js:26
 #: blocks/context/block.js:24
 #: blocks/context/block.js:97
@@ -139,14 +139,14 @@ msgid "In reply to %s."
 msgstr ""
 
 #. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted.
-#: includes/class-micropub-compat.php:465
+#: includes/class-micropub-compat.php:469
 #: assets/common.js:17
 msgid "Reposted %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "page" being reposted.
-#: includes/class-micropub-compat.php:488
-#: includes/class-micropub-compat.php:503
+#: includes/class-micropub-compat.php:492
+#: includes/class-micropub-compat.php:507
 #: assets/common.js:28
 #: blocks/context/block.js:26
 #: blocks/context/block.js:99
@@ -164,8 +164,9 @@ msgstr ""
 
 #: includes/class-options-handler.php:376
 #: includes/class-options-handler.php:479
-#: includes/class-webmention-receiver.php:304
-#: includes/class-webmention-sender.php:416
+#: includes/class-webmention-receiver.php:316
+#: includes/class-webmention-sender.php:444
+#: includes/class-webmention-sender.php:463
 msgid "Webmention"
 msgstr ""
 
@@ -531,92 +532,105 @@ msgstr ""
 msgid "likes"
 msgstr ""
 
-#: includes/class-webmention-parser.php:80
+#: includes/class-webmention-parser.php:118
 msgid "&hellip; bookmarked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:85
+#: includes/class-webmention-parser.php:123
 msgid "&hellip; liked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:89
+#: includes/class-webmention-parser.php:127
 msgid "&hellip; reposted this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:93
+#: includes/class-webmention-parser.php:131
 msgid "&hellip; (wants to) read this!"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:229
+#: includes/class-webmention-receiver.php:232
 msgid "&hellip; commented on this."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:323
+#: includes/class-webmention-receiver.php:335
 msgid "Source"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:326
+#: includes/class-webmention-receiver.php:338
 #: blocks/context/block.js:67
 msgid "Type"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:330
+#: includes/class-webmention-receiver.php:342
 msgid "Avatar"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:334
+#: includes/class-webmention-receiver.php:346
 msgid "Delete"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:364
-#: includes/class-webmention-sender.php:483
+#: includes/class-webmention-receiver.php:384
 msgid "Missing or invalid nonce."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:370
+#: includes/class-webmention-receiver.php:390
 msgid "Invalid comment ID."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:378
-#: includes/class-webmention-sender.php:497
+#: includes/class-webmention-receiver.php:398
+#: includes/class-webmention-sender.php:570
+#: includes/class-webmention-sender.php:585
 msgid "Insufficient rights."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:448
+#: includes/class-webmention-sender.php:502
 msgid "Sent to %1$s on %2$s. Response code: %3$d."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:448
+#: includes/class-webmention-sender.php:502
 msgid "M j, Y \\a\\t H:i"
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:451
+#: includes/class-webmention-sender.php:505
 msgid "Could not send webmention to %s."
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:454
+#: includes/class-webmention-sender.php:508
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr ""
 
-#: includes/class-webmention-sender.php:464
+#: includes/class-webmention-sender.php:518
+#: includes/class-webmention-sender.php:526
 msgid "Resend"
 msgstr ""
 
-#: includes/class-webmention-sender.php:468
-#: includes/class-webmention.php:152
+#: includes/class-webmention-sender.php:523
+#: includes/class-webmention.php:154
 msgid "Webmention scheduled."
 msgstr ""
 
-#: includes/class-webmention-sender.php:470
+#: includes/class-webmention-sender.php:530
 msgid "No endpoints found."
 msgstr ""
 
-#: includes/class-webmention-sender.php:489
-msgid "Invalid post ID."
+#: includes/class-webmention-sender.php:543
+msgid "Missing nonce."
+msgstr ""
+
+#: includes/class-webmention-sender.php:549
+msgid "Missing webmention type."
+msgstr ""
+
+#: includes/class-webmention-sender.php:555
+msgid "Invalid nonce."
+msgstr ""
+
+#: includes/class-webmention-sender.php:561
+msgid "Invalid object ID."
 msgstr ""
 
 #: blocks/bookmark/block.js:26
@@ -718,11 +732,11 @@ msgstr ""
 msgid "Icon background color"
 msgstr ""
 
-#: blocks/facepile/block.js:19
+#: blocks/facepile/block.js:18
 msgid "Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile."
 msgstr ""
 
-#: blocks/facepile/block.js:28
+#: blocks/facepile/block.js:24
 msgid "Likes, Bookmarks, and Reposts"
 msgstr ""
 

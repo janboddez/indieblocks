@@ -2,7 +2,7 @@
 Contributors: janboddez
 Tags: blocks, gutenberg, indieweb, notes, likes, microblog, microblogging, micropub, fse, site editor, webmention, syndication
 Tested up to: 6.4
-Stable tag: 0.11.1
+Stable tag: 0.12.0
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,6 +35,9 @@ While IndieBlocks does not depend on _any_ other plugin, it is compatible with, 
 IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
 
 == Changelog ==
+= 0.12.0 =
+Improve comment mentions, remove margin "below" hidden note and like titles.
+
 = 0.11.0 =
 Improve avatar deletion, add meta box for outgoing "comment mentions," hide meta boxes if empty.
 

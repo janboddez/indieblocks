@@ -526,3 +526,14 @@ function delete_meta( $obj, $meta_key ) {
 		delete_comment_meta( $obj->comment_ID, $meta_key );
 	}
 }
+
+/**
+ * Echoes the "facepile" icons.
+ */
+function print_facepile_icons() {
+	$icons = dirname( __DIR__ ) . '/assets/webmention-icons.svg';
+
+	if ( is_readable( $icons ) ) {
+		require_once $icons;
+	}
+}

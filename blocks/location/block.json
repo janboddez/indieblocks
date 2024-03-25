@@ -5,6 +5,7 @@
 	"category": "theme",
 	"icon": "location",
 	"editorScript": "file:./block.js",
+	"render": "file:./render.php",
 	"attributes": {
 		"includeWeather": {
 			"type": "boolean",

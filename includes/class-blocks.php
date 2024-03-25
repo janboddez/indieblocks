@@ -63,14 +63,20 @@ class Blocks {
 	 * Registers the different blocks.
 	 */
 	public static function register_blocks() {
-		// Dynamic blocks.
-		foreach ( array( 'Facepile', 'Facepile_Content', 'Location', 'Syndication', 'Link_Preview' ) as $class ) {
-			$class = '\\IndieBlocks\\' . $class . '_Block';
-			$class::register();
-		}
+		$blocks = array(
+			'bookmark',
+			'context',
+			'facepile',
+			'facepile-content',
+			'like',
+			'link-preview',
+			'location',
+			'reply',
+			'repost',
+			'syndication',
+		);
 
-		// Static blocks.
-		foreach ( array( 'context', 'bookmark', 'like', 'reply', 'repost' ) as $block ) {
+		foreach ( $blocks as $block ) {
 			register_block_type( dirname( __DIR__ ) . "/blocks/$block" );
 
 			wp_set_script_translations(

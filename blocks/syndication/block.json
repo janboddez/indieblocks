@@ -5,6 +5,7 @@
 	"category": "theme",
 	"icon": "admin-links",
 	"editorScript": "file:./block.js",
+	"render": "file:./render.php",
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

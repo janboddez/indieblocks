@@ -4,6 +4,7 @@
 	"name": "indieblocks/facepile",
 	"category": "theme",
 	"editorScript": "file:./block.js",
+	"render": "file:./render.php",
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",
 	"supports": {

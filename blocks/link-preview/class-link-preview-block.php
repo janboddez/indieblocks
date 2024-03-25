@@ -10,7 +10,7 @@ class Link_Preview_Block {
 	 * Registers the Link Preview block.
 	 */
 	public static function register() {
-		register_block_type_from_metadata( __DIR__, array( 'render_callback' => array( __CLASS__, 'render_link_preview_block' ) ) );
+		register_block_type_from_metadata( __DIR__, array( 'render_callback' => array( __CLASS__, 'render' ) ) );
 
 		// This oughta happen automatically, but whatevs.
 		wp_set_script_translations(
@@ -28,7 +28,7 @@ class Link_Preview_Block {
 	 * @param  \WP_Block $block      Block instance.
 	 * @return string                The block's output HTML.
 	 */
-	public static function render_link_preview_block( $attributes, $content, $block ) {
+	public static function render( $attributes, $content, $block ) {
 		if ( ! isset( $block->context['postId'] ) ) {
 			return '';
 		}

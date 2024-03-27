@@ -13,10 +13,12 @@ class Blocks {
 	 */
 	public static function register() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_scripts' ) );
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), 11 );
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
-		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoint' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
 		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
 		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
 		add_filter( 'the_excerpt_rss', array( __CLASS__, 'excerpt_feed' ) );
@@ -57,6 +59,36 @@ class Blocks {
 				'assets_url' => plugins_url( '/assets/', __DIR__ ),
 			)
 		);
+	}
+
+	/**
+	 * Enqueues additional scripts, like the Location sidebar panel thingy.
+	 */
+	public static function enqueue_scripts() {
+		$current_screen = get_current_screen();
+
+		if (
+			isset( $current_screen->post_type ) &&
+			in_array( $current_screen->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true )
+		) {
+			wp_enqueue_script(
+				'indieblocks-location',
+				plugins_url( '/assets/location.js', __DIR__ ),
+				array(
+					'wp-element',
+					'wp-components',
+					'wp-i18n',
+					'wp-data',
+					'wp-core-data',
+					'wp-plugins',
+					'wp-edit-post',
+					'wp-api-fetch',
+					'wp-url',
+				),
+				\IndieBlocks\Plugin::PLUGIN_VERSION,
+				false
+			);
+		}
 	}
 
 	/**
@@ -207,25 +239,26 @@ class Blocks {
 	/**
 	 * Registers (block-related) REST API endpoints.
 	 */
-	public static function register_api_endpoint() {
+	public static function register_api_endpoints() {
 		register_rest_route(
 			'indieblocks/v1',
 			'/meta',
 			array(
 				'methods'             => array( 'GET' ),
-				'callback'            => array( __CLASS__, 'get_meta' ),
-				'permission_callback' => array( __CLASS__, 'permission_callback' ),
+				'callback'            => array( __CLASS__, 'get_url_meta' ),
+				'permission_callback' => array( __CLASS__, 'url_permission_callback' ),
 			)
 		);
-	}
 
-	/**
-	 * The one, for now, REST API permission callback.
-	 *
-	 * @return bool If the request's authorized or not.
-	 */
-	public static function permission_callback() {
-		return current_user_can( 'edit_posts' );
+		register_rest_route(
+			'indieblocks/v1',
+			'/location',
+			array(
+				'methods'             => array( 'GET' ),
+				'callback'            => array( __CLASS__, 'get_location_meta' ),
+				'permission_callback' => array( __CLASS__, 'location_permission_callback' ),
+			)
+		);
 	}
 
 	/**
@@ -234,7 +267,7 @@ class Blocks {
 	 * @param  \WP_REST_Request $request   WP REST API request.
 	 * @return \WP_REST_Response|\WP_Error Response.
 	 */
-	public static function get_meta( $request ) {
+	public static function get_url_meta( $request ) {
 		$url = $request->get_param( 'url' );
 
 		if ( empty( $url ) ) {
@@ -267,5 +300,118 @@ class Blocks {
 				),
 			)
 		);
+	}
+
+	/**
+	 * URL meta permission callback.
+	 *
+	 * @return bool If the request's authorized or not.
+	 */
+	public static function url_permission_callback() {
+		return current_user_can( 'edit_posts' );
+	}
+
+	/**
+	 * Exposes Location metadata to the REST API.
+	 *
+	 * @param  \WP_REST_Request|array $request API request (parameters).
+	 * @return array|\WP_Error                 Response (or error).
+	 */
+	public static function get_location_meta( $request ) {
+		if ( is_array( $request ) ) {
+			$post_id = $request['id'];
+		} else {
+			$post_id = $request->get_param( 'post_id' );
+		}
+
+		if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		$post_id = (int) $post_id;
+
+		return array(
+			'name' => get_post_meta( $post_id, 'geo_address', true ),
+		);
+	}
+
+	/**
+	 * Location REST API permission callback.
+	 *
+	 * @param  \WP_REST_Request $request WP REST API request.
+	 * @return bool                      If the request's authorized.
+	 */
+	public static function location_permission_callback( $request ) {
+		$post_id = $request->get_param( 'post_id' );
+
+		if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_post', $post_id );
+	}
+
+	/**
+	 * Registers (some of) IndieBlocks' custom fields for use with the REST API.
+	 */
+	public static function register_meta() {
+
+		$post_types = apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
+
+		foreach ( $post_types as $post_type ) {
+			if ( use_block_editor_for_post_type( $post_type ) ) {
+				// Allow these fields to be *set* by the block editor.
+				register_post_meta(
+					$post_type,
+					'geo_latitude',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( $meta_value );
+						},
+					)
+				);
+
+				register_post_meta(
+					$post_type,
+					'geo_longitude',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( $meta_value );
+						},
+					)
+				);
+
+				register_post_meta(
+					$post_type,
+					'geo_address',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( $meta_value );
+						},
+					)
+				);
+			}
+		}
 	}
 }

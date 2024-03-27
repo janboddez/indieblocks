@@ -108,7 +108,8 @@ class Location {
 			array( __CLASS__, 'render_meta_box' ),
 			apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ),
 			'side',
-			'default'
+			'default',
+			array( '__back_compat_meta_box' => true ) // Hide from Gutenberg users.
 		);
 	}
 

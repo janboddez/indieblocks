@@ -90,7 +90,7 @@
 
 			return el( PluginDocumentSettingPanel, {
 					name: 'indieblocks-location-panel',
-					title: __( 'IndieBlocks', 'indieblocks' ),
+					title: __( 'Location', 'indieblocks' ),
 				},
 				el( ToggleControl, {
 					label: __( 'Update location data?', 'indieblocks' ),

@@ -88,9 +88,44 @@ class Blocks {
 				\IndieBlocks\Plugin::PLUGIN_VERSION,
 				false
 			);
+
+			global $post;
+
+			$checked = '1';
+			if ( ! empty( $post ) && static::is_older_than( 900, $post ) ) {
+				$checked = '0';
+			}
+
+			wp_localize_script(
+				'indieblocks-location',
+				'indieblocks_location_obj',
+				array(
+					'should_update' => $checked,
+				)
+			);
 		}
 	}
 
+	/**
+	 * Determines whether a post is older than a certain number of seconds.
+	 *
+	 * @param  int      $seconds Minimum "age," in secondss.
+	 * @param  \WP_Post $post    Post object.
+	 * @return bool              True if the post exists and is older than `$seconds`, false otherwise.
+	 */
+	protected static function is_older_than( $seconds, $post ) {
+		$post_time = get_post_time( 'U', true, $post );
+
+		if ( false === $post_time ) {
+			return false;
+		}
+
+		if ( $post_time >= time() - $seconds ) {
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * Registers the different blocks.
 	 */

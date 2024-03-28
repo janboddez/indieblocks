@@ -1,6 +1,9 @@
 ( function ( element, components, i18n, data, coreData, plugins, editPost, apiFetch, url ) {
 	const el                         = element.createElement;
+	const useEffect                   = element.useEffect;
 	const useState                   = element.useState;
+	const Flex                       = components.Flex;
+	const FlexItem                   = components.FlexItem;
 	const TextControl                = components.TextControl;
 	const ToggleControl              = components.ToggleControl;
 	const __                         = i18n.__;
@@ -32,6 +35,9 @@
 		return false;
 	};
 
+	// This doesn't yet work as intended, but the idea here was to fetch a
+	// location name after it was set in the background. We must, however, make
+	// sure that we don't overwrite it once more with, e.g., an empty string.
 	const fetchLocation = ( postId ) => {
 		if ( ! postId ) {
 			return false;
@@ -51,9 +57,9 @@
 
 			if ( response.hasOwnProperty( 'name' ) ) {
 				// This function does not do anything besides displaying a location name.
-				var locName = document.querySelector( '[name="indieblocks_address"]' );
-				if ( locName ) {
-					locName.value = response.name;
+				var geoAddress = document.querySelector( '.indieblocks-address"]' );
+				if ( geoAddress ) {
+					geoAddress.value = response.name;
 				}
 			}
 		} ).catch( function( error ) {
@@ -63,15 +69,39 @@
 	};
 
 	registerPlugin( 'indieblocks-location-panel', {
-		render: function( props ) {
+		render: () => {
 			const postId   = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
 			const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
 
-			// To be able to actually save post meta (namely, `_share_on_mastodon` and `_share_on_mastodon_status`).
-			const [ meta, setMeta ]       = coreData.useEntityProp( 'postType', postType, 'meta' );
-			const [ enabled, setEnabled ] = useState( true ); // @todo: Make this dependent on the post date!
+			// To be able to actually save post meta.
+			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
 
-			if ( doneSaving() && enabled && '' === meta.geo_address ) {
+			// To keep track of the "should update" toggle.
+			const [ enabled, setEnabled ] = useState( '1' === indieblocks_location_obj?.should_update ); // The `indieblocks_location_obj` object is populated server-side.
+
+			// Run only once?
+			useEffect( () => {
+				if ( meta?.geo_latitude || meta?.geo_longitude ) {
+					// Not empty.
+					return;
+				}
+
+				if ( ! navigator.geolocation ) {
+					// Not supported.
+					return;
+				}
+
+				navigator.geolocation.getCurrentPosition( ( position ) => {
+					// Need to update both coords at once in order not to remove
+					// one or the other.
+					setMeta( { ...meta, geo_latitude: position.coords.latitude, geo_longitude: position.coords.longitude } );
+				}, ( error ) => {
+					// Do nothing.
+					console.log( error );
+				} );
+			}, [] );
+
+			if ( doneSaving() && enabled && ! meta?.geo_address ) {
 				// Post was updated, location "name" is (still) empty.
 				setTimeout( () => {
 					// After a shortish delay, fetch and display the new name (if any).
@@ -92,27 +122,26 @@
 					name: 'indieblocks-location-panel',
 					title: __( 'Location', 'indieblocks' ),
 				},
-				el( ToggleControl, {
-					label: __( 'Update location data?', 'indieblocks' ),
-					checked: enabled,
-					onChange: ( value ) => {
-						setEnabled( value );
-					},
-				} ),
-				el( TextControl, {
-					label: __( 'Latitude', 'indieblocks' ),
-					value: meta.geo_latitude ?? '',
-					onChange: ( value ) => {
-						setMeta( { ...meta, geo_latitude: value } );
-					},
-				} ),
-				el( TextControl, {
-					label: __( 'Longitude', 'indieblocks' ),
-					value: meta.geo_longitude ?? '',
-					onChange: ( value ) => {
-						setMeta( { ...meta, geo_longitude: value } );
-					},
-				} ),
+				el( Flex, {},
+					el( FlexItem, {},
+						el( TextControl, {
+							label: __( 'Latitude', 'indieblocks' ),
+							value: meta.geo_latitude ?? '',
+							onChange: ( value ) => {
+								setMeta( { ...meta, geo_latitude: value } );
+							},
+						} )
+					),
+					el( FlexItem, {},
+						el( TextControl, {
+							label: __( 'Longitude', 'indieblocks' ),
+							value: meta.geo_longitude ?? '',
+							onChange: ( value ) => {
+								setMeta( { ...meta, geo_longitude: value } );
+							},
+						} )
+					)
+				),
 				el( TextControl, {
 					label: __( 'Location', 'indieblocks' ),
 					value: meta.geo_address ?? '',
@@ -120,6 +149,13 @@
 						setMeta( { ...meta, geo_address: value } );
 					},
 				} ),
+				el( ToggleControl, {
+					label: __( 'Update location data?', 'indieblocks' ),
+					checked: enabled,
+					onChange: ( value ) => {
+						setEnabled( value );
+					},
+				} )
 			);
 		},
 	} );

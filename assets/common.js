@@ -1,12 +1,11 @@
 var IndieBlocks = {
-	hCite: function( className, attributes, innerBlocks = null ) {
-		var el          = window.wp.element.createElement;
-		var interpolate = window.wp.element.createInterpolateElement;
+	hCite: ( className, attributes, innerBlocks = null ) => {
+		const el          = window.wp.element.createElement;
+		const interpolate = window.wp.element.createInterpolateElement;
+		const __          = window.wp.i18n.__;
+		const sprintf     = window.wp.i18n.sprintf;
 
-		var __      = window.wp.i18n.__;
-		var sprintf = window.wp.i18n.sprintf;
-
-		var messagesWithByline = {
+		const messagesWithByline = {
 			/* translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page. */
 			'u-bookmark-of': __( 'Bookmarked %1$s by %2$s.', 'indieblocks' ),
 			/* translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page. */
@@ -17,7 +16,7 @@ var IndieBlocks = {
 			'u-repost-of': __( 'Reposted %1$s by %2$s.', 'indieblocks' ),
 		};
 
-		var messages = {
+		const messages = {
 			/* translators: %s: Link to the bookmarked page. */
 			'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
 			/* translators: %s: Link to the "liked" page. */
@@ -28,11 +27,11 @@ var IndieBlocks = {
 			'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 		};
 
-		var message = ( ! attributes.author || 'undefined' === attributes.author )
+		const message = ( ! attributes.author || 'undefined' === attributes.author )
 			? messages[ className ]
 			: messagesWithByline[ className ];
 
-		var name = attributes.title || attributes.url;
+		const name = attributes.title || attributes.url;
 
 		return el( 'div', { className: className + ' h-cite' },
 			el( 'p', {}, // Adding paragraphs this time around.
@@ -74,8 +73,8 @@ var IndieBlocks = {
 	 * Calls a backend function that parses a URL for microformats and the like,
 	 * and sets attributes accordingly.
 	 */
-	updateMeta: function( props ) {
-		var url = props.attributes.url;
+	updateMeta: ( props ) => {
+		const url = props.attributes.url;
 
 		if ( props.attributes.customTitle && props.attributes.customAuthor ) {
 			// We're using custom values for both title and author;/ nothing to
@@ -88,15 +87,15 @@ var IndieBlocks = {
 		}
 
 		// Like a time-out.
-		var controller = new AbortController();
-		var timeoutId  = setTimeout( function() {
+		const controller = new AbortController();
+		const timeoutId  = setTimeout( function() {
 			controller.abort();
 		}, 6000 );
 
 		window.wp.apiFetch( {
 			path: '/indieblocks/v1/meta?url=' + encodeURIComponent( url ),
 			signal: controller.signal, // That time-out thingy.
-		} ).then( function( response ) {
+		} ).then( ( response ) => {
 			if ( ! props.attributes.customTitle && ( response.name || '' === response.name ) ) {
 				// Got a, possibly empty, title.
 				props.setAttributes( { title: response.name } );
@@ -108,14 +107,14 @@ var IndieBlocks = {
 			}
 
 			clearTimeout( timeoutId );
-		} ).catch( function( error ) {
+		} ).catch( ( error ) => {
 			// The request timed out or otherwise failed. Leave as is.
 		} );
 	},
 	/**
 	 * Validates a URL.
 	 */
-	isValidUrl: function( string ) {
+	isValidUrl: ( string ) => {
 		try {
 			new URL( string );
 		} catch ( error ) {

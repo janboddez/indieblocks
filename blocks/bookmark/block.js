@@ -1,19 +1,13 @@
-( function ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) {
-	var createBlock = blocks.createBlock;
-
-	var el        = element.createElement;
-	var useEffect = element.useEffect;
-
-	var InnerBlocks   = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	var ToggleControl = components.ToggleControl;
-	var TextControl   = components.TextControl;
-
-	var useSelect = data.useSelect;
-
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
+( ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) => {
+	const createBlock   = blocks.createBlock;
+	const el            = element.createElement;
+	const useEffect     = element.useEffect;
+	const InnerBlocks   = blockEditor.InnerBlocks;
+	const useBlockProps = blockEditor.useBlockProps;
+	const ToggleControl = components.ToggleControl;
+	const TextControl   = components.TextControl;
+	const useSelect     = data.useSelect;
+	const __            = i18n.__;
 
 	blocks.registerBlockType( 'indieblocks/bookmark', {
 		icon: el( 'svg', {
@@ -25,18 +19,24 @@
 		),
 		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
 		edit: ( props ) => {
-			var url          = props.attributes.url;
-			var customTitle  = props.attributes.customTitle;
-			var title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
-			var customAuthor = props.attributes.customAuthor;
-			var author       = props.attributes.author || '';
+			const url          = props.attributes.url;
+			const customTitle  = props.attributes.customTitle;
+			const title        = props.attributes.title || ''; // May not be present in the saved HTML, so we need a fallback value even when `block.json` contains a default.
+			const customAuthor = props.attributes.customAuthor;
+			const author       = props.attributes.author || '';
 
-			function updateEmpty( empty ) {
+			const updateEmpty = ( empty ) => {
 				props.setAttributes( { empty } );
-			}
+			};
 
-			var parentClientId = useSelect( ( select ) => select( 'core/block-editor' ).getBlockHierarchyRootClientId( props.clientId ) );
-			var innerBlocks    = useSelect( ( select ) => select( 'core/block-editor' ).getBlocks( parentClientId ) );
+			const { parentClientId, innerBlocks } = useSelect( ( select ) => {
+				const parentClientId = select( 'core/block-editor' ).getBlockHierarchyRootClientId( props.clientId );
+
+				return {
+					parentClientId: parentClientId,
+					innerBlocks: select( 'core/block-editor' ).getBlocks( parentClientId )
+				}
+			}, [] );
 
 			// To determine whether `.e-content` and `InnerBlocks.Content`
 			// should be saved (and echoed).
@@ -67,7 +67,7 @@
 				updateEmpty( empty );
 			}, [ innerBlocks, updateEmpty ] );
 
-			var placeholderProps = {
+			const placeholderProps = {
 				icon: el( 'svg', {
 						xmlns: 'http://www.w3.org/2000/svg',
 						viewBox: '0 0 24 24',
@@ -83,7 +83,7 @@
 				placeholderProps.instructions = __( 'Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph.', 'indieblocks' );
 			}
 
-			var titleProps = {
+			const titleProps = {
 				label: __( 'Title', 'indieblocks' ),
 				value: title,
 				onChange: ( value ) => { props.setAttributes( { title: value } ) },
@@ -93,7 +93,7 @@
 				titleProps.readOnly = 'readonly';
 			}
 
-			var authorProps = {
+			const authorProps = {
 				label: __( 'Author', 'indieblocks' ),
 				value: author,
 				onChange: ( value ) => { props.setAttributes( { author: value } ) },

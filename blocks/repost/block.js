@@ -34,7 +34,7 @@
 
 				return {
 					parentClientId: parentClientId,
-					innerBlocks: select( 'core/block-editor' ).getBlocks( parentClientId )
+					innerBlocks: select( 'core/block-editor' ).getBlocks( parentClientId ),
 				}
 			}, [] );
 

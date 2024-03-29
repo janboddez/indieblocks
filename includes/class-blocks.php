@@ -92,8 +92,14 @@ class Blocks {
 			global $post;
 
 			$checked = '1';
-			if ( ! empty( $post ) && static::is_older_than( 900, $post ) ) {
-				$checked = '0';
+			if ( ! empty( $post ) ) {
+				if ( static::is_older_than( 900, $post ) ) {
+					$checked = '0';
+				}
+
+				if ( '' !== get_meta( $post, 'geo_latitude' ) && '' !== get_meta( $post, 'geo_longitude' ) ) {
+					$checked = '0';
+				}
 			}
 
 			wp_localize_script(
@@ -408,7 +414,7 @@ class Blocks {
 							return current_user_can( 'edit_posts' );
 						},
 						'sanitize_callback' => function ( $meta_value ) {
-							return sanitize_text_field( $meta_value );
+							return sanitize_text_field( (float) $meta_value );
 						},
 					)
 				);
@@ -425,7 +431,7 @@ class Blocks {
 							return current_user_can( 'edit_posts' );
 						},
 						'sanitize_callback' => function ( $meta_value ) {
-							return sanitize_text_field( $meta_value );
+							return sanitize_text_field( (float) $meta_value );
 						},
 					)
 				);

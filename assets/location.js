@@ -1,6 +1,6 @@
 ( function ( element, components, i18n, data, coreData, plugins, editPost, apiFetch, url ) {
 	const el                         = element.createElement;
-	const useEffect                   = element.useEffect;
+	const useEffect                  = element.useEffect;
 	const useState                   = element.useState;
 	const Flex                       = components.Flex;
 	const FlexItem                   = components.FlexItem;
@@ -21,14 +21,14 @@
 			};
 		} );
 
-		const [ wasSaving, setWasSaving ] = useState( isSaving && ! isAutosaving && 'publish' === status ); // Ignore autosaves, and unpublished posts.
+		const [ wasSaving, setWasSaving ] = useState( isSaving && ! isAutosaving ); // Ignore autosaves.
 
 		if ( wasSaving ) {
 			if ( ! isSaving ) {
 				setWasSaving( false );
 				return true;
 			}
-		} else if ( isSaving && ! isAutosaving && 'publish' === status ) {
+		} else if ( isSaving && ! isAutosaving ) {
 			setWasSaving( true );
 		}
 
@@ -38,7 +38,7 @@
 	// This doesn't yet work as intended, but the idea here was to fetch a
 	// location name after it was set in the background. We must, however, make
 	// sure that we don't overwrite it once more with, e.g., an empty string.
-	const fetchLocation = ( postId ) => {
+	const fetchLocation = ( postId, meta, setMeta ) => {
 		if ( ! postId ) {
 			return false;
 		}
@@ -57,21 +57,21 @@
 
 			if ( response.hasOwnProperty( 'name' ) ) {
 				// This function does not do anything besides displaying a location name.
-				var geoAddress = document.querySelector( '.indieblocks-address"]' );
-				if ( geoAddress ) {
-					geoAddress.value = response.name;
-				}
+				setMeta( { ...meta, geo_address: response.name } );
 			}
 		} ).catch( function( error ) {
 			// The request timed out or otherwise failed. Leave as is.
-			console.debug( '[IndieBlocks] "Get location" request failed.' );
 		} );
 	};
 
 	registerPlugin( 'indieblocks-location-panel', {
 		render: () => {
-			const postId   = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
-			const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+			const { postId, postType } = useSelect( ( select ) => {
+				return {
+					postId: select( 'core/editor' ).getCurrentPostId(),
+					postType: select( 'core/editor' ).getCurrentPostType()
+				}
+			 }, [] );
 
 			// To be able to actually save post meta.
 			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
@@ -79,7 +79,7 @@
 			// To keep track of the "should update" toggle.
 			const [ enabled, setEnabled ] = useState( '1' === indieblocks_location_obj?.should_update ); // The `indieblocks_location_obj` object is populated server-side.
 
-			// Run only once?
+			// Run once, plus whenever `enabled` is updated.
 			useEffect( () => {
 				if ( meta?.geo_latitude || meta?.geo_longitude ) {
 					// Not empty.
@@ -92,20 +92,24 @@
 				}
 
 				navigator.geolocation.getCurrentPosition( ( position ) => {
+					if ( ! enabled ) {
+						return;
+					}
+
 					// Need to update both coords at once in order not to remove
 					// one or the other.
-					setMeta( { ...meta, geo_latitude: position.coords.latitude, geo_longitude: position.coords.longitude } );
+					setMeta( { ...meta, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
 				}, ( error ) => {
 					// Do nothing.
 					console.log( error );
 				} );
-			}, [] );
+			}, [ enabled, meta, setMeta ] );
 
-			if ( doneSaving() && enabled && ! meta?.geo_address ) {
+			if ( doneSaving() ) {
 				// Post was updated, location "name" is (still) empty.
 				setTimeout( () => {
 					// After a shortish delay, fetch and display the new name (if any).
-					fetchLocation( postId );
+					fetchLocation( postId, meta, setMeta );
 				}, 1500 );
 
 				setTimeout( () => {
@@ -114,7 +118,7 @@
 					// happen. Unless of course the "Delay" option is set to
 					// something larger, but then there's no point in displaying
 					// this type of feedback anyway.
-					fetchLocation( postId );
+					fetchLocation( postId, meta, setMeta );
 				}, 15000 );
 			}
 

@@ -1,11 +1,11 @@
-( function ( element, components, i18n, data, coreData, plugins, editPost, apiFetch, url ) {
+( ( element, components, i18n, data, coreData, plugins, editPost, apiFetch, url ) => {
 	const el                         = element.createElement;
 	const useEffect                  = element.useEffect;
 	const useState                   = element.useState;
+	const Button                     = components.Button;
 	const Flex                       = components.Flex;
 	const FlexItem                   = components.FlexItem;
 	const TextControl                = components.TextControl;
-	const ToggleControl              = components.ToggleControl;
 	const __                         = i18n.__;
 	const useSelect                  = data.useSelect;
 	const registerPlugin             = plugins.registerPlugin;
@@ -45,21 +45,21 @@
 
 		// Like a time-out.
 		const controller = new AbortController();
-		const timeoutId  = setTimeout( function() {
+		const timeoutId  = setTimeout( () => {
 			controller.abort();
 		}, 6000 );
 
 		apiFetch( {
 			path: url.addQueryArgs( '/indieblocks/v1/location', { post_id: postId } ),
 			signal: controller.signal, // That time-out thingy.
-		} ).then( function( response ) {
+		} ).then( ( response ) => {
 			clearTimeout( timeoutId );
 
 			if ( response.hasOwnProperty( 'name' ) ) {
 				// This function does not do anything besides displaying a location name.
 				setMeta( { ...meta, geo_address: response.name } );
 			}
-		} ).catch( function( error ) {
+		} ).catch( ( error ) => {
 			// The request timed out or otherwise failed. Leave as is.
 		} );
 	};
@@ -76,34 +76,47 @@
 			// To be able to actually save post meta.
 			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
 
-			// To keep track of the "should update" toggle.
-			const [ enabled, setEnabled ] = useState( '1' === indieblocks_location_obj?.should_update ); // The `indieblocks_location_obj` object is populated server-side.
+			const [ latitude, setLatitude ]   = useState( meta?.geo_latitude ?? '' );
+			const [ longitude, setLongitude ] = useState( meta?.geo_longitude ?? '' );
 
-			// Run once, plus whenever `enabled` is updated.
+			const shouldUpdate = indieblocks_location_obj?.should_update ?? '0';
+
 			useEffect( () => {
-				if ( meta?.geo_latitude || meta?.geo_longitude ) {
-					// Not empty.
+				if ( '' !== latitude ) {
+					return;
+				}
+
+				if ( '' !== longitude ) {
+					return;
+				}
+
+				if ( '1' !== shouldUpdate ) {
 					return;
 				}
 
 				if ( ! navigator.geolocation ) {
-					// Not supported.
 					return;
 				}
 
 				navigator.geolocation.getCurrentPosition( ( position ) => {
-					if ( ! enabled ) {
-						return;
-					}
-
-					// Need to update both coords at once in order not to remove
-					// one or the other.
-					setMeta( { ...meta, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
+					// If we used `setMeta()`, due to the delay, it
+					// could update other `meta` props with old values.
+					setLatitude( position.coords.latitude.toString() );
+					setLongitude( position.coords.longitude.toString() );
 				}, ( error ) => {
 					// Do nothing.
 					console.log( error );
 				} );
-			}, [ enabled, meta, setMeta ] );
+			}, [] );
+
+			// If we called `setMeta()` inside the `navigator.geolocation.getCurrentPosition()`
+			// callback, it'd almost certainly use stale values for other `meta`
+			// properties. This, however, seems to work (for now).
+			useEffect( () => {
+				console.log( 'Updating `meta` with coordinates.' );
+				// setMeta( meta => ( { ...meta, geo_latitude: latitude, geo_longitude: longitude } ) ); // This won't actually update!?
+				setMeta( { ...meta, geo_latitude: latitude, geo_longitude: longitude } ); // What if `meta` is "stale"?
+			}, [ latitude, longitude ] );
 
 			if ( doneSaving() ) {
 				// Post was updated, location "name" is (still) empty.
@@ -130,18 +143,18 @@
 					el( FlexItem, {},
 						el( TextControl, {
 							label: __( 'Latitude', 'indieblocks' ),
-							value: meta.geo_latitude ?? '',
+							value: latitude ?? '',
 							onChange: ( value ) => {
-								setMeta( { ...meta, geo_latitude: value } );
+								setLatitude( value );
 							},
 						} )
 					),
 					el( FlexItem, {},
 						el( TextControl, {
 							label: __( 'Longitude', 'indieblocks' ),
-							value: meta.geo_longitude ?? '',
+							value: longitude ?? '',
 							onChange: ( value ) => {
-								setMeta( { ...meta, geo_longitude: value } );
+								setLongitude( value );
 							},
 						} )
 					)
@@ -153,13 +166,25 @@
 						setMeta( { ...meta, geo_address: value } );
 					},
 				} ),
-				el( ToggleControl, {
-					label: __( 'Update location data?', 'indieblocks' ),
-					checked: enabled,
-					onChange: ( value ) => {
-						setEnabled( value );
+				el( Button, {
+					onClick: () => {
+						if ( ! navigator.geolocation ) {
+							return;
+						}
+
+						navigator.geolocation.getCurrentPosition( ( position ) => {
+							// If we used `setMeta()`, due to the delay, it
+							// could update other `meta` props with old values.
+							// setMeta( meta => ( { ...meta, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } ) )
+							setLatitude( position.coords.latitude.toString() );
+							setLongitude( position.coords.longitude.toString() );
+						}, ( error ) => {
+							// Do nothing.
+							console.log( error );
+						} );
 					},
-				} )
+					variant: 'secondary',
+				}, __( 'Fetch Coordinates', 'indieblocks' )	)
 			);
 		},
 	} );

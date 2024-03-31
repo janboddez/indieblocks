@@ -2,6 +2,7 @@
 	const el                         = element.createElement;
 	const useEffect                  = element.useEffect;
 	const useState                   = element.useState;
+	const useRef                     = element.useRef;
 	const Button                     = components.Button;
 	const Flex                       = components.Flex;
 	const FlexItem                   = components.FlexItem;
@@ -38,7 +39,7 @@
 	// This doesn't yet work as intended, but the idea here was to fetch a
 	// location name after it was set in the background. We must, however, make
 	// sure that we don't overwrite it once more with, e.g., an empty string.
-	const fetchLocation = ( postId, meta, setMeta ) => {
+	const fetchLocation = ( postId, setMeta, stateRef ) => {
 		if ( ! postId ) {
 			return false;
 		}
@@ -55,9 +56,9 @@
 		} ).then( ( response ) => {
 			clearTimeout( timeoutId );
 
-			if ( response.hasOwnProperty( 'name' ) ) {
+			if ( response.hasOwnProperty( 'name' ) && '' !== response.name ) {
 				// This function does not do anything besides displaying a location name.
-				setMeta( { ...meta, geo_address: response.name } );
+				setMeta( { ...stateRef.current, geo_address: response.name } );
 			}
 		} ).catch( ( error ) => {
 			// The request timed out or otherwise failed. Leave as is.
@@ -73,14 +74,30 @@
 				}
 			 }, [] );
 
-			// To be able to actually save post meta.
 			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
 
-			const [ latitude, setLatitude ]   = useState( meta?.geo_latitude ?? '' );
-			const [ longitude, setLongitude ] = useState( meta?.geo_longitude ?? '' );
+			const latitude   = meta?.geo_latitude ?? '';
+			const longitude  = meta?.geo_longitude ?? '';
+			const geoAddress = meta?.geo_address ?? '';
 
-			const shouldUpdate = indieblocks_location_obj?.should_update ?? '0';
+			const stateRef   = useRef();
+			stateRef.current = meta;
 
+			// These are custom fields we *don't* want to be set by `setMeta()`.
+			const { record, isResolving } = coreData.useEntityRecord( 'postType', postType, postId );
+
+			// Update location name. Note: Doesn't work as it should, yet.
+			if ( doneSaving() && '' === geoAddress ) {
+				setTimeout( () => {
+					fetchLocation( postId, setMeta, stateRef );
+				}, 1500 );
+
+				setTimeout( () => {
+					fetchLocation( postId, setMeta, stateRef );
+				}, 15000 );
+			}
+
+			// Runs once.
 			useEffect( () => {
 				if ( '' !== latitude ) {
 					return;
@@ -90,6 +107,7 @@
 					return;
 				}
 
+				const shouldUpdate = indieblocks_location_obj?.should_update ?? '0';
 				if ( '1' !== shouldUpdate ) {
 					return;
 				}
@@ -98,42 +116,20 @@
 					return;
 				}
 
-				navigator.geolocation.getCurrentPosition( ( position ) => {
-					// If we used `setMeta()`, due to the delay, it
-					// could update other `meta` props with old values.
-					setLatitude( position.coords.latitude.toString() );
-					setLongitude( position.coords.longitude.toString() );
-				}, ( error ) => {
+				navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
 					// Do nothing.
 					console.log( error );
 				} );
 			}, [] );
 
-			// If we called `setMeta()` inside the `navigator.geolocation.getCurrentPosition()`
-			// callback, it'd almost certainly use stale values for other `meta`
-			// properties. This, however, seems to work (for now).
-			useEffect( () => {
-				console.log( 'Updating `meta` with coordinates.' );
-				// setMeta( meta => ( { ...meta, geo_latitude: latitude, geo_longitude: longitude } ) ); // This won't actually update!?
-				setMeta( { ...meta, geo_latitude: latitude, geo_longitude: longitude } ); // What if `meta` is "stale"?
-			}, [ latitude, longitude ] );
+			// `navigator.geolocation.getCurrentPosition` callback.
+			const updatePosition = ( position ) => {
+				setMeta( { ...stateRef.current, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
+			};
 
-			if ( doneSaving() ) {
-				// Post was updated, location "name" is (still) empty.
-				setTimeout( () => {
-					// After a shortish delay, fetch and display the new name (if any).
-					fetchLocation( postId, meta, setMeta );
-				}, 1500 );
-
-				setTimeout( () => {
-					// Just in case. I thought of `setInterval()`, but if after
-					// 15 seconds it's still not there, it's likely not going to
-					// happen. Unless of course the "Delay" option is set to
-					// something larger, but then there's no point in displaying
-					// this type of feedback anyway.
-					fetchLocation( postId, meta, setMeta );
-				}, 15000 );
-			}
+			// useEffect( () => {
+			// 	console.table( meta );
+			// }, [ meta ] );
 
 			return el( PluginDocumentSettingPanel, {
 					name: 'indieblocks-location-panel',
@@ -143,48 +139,44 @@
 					el( FlexItem, {},
 						el( TextControl, {
 							label: __( 'Latitude', 'indieblocks' ),
-							value: latitude ?? '',
+							value: latitude,
 							onChange: ( value ) => {
-								setLatitude( value );
+								setMeta( { ...meta, geo_latitude: value } );
 							},
 						} )
 					),
 					el( FlexItem, {},
 						el( TextControl, {
 							label: __( 'Longitude', 'indieblocks' ),
-							value: longitude ?? '',
+							value: longitude,
 							onChange: ( value ) => {
-								setLongitude( value );
+								setMeta( { ...meta, geo_longitude: value } );
 							},
 						} )
 					)
 				),
-				el( TextControl, {
-					label: __( 'Location', 'indieblocks' ),
-					value: meta.geo_address ?? '',
-					onChange: ( value ) => {
-						setMeta( { ...meta, geo_address: value } );
-					},
-				} ),
 				el( Button, {
+					style: { marginBottom: '12px' },
 					onClick: () => {
 						if ( ! navigator.geolocation ) {
 							return;
 						}
 
-						navigator.geolocation.getCurrentPosition( ( position ) => {
-							// If we used `setMeta()`, due to the delay, it
-							// could update other `meta` props with old values.
-							// setMeta( meta => ( { ...meta, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } ) )
-							setLatitude( position.coords.latitude.toString() );
-							setLongitude( position.coords.longitude.toString() );
-						}, ( error ) => {
+						navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
 							// Do nothing.
 							console.log( error );
 						} );
 					},
 					variant: 'secondary',
-				}, __( 'Fetch Coordinates', 'indieblocks' )	)
+				}, __( 'Fetch Coordinates', 'indieblocks' )	),
+				// To allow authors to manually override or pass on a location.
+				el( TextControl, {
+					label: __( 'Location', 'indieblocks' ),
+					value: geoAddress,
+					onChange: ( value ) => {
+						setMeta( { ...meta, geo_address: value } );
+					},
+				} )
 			);
 		},
 	} );

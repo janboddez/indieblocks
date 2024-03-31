@@ -36,7 +36,7 @@ foreach ( $facepile_comments as $facepile_comment ) {
 	}
 
 	$alt = $processor->get_attribute( 'alt' );
-	$alt = ! empty( $alt ) ? $alt : get_comment_author( $comfacepile_commentment );
+	$alt = ! empty( $alt ) ? $alt : get_comment_author( $facepile_comment );
 
 	$processor->set_attribute( 'alt', esc_attr( $alt ) );
 

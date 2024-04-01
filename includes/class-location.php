@@ -90,6 +90,23 @@ class Location {
 					'should_update' => $should_update,
 				)
 			);
+
+			// When our Gutenberg panel is active, hide these fields from the
+			// Custom Fields panel, to prevent them from being accidentally
+			// overwritten with stale values.
+			// @todo: Make this a proper callback so that it can be unhooked.
+			add_filter(
+				'is_protected_meta',
+				function ( $is_protected, $meta_key ) {
+					if ( in_array( $meta_key, array( 'geo_latitude', 'geo_longitude', 'geo_address', ), true ) ) {
+						return true;
+					}
+
+					return $is_protected;
+				},
+				10,
+				2
+			);
 		}
 	}
 

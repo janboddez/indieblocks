@@ -37,12 +37,20 @@
 		return false;
 	};
 
-	// This doesn't yet work as intended, but the idea here was to fetch a
-	// location name after it was set in the background. We must, however, make
-	// sure that we don't overwrite it once more with, e.g., an empty string.
-	const fetchLocation = ( postId, setMeta, stateRef ) => {
+	// The idea here was to fetch a location name after it is set in the
+	// background. So that if the OpenStreetMap geolocation API is "too slow"
+	// we'll still get an "up-to-date" location.
+	const fetchLocation = ( postId, postType, setMeta, stateRef ) => {
 		if ( ! postId ) {
-			return false;
+			return;
+		}
+
+		if ( ! postType ) {
+			return;
+		}
+
+		if ( stateRef.current.geo_address ) {
+			return;
 		}
 
 		// Like a time-out.
@@ -52,14 +60,14 @@
 		}, 6000 );
 
 		apiFetch( {
-			path: url.addQueryArgs( '/indieblocks/v1/location', { post_id: postId } ),
+			path: '/wp/v2/' + postType + '/' + postId,
 			signal: controller.signal, // That time-out thingy.
 		} ).then( ( response ) => {
 			clearTimeout( timeoutId );
 
-			if ( response.hasOwnProperty( 'geo_address' ) && '' !== response.geo_address ) {
+			if ( response.indieblocks_location && response.indieblocks_location.geo_address ) {
 				// This function does not do anything besides displaying a location name.
-				setMeta( { ...stateRef.current, geo_address: response.geo_address } );
+				setMeta( { ...stateRef.current, geo_address: response.indieblocks_location.geo_address } );
 			}
 		} ).catch( ( error ) => {
 			// The request timed out or otherwise failed. Leave as is.
@@ -84,19 +92,22 @@
 			const stateRef   = useRef();
 			stateRef.current = meta;
 
-			// These are custom fields we *don't* want to be set by `setMeta()`.
-			const { record, isResolving } = coreData.useEntityRecord( 'postType', postType, postId );
-
-			// Update location name. Note: Doesn't work as it should, yet.
-			if ( doneSaving() && '' === geoAddress ) {
+			// This seems superfluous, but let's leave it in place, in case our
+			// server's "too slow" to immediately return a location name.
+			if ( doneSaving() && ! geoAddress ) {
 				setTimeout( () => {
-					fetchLocation( postId, setMeta, stateRef );
+					fetchLocation( postId, postType, setMeta, stateRef );
 				}, 1500 );
 
 				setTimeout( () => {
-					fetchLocation( postId, setMeta, stateRef );
+					fetchLocation( postId, postType, setMeta, stateRef );
 				}, 15000 );
 			}
+
+			// `navigator.geolocation.getCurrentPosition` callback.
+			const updatePosition = ( position ) => {
+				setMeta( { ...stateRef.current, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
+			};
 
 			// Runs once.
 			useEffect( () => {
@@ -122,11 +133,6 @@
 					console.log( error );
 				} );
 			}, [] );
-
-			// `navigator.geolocation.getCurrentPosition` callback.
-			const updatePosition = ( position ) => {
-				setMeta( { ...stateRef.current, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
-			};
 
 			// useEffect( () => {
 			// 	console.table( meta );

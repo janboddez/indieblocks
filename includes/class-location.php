@@ -17,12 +17,11 @@ class Location {
 	public static function register() {
 		// Enqueue block editor script.
 		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), 11 );
-		// Register REST API endpoint.
-		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+
 		// Register location meta.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
 
-		// (Legacy) register for REST API use.
+		// For read-only (for now) access.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
 
 		// Add a "Location" meta box.
@@ -178,36 +177,10 @@ class Location {
 	}
 
 	/**
-	 * Yet another way of retrieving data from the REST API. Used by the editor
-	 * sidebar panel to update its location, after it is retrieved server-side.
-	 * We can almost certainly ditch this in favor of the REST field above. I.e.,
-	 * just re-fetch the post and look in the `indieblocks_location` property.
-	 */
-	public static function register_api_endpoints() {
-		register_rest_route(
-			'indieblocks/v1',
-			'/location',
-			array(
-				'methods'             => array( 'GET' ),
-				'callback'            => array( __CLASS__, 'get_meta' ),
-				'permission_callback' => function ( $request ) {
-					$post_id = $request->get_param( 'post_id' );
-
-					if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
-						return false;
-					}
-
-					return current_user_can( 'edit_post', $post_id );
-				},
-			)
-		);
-	}
-
-	/**
 	 * Returns location metadata.
 	 *
-	 * Used as both a `register_rest_route()` *and* `register_rest_field()`
-	 * callback!
+	 * Can be used as both a `register_rest_route()` and `register_rest_field()`
+	 * callback.
 	 *
 	 * @param  \WP_REST_Request|array $request API request (parameters).
 	 * @return array|\WP_Error                 Response (or error).

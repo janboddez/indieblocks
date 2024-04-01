@@ -13,12 +13,13 @@ class Blocks {
 	 */
 	public static function register() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_scripts' ) );
-		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), 11 );
+
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
+
 		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
-		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
+
 		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
 		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
 		add_filter( 'the_excerpt_rss', array( __CLASS__, 'excerpt_feed' ) );
@@ -62,77 +63,6 @@ class Blocks {
 	}
 
 	/**
-	 * Enqueues additional scripts, like the Location sidebar panel thingy.
-	 */
-	public static function enqueue_scripts() {
-		$current_screen = get_current_screen();
-
-		if (
-			isset( $current_screen->post_type ) &&
-			in_array( $current_screen->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true )
-		) {
-			wp_enqueue_script(
-				'indieblocks-location',
-				plugins_url( '/assets/location.js', __DIR__ ),
-				array(
-					'wp-element',
-					'wp-components',
-					'wp-i18n',
-					'wp-data',
-					'wp-core-data',
-					'wp-plugins',
-					'wp-edit-post',
-					'wp-api-fetch',
-					'wp-url',
-				),
-				\IndieBlocks\Plugin::PLUGIN_VERSION,
-				false
-			);
-
-			global $post;
-
-			$checked = '1';
-			if ( ! empty( $post ) ) {
-				if ( static::is_older_than( 900, $post ) ) {
-					$checked = '0';
-				}
-
-				if ( '' !== get_meta( $post, 'geo_latitude' ) && '' !== get_meta( $post, 'geo_longitude' ) ) {
-					$checked = '0';
-				}
-			}
-
-			wp_localize_script(
-				'indieblocks-location',
-				'indieblocks_location_obj',
-				array(
-					'should_update' => $checked,
-				)
-			);
-		}
-	}
-
-	/**
-	 * Determines whether a post is older than a certain number of seconds.
-	 *
-	 * @param  int      $seconds Minimum "age," in secondss.
-	 * @param  \WP_Post $post    Post object.
-	 * @return bool              True if the post exists and is older than `$seconds`, false otherwise.
-	 */
-	protected static function is_older_than( $seconds, $post ) {
-		$post_time = get_post_time( 'U', true, $post );
-
-		if ( false === $post_time ) {
-			return false;
-		}
-
-		if ( $post_time >= time() - $seconds ) {
-			return false;
-		}
-
-		return true;
-	}
-	/**
 	 * Registers the different blocks.
 	 */
 	public static function register_blocks() {
@@ -158,47 +88,6 @@ class Blocks {
 				dirname( __DIR__ ) . '/languages'
 			);
 		}
-	}
-
-	/**
-	 * Registers block patterns.
-	 */
-	public static function register_block_patterns() {
-		register_block_pattern(
-			'indieblocks/note-starter-pattern',
-			array(
-				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
-				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
-				'categories'  => array( 'text' ),
-				'content'     => '<!-- wp:indieblocks/context -->
-					<div class="wp-block-indieblocks-context"></div>
-					<!-- /wp:indieblocks/context -->
-
-					<!-- wp:group {"className":"e-content"} -->
-					<div class="wp-block-group e-content"><!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph --></div>
-					<!-- /wp:group -->',
-			)
-		);
-
-		register_block_pattern(
-			'indieblocks/repost-starter-pattern',
-			array(
-				'title'       => __( 'Repost Starter Pattern', 'indieblocks' ),
-				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts.', 'indieblocks' ),
-				'categories'  => array( 'text' ),
-				'content'     => '<!-- wp:indieblocks/context -->
-					<div class="wp-block-indieblocks-context"></div>
-					<!-- /wp:indieblocks/context -->
-
-					<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content"><!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph --></blockquote>
-					<!-- /wp:quote -->',
-			)
-		);
 	}
 
 	/**
@@ -287,17 +176,9 @@ class Blocks {
 			array(
 				'methods'             => array( 'GET' ),
 				'callback'            => array( __CLASS__, 'get_url_meta' ),
-				'permission_callback' => array( __CLASS__, 'url_permission_callback' ),
-			)
-		);
-
-		register_rest_route(
-			'indieblocks/v1',
-			'/location',
-			array(
-				'methods'             => array( 'GET' ),
-				'callback'            => array( __CLASS__, 'get_location_meta' ),
-				'permission_callback' => array( __CLASS__, 'location_permission_callback' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
 			)
 		);
 	}
@@ -344,115 +225,45 @@ class Blocks {
 	}
 
 	/**
-	 * URL meta permission callback.
+	 * Registers block patterns.
 	 *
-	 * @return bool If the request's authorized or not.
+	 * These are mostly outdated now.
 	 */
-	public static function url_permission_callback() {
-		return current_user_can( 'edit_posts' );
-	}
+	public static function register_block_patterns() {
+		register_block_pattern(
+			'indieblocks/note-starter-pattern',
+			array(
+				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
 
-	/**
-	 * Exposes Location metadata to the REST API.
-	 *
-	 * @param  \WP_REST_Request|array $request API request (parameters).
-	 * @return array|\WP_Error                 Response (or error).
-	 */
-	public static function get_location_meta( $request ) {
-		if ( is_array( $request ) ) {
-			$post_id = $request['id'];
-		} else {
-			$post_id = $request->get_param( 'post_id' );
-		}
-
-		if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
-			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
-		}
-
-		$post_id = (int) $post_id;
-
-		return array(
-			'name' => get_post_meta( $post_id, 'geo_address', true ),
+					<!-- wp:group {"className":"e-content"} -->
+					<div class="wp-block-group e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></div>
+					<!-- /wp:group -->',
+			)
 		);
-	}
 
-	/**
-	 * Location REST API permission callback.
-	 *
-	 * @param  \WP_REST_Request $request WP REST API request.
-	 * @return bool                      If the request's authorized.
-	 */
-	public static function location_permission_callback( $request ) {
-		$post_id = $request->get_param( 'post_id' );
+		register_block_pattern(
+			'indieblocks/repost-starter-pattern',
+			array(
+				'title'       => __( 'Repost Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
 
-		if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
-			return false;
-		}
-
-		return current_user_can( 'edit_post', $post_id );
-	}
-
-	/**
-	 * Registers (some of) IndieBlocks' custom fields for use with the REST API.
-	 */
-	public static function register_meta() {
-
-		$post_types = apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
-
-		foreach ( $post_types as $post_type ) {
-			if ( use_block_editor_for_post_type( $post_type ) ) {
-				// Allow these fields to be *set* by the block editor.
-				register_post_meta(
-					$post_type,
-					'geo_latitude',
-					array(
-						'single'            => true,
-						'show_in_rest'      => true,
-						'type'              => 'string',
-						'default'           => '',
-						'auth_callback'     => function () {
-							return current_user_can( 'edit_posts' );
-						},
-						'sanitize_callback' => function ( $meta_value ) {
-							return sanitize_text_field( (float) $meta_value );
-						},
-					)
-				);
-
-				register_post_meta(
-					$post_type,
-					'geo_longitude',
-					array(
-						'single'            => true,
-						'show_in_rest'      => true,
-						'type'              => 'string',
-						'default'           => '',
-						'auth_callback'     => function () {
-							return current_user_can( 'edit_posts' );
-						},
-						'sanitize_callback' => function ( $meta_value ) {
-							return sanitize_text_field( (float) $meta_value );
-						},
-					)
-				);
-
-				register_post_meta(
-					$post_type,
-					'geo_address',
-					array(
-						'single'            => true,
-						'show_in_rest'      => true,
-						'type'              => 'string',
-						'default'           => '',
-						'auth_callback'     => function () {
-							return current_user_can( 'edit_posts' );
-						},
-						'sanitize_callback' => function ( $meta_value ) {
-							return sanitize_text_field( $meta_value );
-						},
-					)
-				);
-			}
-		}
+					<!-- wp:quote {"className":"e-content"} -->
+					<blockquote class="wp-block-quote e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></blockquote>
+					<!-- /wp:quote -->',
+			)
+		);
 	}
 }

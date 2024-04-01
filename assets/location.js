@@ -5,6 +5,7 @@
 	const useRef                     = element.useRef;
 	const Button                     = components.Button;
 	const Flex                       = components.Flex;
+	const FlexBlock                  = components.FlexBlock;
 	const FlexItem                   = components.FlexItem;
 	const TextControl                = components.TextControl;
 	const __                         = i18n.__;
@@ -56,9 +57,9 @@
 		} ).then( ( response ) => {
 			clearTimeout( timeoutId );
 
-			if ( response.hasOwnProperty( 'name' ) && '' !== response.name ) {
+			if ( response.hasOwnProperty( 'geo_address' ) && '' !== response.geo_address ) {
 				// This function does not do anything besides displaying a location name.
-				setMeta( { ...stateRef.current, geo_address: response.name } );
+				setMeta( { ...stateRef.current, geo_address: response.geo_address } );
 			}
 		} ).catch( ( error ) => {
 			// The request timed out or otherwise failed. Leave as is.
@@ -135,8 +136,8 @@
 					name: 'indieblocks-location-panel',
 					title: __( 'Location', 'indieblocks' ),
 				},
-				el( Flex, {},
-					el( FlexItem, {},
+				el( Flex, { align: 'end' },
+					el( FlexBlock, {},
 						el( TextControl, {
 							label: __( 'Latitude', 'indieblocks' ),
 							value: latitude,
@@ -145,7 +146,7 @@
 							},
 						} )
 					),
-					el( FlexItem, {},
+					el( FlexBlock, {},
 						el( TextControl, {
 							label: __( 'Longitude', 'indieblocks' ),
 							value: longitude,
@@ -153,22 +154,24 @@
 								setMeta( { ...meta, geo_longitude: value } );
 							},
 						} )
+					),
+					el( FlexItem, {},
+						el( Button, {
+							style: { height: 'auto', marginBottom: '8px', minHeight: '31px' },
+							onClick: () => {
+								if ( ! navigator.geolocation ) {
+									return;
+								}
+
+								navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
+									// Do nothing.
+									console.log( error );
+								} );
+							},
+							variant: 'secondary',
+						}, __( 'Fetch', 'indieblocks' )	),
 					)
 				),
-				el( Button, {
-					style: { marginBottom: '12px' },
-					onClick: () => {
-						if ( ! navigator.geolocation ) {
-							return;
-						}
-
-						navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
-							// Do nothing.
-							console.log( error );
-						} );
-					},
-					variant: 'secondary',
-				}, __( 'Fetch Coordinates', 'indieblocks' )	),
 				// To allow authors to manually override or pass on a location.
 				el( TextControl, {
 					label: __( 'Location', 'indieblocks' ),

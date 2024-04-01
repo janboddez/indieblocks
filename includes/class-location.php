@@ -15,20 +15,245 @@ class Location {
 	 * Hooks and such.
 	 */
 	public static function register() {
+		// Enqueue block editor script.
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), 11 );
+		// Register REST API endpoint.
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+		// Register location meta.
+		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
+
+		// (Legacy) register for REST API use.
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
+
 		// Add a "Location" meta box.
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
-		add_action( 'transition_post_status', array( __CLASS__, 'update_meta' ), 11, 3 );
 
 		// Look up a location name (and weather info).
-		add_action( 'transition_post_status', array( __CLASS__, 'set_location' ), 12, 3 );
-		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
+		foreach ( apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ) as $post_type ) {
+			add_action( "save_post_{$post_type}", array( __CLASS__, 'update_meta' ), 11 );
+			add_action( "save_post_{$post_type}", array( __CLASS__, 'set_location' ), 12 );
+		}
 
-		// Register for REST API use.
-		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
+		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
 	}
 
 	/**
-	 * Renders the meta box.
+	 * Adds the Location panel to Gutenberg's document sidebar.
+	 */
+	public static function enqueue_scripts() {
+		$current_screen = get_current_screen();
+
+		if (
+			isset( $current_screen->post_type ) &&
+			in_array( $current_screen->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true )
+		) {
+			wp_enqueue_script(
+				'indieblocks-location',
+				plugins_url( '/assets/location.js', __DIR__ ),
+				array(
+					'wp-element',
+					'wp-components',
+					'wp-i18n',
+					'wp-data',
+					'wp-core-data',
+					'wp-plugins',
+					'wp-edit-post',
+					'wp-api-fetch',
+					'wp-url',
+				),
+				\IndieBlocks\Plugin::PLUGIN_VERSION,
+				false
+			);
+
+			global $post;
+
+			// Whether we should attempt to automatically fill out a location.
+			$should_update = '1';
+			if ( ! static::is_recent( $post ) ) {
+				// Post is over one hour old.
+				$should_update = '0';
+			}
+
+			if ( '' !== get_meta( $post, 'geo_latitude' ) && '' !== get_meta( $post, 'geo_longitude' ) ) {
+				// Latitude and longitude were set previously.
+				$should_update = '0';
+			}
+
+			if ( '' !== get_meta( $post, 'geo_address' ) ) {
+				// Location was set previously.
+				$should_update = '0';
+			}
+
+			wp_localize_script(
+				'indieblocks-location',
+				'indieblocks_location_obj',
+				array(
+					'should_update' => $should_update,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Allows location-related fields to be edited through the REST API. Used by
+	 * the editor sidebar panel.
+	 */
+	public static function register_meta() {
+		$post_types = apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
+
+		foreach ( $post_types as $post_type ) {
+			if ( use_block_editor_for_post_type( $post_type ) ) {
+				// Allow these fields to be *set* by the block editor.
+				register_post_meta(
+					$post_type,
+					'geo_latitude',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( (float) $meta_value );
+						},
+					)
+				);
+
+				register_post_meta(
+					$post_type,
+					'geo_longitude',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( (float) $meta_value );
+						},
+					)
+				);
+
+				register_post_meta(
+					$post_type,
+					'geo_address',
+					array(
+						'single'            => true,
+						'show_in_rest'      => true,
+						'type'              => 'string',
+						'default'           => '',
+						'auth_callback'     => function () {
+							return current_user_can( 'edit_posts' );
+						},
+						'sanitize_callback' => function ( $meta_value ) {
+							return sanitize_text_field( $meta_value );
+						},
+					)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Registers a custom REST API endpoint for reading (but not writing) our
+	 * location data. Used by the Location block.
+	 */
+	public static function register_rest_field() {
+		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
+
+		foreach ( $post_types as $post_type ) {
+			register_rest_field(
+				$post_type,
+				'indieblocks_location',
+				array(
+					'get_callback'    => array( __CLASS__, 'get_meta' ),
+					'update_callback' => null,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Yet another way of retrieving data from the REST API. Used by the editor
+	 * sidebar panel to update its location, after it is retrieved server-side.
+	 * We can almost certainly ditch this in favor of the REST field above. I.e.,
+	 * just re-fetch the post and look in the `indieblocks_location` property.
+	 */
+	public static function register_api_endpoints() {
+		register_rest_route(
+			'indieblocks/v1',
+			'/location',
+			array(
+				'methods'             => array( 'GET' ),
+				'callback'            => array( __CLASS__, 'get_meta' ),
+				'permission_callback' => function ( $request ) {
+					$post_id = $request->get_param( 'post_id' );
+
+					if ( empty( $post_id ) || ! ctype_digit( (string) $post_id ) ) {
+						return false;
+					}
+
+					return current_user_can( 'edit_post', $post_id );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Returns location metadata.
+	 *
+	 * Used as both a `register_rest_route()` *and* `register_rest_field()`
+	 * callback!
+	 *
+	 * @param  \WP_REST_Request|array $request API request (parameters).
+	 * @return array|\WP_Error                 Response (or error).
+	 */
+	public static function get_meta( $request ) {
+		if ( is_array( $request ) ) {
+			// `register_rest_field()` callback.
+			$post_id = $request['id'];
+		} else {
+			// `register_rest_route()` callback.
+			$post_id = $request->get_param( 'post_id' );
+		}
+
+		if ( empty( $post_id ) || ! is_int( $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		$post_id  = (int) $post_id;
+		$weather  = get_post_meta( $post_id, '_indieblocks_weather', true );
+		$location = array(
+			'geo_latitude'  => get_post_meta( $post_id, 'geo_latitude', true ),
+			'geo_longitude' => get_post_meta( $post_id, 'geo_longitude', true ),
+			'geo_address'   => get_post_meta( $post_id, 'geo_address', true ),
+			'weather'       => is_array( $weather ) ? $weather : array(),
+		);
+
+		return $location; // Either an empty string, or an associated array (which gets translated into a JSON object).
+	}
+
+	/**
+	 * Registers a new meta box.
+	 */
+	public static function add_meta_box() {
+		add_meta_box(
+			'indieblocks-location',
+			__( 'Location', 'indieblocks' ),
+			array( __CLASS__, 'render_meta_box' ),
+			apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ),
+			'side',
+			'default',
+			array( '__back_compat_meta_box' => true ) // Hide from Gutenberg users.
+		);
+	}
+
+	/**
+	 * Renders the "classic" meta box.
 	 *
 	 * @param WP_Post $post Post being edited.
 	 */
@@ -99,28 +324,13 @@ class Location {
 	}
 
 	/**
-	 * Registers a new meta box.
-	 */
-	public static function add_meta_box() {
-		add_meta_box(
-			'indieblocks-location',
-			__( 'Location', 'indieblocks' ),
-			array( __CLASS__, 'render_meta_box' ),
-			apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ),
-			'side',
-			'default',
-			array( '__back_compat_meta_box' => true ) // Hide from Gutenberg users.
-		);
-	}
-
-	/**
-	 * Updates post meta after save.
+	 * ("Classic" meta box only.) Updates post meta after save.
 	 *
-	 * @param string  $new_status New post status.
-	 * @param string  $old_status Old post status.
-	 * @param WP_Post $post       Post object.
+	 * @param int|\WP_Post $post Post ID or object.
 	 */
-	public static function update_meta( $new_status, $old_status, $post ) {
+	public static function update_meta( $post ) {
+		$post = get_post( $post );
+
 		if ( wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ) {
 			return;
 		}
@@ -161,11 +371,20 @@ class Location {
 	/**
 	 * Cleans up location metadata.
 	 *
-	 * @param string  $new_status New post status.
-	 * @param string  $old_status Old post status.
-	 * @param WP_Post $post       Post object.
+	 * @param int|\WP_Post $post Post ID or object.
 	 */
-	public static function set_location( $new_status, $old_status, $post ) {
+	public static function set_location( $post ) {
+		$post = get_post( $post );
+
+		if ( 0 === strpos( current_action(), 'save_' ) && defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			// For REST requests, we use a *later* hook, which runs *after*
+			// metadata, if any, has been saved.
+			add_action( "rest_after_insert_{$post->post_type}", array( __CLASS__, 'set_location' ), 20 );
+
+			// Don't do anything just yet.
+			return;
+		}
+
 		if ( wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ) {
 			return;
 		}
@@ -430,53 +649,6 @@ class Location {
 		}
 
 		return '';
-	}
-
-	/**
-	 * Registers a custom REST API endpoint for reading (but not writing) our
-	 * location data.
-	 */
-	public static function register_rest_field() {
-		$post_types = (array) apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) );
-
-		foreach ( $post_types as $post_type ) {
-			register_rest_field(
-				$post_type,
-				'indieblocks_location',
-				array(
-					'get_callback'    => array( __CLASS__, 'get_meta' ),
-					'update_callback' => null,
-				)
-			);
-		}
-	}
-
-	/**
-	 * Returns location metadata.
-	 *
-	 * @param  array $params WP REST API request.
-	 * @return mixed         Response.
-	 */
-	public static function get_meta( $params ) {
-		$post_id = $params['id'];
-
-		if ( empty( $post_id ) || ! is_int( $post_id ) ) {
-			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
-		}
-
-		$post_id = (int) $post_id;
-
-		$location = get_transient( "indieblocks:$post_id:location" );
-		if ( false === $location ) {
-			$weather  = get_post_meta( $post_id, '_indieblocks_weather', true );
-			$location = array(
-				'geo_address' => get_post_meta( $post_id, 'geo_address', true ),
-				'weather'     => is_array( $weather ) ? $weather : array(),
-			);
-			set_transient( "indieblocks:$post_id:location", $location, 300 );
-		}
-
-		return $location; // Either an empty string, or an associated array (which gets translated into a JSON object).
 	}
 
 	/**

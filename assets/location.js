@@ -1,4 +1,4 @@
-( ( element, components, i18n, data, coreData, plugins, editPost, apiFetch, url ) => {
+( ( element, components, i18n, data, coreData, plugins, editPost, apiFetch ) => {
 	const el                         = element.createElement;
 	const useEffect                  = element.useEffect;
 	const useState                   = element.useState;
@@ -37,43 +37,6 @@
 		return false;
 	};
 
-	// The idea here was to fetch a location name after it is set in the
-	// background. So that if the OpenStreetMap geolocation API is "too slow"
-	// we'll still get an "up-to-date" location.
-	const fetchLocation = ( postId, postType, setMeta, stateRef ) => {
-		if ( ! postId ) {
-			return;
-		}
-
-		if ( ! postType ) {
-			return;
-		}
-
-		if ( stateRef.current.geo_address ) {
-			return;
-		}
-
-		// Like a time-out.
-		const controller = new AbortController();
-		const timeoutId  = setTimeout( () => {
-			controller.abort();
-		}, 6000 );
-
-		apiFetch( {
-			path: '/wp/v2/' + postType + '/' + postId,
-			signal: controller.signal, // That time-out thingy.
-		} ).then( ( response ) => {
-			clearTimeout( timeoutId );
-
-			if ( response.indieblocks_location && response.indieblocks_location.geo_address ) {
-				// This function does not do anything besides displaying a location name.
-				setMeta( { ...stateRef.current, geo_address: response.indieblocks_location.geo_address } );
-			}
-		} ).catch( ( error ) => {
-			// The request timed out or otherwise failed. Leave as is.
-		} );
-	};
-
 	registerPlugin( 'indieblocks-location-panel', {
 		render: () => {
 			const { postId, postType } = useSelect( ( select ) => {
@@ -94,13 +57,51 @@
 
 			// This seems superfluous, but let's leave it in place, in case our
 			// server's "too slow" to immediately return a location name.
+
+			// The idea here was to fetch a location name after it is set in the
+			// background. So that if the OpenStreetMap geolocation API is "too slow"
+			// we'll still get an "up-to-date" location.
+			const fetchLocation = () => {
+				if ( ! postId ) {
+					return;
+				}
+
+				if ( ! postType ) {
+					return;
+				}
+
+				if ( stateRef.current.geo_address ) {
+					return;
+				}
+
+				// Like a time-out.
+				const controller = new AbortController();
+				const timeoutId  = setTimeout( () => {
+					controller.abort();
+				}, 6000 );
+
+				apiFetch( {
+					path: '/wp/v2/' + postType + '/' + postId,
+					signal: controller.signal, // That time-out thingy.
+				} ).then( ( response ) => {
+					clearTimeout( timeoutId );
+
+					if ( response.indieblocks_location && response.indieblocks_location.geo_address ) {
+						// This function does not do anything besides displaying a location name.
+						setMeta( { ...stateRef.current, geo_address: response.indieblocks_location.geo_address } );
+					}
+				} ).catch( ( error ) => {
+					// The request timed out or otherwise failed. Leave as is.
+				} );
+			};
+
 			if ( doneSaving() && ! geoAddress ) {
 				setTimeout( () => {
-					fetchLocation( postId, postType, setMeta, stateRef );
+					fetchLocation();
 				}, 1500 );
 
 				setTimeout( () => {
-					fetchLocation( postId, postType, setMeta, stateRef );
+					fetchLocation();
 				}, 15000 );
 			}
 
@@ -189,4 +190,4 @@
 			);
 		},
 	} );
-} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.plugins, window.wp.editPost, window.wp.apiFetch, window.wp.url );
+} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.plugins, window.wp.editPost, window.wp.apiFetch );

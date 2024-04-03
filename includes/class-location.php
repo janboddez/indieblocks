@@ -218,10 +218,8 @@ class Location {
 		$post_id  = (int) $post_id;
 		$weather  = get_post_meta( $post_id, '_indieblocks_weather', true );
 		$location = array(
-			'geo_latitude'  => get_post_meta( $post_id, 'geo_latitude', true ),
-			'geo_longitude' => get_post_meta( $post_id, 'geo_longitude', true ),
-			'geo_address'   => get_post_meta( $post_id, 'geo_address', true ),
-			'weather'       => is_array( $weather ) ? $weather : array(),
+			'geo_address' => get_post_meta( $post_id, 'geo_address', true ),
+			'weather'     => is_array( $weather ) ? $weather : array(),
 		);
 
 		return $location; // Either an empty string, or an associated array (which gets translated into a JSON object).
@@ -359,7 +357,8 @@ class Location {
 	}
 
 	/**
-	 * Cleans up location metadata.
+	 * Cleans up location metadata, and, when applicable, adds a location name
+	 * and weather info.
 	 *
 	 * @param int|\WP_Post $post Post ID or object.
 	 */
@@ -393,7 +392,9 @@ class Location {
 			return;
 		}
 
-		// Adds address, or rather, city/town data.
+		$updated = false;
+
+		// Add address, or rather, city/town data.
 		if ( '' === get_post_meta( $post->ID, 'geo_address', true ) ) {
 			// Okay, so we've got coordinates but no name; let's change that.
 			$geo_address = static::get_address( $lat, $lon );
@@ -401,17 +402,18 @@ class Location {
 			if ( ! empty( $geo_address ) ) {
 				// Add town and country metadata.
 				update_post_meta( $post->ID, 'geo_address', $geo_address );
+				$updated = true;
 			}
 		}
 
-		// Adds weather data.
-		if ( static::is_recent( $post ) ) {
-			$indieblocks_weather = get_post_meta( $post->ID, '_indieblocks_weather', true );
+		// Only add weather data to sufficiently recent posts.
+		if ( ! static::is_recent( $post ) ) {
+			return;
+		}
 
-			if ( ! empty( $indieblocks_weather ) ) { // Checking for an empty string won't cut it anymore, as the block editor will save an, empty at first, array.
-				return;
-			}
+		$indieblocks_weather = get_post_meta( $post->ID, '_indieblocks_weather', true ); // String or array.
 
+		if ( $updated || empty( $indieblocks_weather ) ) {
 			// Let's do weather information, too.
 			$weather = static::get_weather( $lat, $lon );
 
@@ -429,7 +431,7 @@ class Location {
 	 *
 	 * @param  float $lat Latitude.
 	 * @param  float $lon Longitude.
-	 * @return string     (Currently) town or city.
+	 * @return string     (Currently) town, city, or municipality.
 	 */
 	public static function get_address( $lat, $lon ) {
 		$location = get_transient( "indieblocks_loc_{$lat}_{$lon}" );
@@ -449,7 +451,8 @@ class Location {
 				return '';
 			}
 
-			set_transient( "indieblocks_loc_{$lat}_{$lon}", $location, WEEK_IN_SECONDS );
+			// Since town names don't change overnight, we cache them for a while.
+			set_transient( "indieblocks_loc_{$lat}_{$lon}", $location, MONTH_IN_SECONDS );
 		}
 
 		$geo_address = '';

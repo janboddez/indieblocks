@@ -7,6 +7,8 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Webmention\Webmention;
+
 class Plugin {
 	/**
 	 * Plugin version.

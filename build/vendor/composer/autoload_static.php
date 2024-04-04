@@ -38,12 +38,8 @@ class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'IndieBlocks\\Blocks' => __DIR__ . '/../..' . '/../includes/class-blocks.php',
-        'IndieBlocks\\Facepile_Block' => __DIR__ . '/../..' . '/../blocks/facepile/class-facepile-block.php',
-        'IndieBlocks\\Facepile_Content_Block' => __DIR__ . '/../..' . '/../blocks/facepile-content/class-facepile-content-block.php',
         'IndieBlocks\\Feeds' => __DIR__ . '/../..' . '/../includes/class-feeds.php',
-        'IndieBlocks\\Link_Preview_Block' => __DIR__ . '/../..' . '/../blocks/link-preview/class-link-preview-block.php',
         'IndieBlocks\\Location' => __DIR__ . '/../..' . '/../includes/class-location.php',
-        'IndieBlocks\\Location_Block' => __DIR__ . '/../..' . '/../blocks/location/class-location-block.php',
         'IndieBlocks\\Masterminds\\HTML5' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5.php',
         'IndieBlocks\\Masterminds\\HTML5\\Elements' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Elements.php',
         'IndieBlocks\\Masterminds\\HTML5\\Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Entities.php',
@@ -76,12 +72,11 @@ class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
         'IndieBlocks\\Plugin' => __DIR__ . '/../..' . '/../includes/class-plugin.php',
         'IndieBlocks\\Post_Types' => __DIR__ . '/../..' . '/../includes/class-post-types.php',
         'IndieBlocks\\Preview_Cards' => __DIR__ . '/../..' . '/../includes/class-preview-cards.php',
-        'IndieBlocks\\Syndication_Block' => __DIR__ . '/../..' . '/../blocks/syndication/class-syndication-block.php',
         'IndieBlocks\\Theme_Mf2' => __DIR__ . '/../..' . '/../includes/class-theme-mf2.php',
-        'IndieBlocks\\Webmention' => __DIR__ . '/../..' . '/../includes/class-webmention.php',
-        'IndieBlocks\\Webmention_Parser' => __DIR__ . '/../..' . '/../includes/class-webmention-parser.php',
-        'IndieBlocks\\Webmention_Receiver' => __DIR__ . '/../..' . '/../includes/class-webmention-receiver.php',
-        'IndieBlocks\\Webmention_Sender' => __DIR__ . '/../..' . '/../includes/class-webmention-sender.php',
+        'IndieBlocks\\Webmention\\Webmention' => __DIR__ . '/../..' . '/../includes/webmention/class-webmention.php',
+        'IndieBlocks\\Webmention\\Webmention_Parser' => __DIR__ . '/../..' . '/../includes/webmention/class-webmention-parser.php',
+        'IndieBlocks\\Webmention\\Webmention_Receiver' => __DIR__ . '/../..' . '/../includes/webmention/class-webmention-receiver.php',
+        'IndieBlocks\\Webmention\\Webmention_Sender' => __DIR__ . '/../..' . '/../includes/webmention/class-webmention-sender.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

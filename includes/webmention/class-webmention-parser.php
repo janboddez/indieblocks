@@ -1,14 +1,16 @@
 <?php
 /**
- * Webmention/microformats parser.
+ * Webmention parser.
  *
  * @package IndieBlocks
  */
 
-namespace IndieBlocks;
+namespace IndieBlocks\Webmention;
+
+use IndieBlocks\Parser;
 
 /**
- * Microformats parser.
+ * Parses a webmention's source page for microformats.
  */
 class Webmention_Parser {
 	/**
@@ -21,6 +23,8 @@ class Webmention_Parser {
 	 */
 	public static function parse_microformats( &$commentdata, $html, $source, $target ) {
 		if ( preg_match( '~/\?c=\d+$~', $source ) ) {
+			// Source looks like a comment shortlink. Let's try to get the full
+			// URL.
 			$response = wp_remote_head(
 				esc_url_raw( $source ),
 				array(
@@ -226,7 +230,7 @@ class Webmention_Parser {
 	 * @return string|null Local avatar path, or nothing on failure.
 	 */
 	protected static function store_avatar( $url ) {
-		$options = get_options();
+		$options = \IndieBlocks\get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			return null;
 		}

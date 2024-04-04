@@ -1,11 +1,11 @@
 <?php
 /**
- * Main plugin class.
+ * Main Webmention class.
  *
  * @package IndieBlocks
  */
 
-namespace IndieBlocks;
+namespace IndieBlocks\Webmention;
 
 /**
  * Main Webmention class.
@@ -146,7 +146,7 @@ class Webmention {
 		}
 
 		// Enqueue CSS and JS.
-		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/webmention.js', __DIR__ ), array( 'jquery' ), Plugin::PLUGIN_VERSION, false );
+		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
 		wp_localize_script(
 			'indieblocks-webmention',
 			'indieblocks_webmention_obj',
@@ -162,7 +162,7 @@ class Webmention {
 	 * @return array Supported post types.
 	 */
 	public static function get_supported_post_types() {
-		$options = get_options();
+		$options = \IndieBlocks\get_options();
 
 		$supported_post_types = isset( $options['webmention_post_types'] ) ? $options['webmention_post_types'] : array( 'post', 'indieblocks_note' );
 		$supported_post_types = (array) apply_filters( 'indieblocks_webmention_post_types', $supported_post_types );

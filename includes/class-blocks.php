@@ -7,6 +7,8 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Webmention\Webmention;
+
 class Blocks {
 	/**
 	 * Hooks and such.
@@ -43,7 +45,7 @@ class Blocks {
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
 			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
-			\IndieBlocks\Plugin::PLUGIN_VERSION,
+			Plugin::PLUGIN_VERSION,
 			true
 		);
 

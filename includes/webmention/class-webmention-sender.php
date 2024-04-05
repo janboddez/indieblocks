@@ -411,15 +411,103 @@ class Webmention_Sender {
 	}
 
 	/**
+	 * Adds the Webmention panel to Gutenberg's document sidebar.
+	 */
+	public static function enqueue_scripts() {
+		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
+			// Outgoing mentions disabled.
+			return;
+		}
+
+		$current_screen = get_current_screen();
+
+		if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
+			// wp_enqueue_style(
+			// 	'indieblocks-location',
+			// 	plugins_url( '/assets/webmention.css', __DIR__ ),
+			// 	array(),
+			// 	\IndieBlocks\Plugin::PLUGIN_VERSION
+			// );
+
+			wp_enqueue_script(
+				'indieblocks-location',
+				plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ),
+				array(
+					'wp-element',
+					'wp-components',
+					'wp-i18n',
+					'wp-data',
+					'wp-core-data',
+					'wp-plugins',
+					'wp-edit-post',
+					'wp-api-fetch',
+					'wp-url',
+				),
+				\IndieBlocks\Plugin::PLUGIN_VERSION,
+				false
+			);
+		}
+	}
+
+	/**
+	 * In the REST API, adds webmention meta to post objects.
+	 */
+	public static function register_rest_field() {
+		foreach ( Webmention::get_supported_post_types() as $post_type ) {
+			register_rest_field(
+				$post_type,
+				'indieblocks_webmention',
+				array(
+					'get_callback'    => array( __CLASS__, 'get_meta' ),
+					'update_callback' => null,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Returns webmention metadata.
+	 *
+	 * Could be used as both a `register_rest_route()` and
+	 * `register_rest_field()` callback.
+	 *
+	 * @param  \WP_REST_Request|array $request API request (parameters).
+	 * @return array|\WP_Error                 Response (or error).
+	 */
+	public static function get_meta( $request ) {
+		if ( is_array( $request ) ) {
+			// `register_rest_field()` callback.
+			$post_id = $request['id'];
+		} else {
+			// `register_rest_route()` callback.
+			$post_id = $request->get_param( 'post_id' );
+		}
+
+		if ( empty( $post_id ) || ! is_int( $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		$post_id = (int) $post_id;
+		$meta    = get_post_meta( $post_id, '_indieblocks_webmention', true );
+
+		if ( is_array( $meta ) ) {
+			return $meta;
+		}
+
+		return array();
+	}
+
+	/**
 	 * Adds meta box.
 	 */
 	public static function add_meta_box() {
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
-			// Disabled.
+			// Outgoing mentions disabled.
 			return;
 		}
 
 		if ( 'add_meta_boxes' === current_action() ) {
+			// "Create/Edit Post" screen.
 			global $post;
 
 			if ( empty( $post->ID ) ) {
@@ -431,7 +519,8 @@ class Webmention_Sender {
 			}
 
 			// We may no longer need this, because if the `_indieblocks_webmention`
-			// custom field is non-empty, we'll likely want to show it.
+			// custom field is non-empty, we'll likely want to show it even if
+			// the post type does not currently support webmentions.
 			$supported_post_types = Webmention::get_supported_post_types();
 
 			if ( empty( $supported_post_types ) ) {
@@ -445,9 +534,11 @@ class Webmention_Sender {
 				array( __CLASS__, 'render_meta_box' ),
 				$supported_post_types,
 				'normal',
-				'default'
+				'default',
+				array( '__back_compat_meta_box' => true ) // Hide for Gutenberg post types.
 			);
 		} elseif ( 'add_meta_boxes_comment' === current_action() ) {
+			// "Edit Comment" screen.
 			global $comment;
 
 			if ( empty( $comment->comment_ID ) ) {

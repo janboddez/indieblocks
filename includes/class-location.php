@@ -42,6 +42,7 @@ class Location {
 	public static function enqueue_scripts() {
 		$options = get_options();
 		if ( ! empty( $options['location_meta_box'] ) ) {
+			// Using a classic meta box instead.
 			return;
 		}
 

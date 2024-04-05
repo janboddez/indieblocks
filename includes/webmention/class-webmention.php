@@ -22,6 +22,8 @@ class Webmention {
 	public static function register() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
+		add_action( 'enqueue_block_editor_assets', array( Webmention_Sender::class, 'enqueue_scripts' ) );
+		add_action( 'rest_api_init', array( Webmention_Sender::class, 'register_rest_field' ) );
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
 		add_action( 'add_meta_boxes_comment', array( Webmention_Sender::class, 'add_meta_box' ) );
 
@@ -145,10 +147,10 @@ class Webmention {
 			return;
 		}
 
-		// Enqueue CSS and JS.
-		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
+		// Enqueue JS.
+		wp_enqueue_script( 'indieblocks-webmention-legacy', plugins_url( '/assets/webmention-legacy.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
 		wp_localize_script(
-			'indieblocks-webmention',
+			'indieblocks-webmention-legacy',
 			'indieblocks_webmention_obj',
 			array(
 				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),

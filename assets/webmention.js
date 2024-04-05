@@ -1,5 +1,6 @@
 ( ( element, components, i18n, data, coreData, plugins, editPost, apiFetch ) => {
 	const el                         = element.createElement;
+	const interpolate                = element.createInterpolateElement;
 	const useEffect                  = element.useEffect;
 	const useState                   = element.useState;
 	const useRef                     = element.useRef;
@@ -9,6 +10,7 @@
 	const FlexItem                   = components.FlexItem;
 	const TextControl                = components.TextControl;
 	const __                         = i18n.__;
+	const sprintf                    = i18n.sprintf;
 	const useSelect                  = data.useSelect;
 	const registerPlugin             = plugins.registerPlugin;
 	const PluginDocumentSettingPanel = editPost.PluginDocumentSettingPanel;
@@ -46,15 +48,65 @@
 				}
 			 }, [] );
 
-			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
+			const { record, isResolving }       = coreData.useEntityRecord( 'postType', postType, postId );
+			const [ webmention, setWebmention ] = useState( record?.indieblocks_webmention ?? [] );
+
+			let output = [];
+
+			if ( typeof webmention === 'object' ) {
+				Object.keys( webmention ).forEach( ( key ) => {
+					const value = webmention[ key ];
+
+					if ( ! value.endpoint ) {
+						return;
+					}
+
+					let line = '';
+
+					if ( value.sent ) {
+						line = sprintf( __( 'Sent to %1$s on %2$s. Response code: %3$d.', 'indieblocks' ), '<a>' + value.endpoint + '</a>', value.sent, value.code );
+						line = interpolate( '<p>' + line + '</p>', {
+							p: el( 'p' ),
+							a: el( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+						} );
+						output.push( line );
+					} else if ( value.retries ) {
+						if ( value.retries >= 3 ) {
+							line = sprintf( __( 'Could not send webmention to %s.', 'indieblocks' ), value.endpoint );
+							line = interpolate( '<p>' + line + '</p>', {
+								p: el( 'p' ),
+								a: el( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+							} );
+							output.push( line );
+						} else {
+							line = sprintf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), value.endpoint );
+							line = el( 'p', {},
+								interpolate(
+									line,
+									{
+										a: el( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+									}
+								)
+							);
+							output.push( line );
+						}
+					}
+				} );
+			} else if ( 'scheduled' === webmention ) {
+				line = el( 'p', {}, __( 'Webmention scheduled.', 'indieblocks' ) );
+				output.push( line );
+			}
+
+			if ( ! output.length ) {
+				// return;
+				output.push( el( 'p', {}, __( 'No endpoints found.', 'indieblocks' ) ) );
+			}
 
 			return el( PluginDocumentSettingPanel, {
 					name: 'indieblocks-webmention-panel',
 					title: __( 'Webmention', 'indieblocks' ),
 				},
-				el( 'p', {},
-					__( 'No endpoints found.', 'indieblocks' )
-				),
+				output,
 				el( Button, {
 					onClick: () => {
 						return;

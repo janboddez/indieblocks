@@ -422,15 +422,8 @@ class Webmention_Sender {
 		$current_screen = get_current_screen();
 
 		if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
-			// wp_enqueue_style(
-			// 	'indieblocks-location',
-			// 	plugins_url( '/assets/webmention.css', __DIR__ ),
-			// 	array(),
-			// 	\IndieBlocks\Plugin::PLUGIN_VERSION
-			// );
-
 			wp_enqueue_script(
-				'indieblocks-location',
+				'indieblocks-webmention',
 				plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ),
 				array(
 					'wp-element',

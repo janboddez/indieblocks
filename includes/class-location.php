@@ -16,12 +16,12 @@ class Location {
 	 */
 	public static function register() {
 		// Enqueue block editor script.
-		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), 11 );
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ) );
 
-		// Register location meta.
+		// Allow location meta to be edited through the block editor.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );
 
-		// For read-only (for now) access.
+		// Register our fields for use with the Location block.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
 
 		// Add a "Location" meta box.
@@ -29,8 +29,8 @@ class Location {
 
 		// Look up a location name (and weather info).
 		foreach ( apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ) as $post_type ) {
-			add_action( "save_post_{$post_type}", array( __CLASS__, 'update_meta' ), 11 );
-			add_action( "save_post_{$post_type}", array( __CLASS__, 'set_location' ), 12 );
+			add_action( "save_post_{$post_type}", array( __CLASS__, 'update_meta' ) );
+			add_action( "save_post_{$post_type}", array( __CLASS__, 'set_location' ), 20 );
 		}
 
 		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
@@ -40,12 +40,24 @@ class Location {
 	 * Adds the Location panel to Gutenberg's document sidebar.
 	 */
 	public static function enqueue_scripts() {
+		$options = get_options();
+		if ( ! empty( $options['location_meta_box'] ) ) {
+			return;
+		}
+
 		$current_screen = get_current_screen();
 
 		if (
 			isset( $current_screen->post_type ) &&
 			in_array( $current_screen->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true )
 		) {
+			wp_enqueue_style(
+				'indieblocks-location',
+				plugins_url( '/assets/location.css', __DIR__ ),
+				array(),
+				\IndieBlocks\Plugin::PLUGIN_VERSION
+			);
+
 			wp_enqueue_script(
 				'indieblocks-location',
 				plugins_url( '/assets/location.js', __DIR__ ),
@@ -66,8 +78,10 @@ class Location {
 
 			global $post;
 
-			// Whether we should attempt to automatically fill out a location.
+			// Whether we should have browsers attempt to automatically fill out
+			// a location.
 			$should_update = '1';
+
 			if ( ! static::is_recent( $post ) ) {
 				// Post is over one hour old.
 				$should_update = '0';
@@ -87,7 +101,7 @@ class Location {
 				'indieblocks-location',
 				'indieblocks_location_obj',
 				array(
-					'should_update' => $should_update,
+					'should_update' => apply_filters( 'indieblocks_location_should_update', $should_update, $post ),
 				)
 			);
 
@@ -95,18 +109,7 @@ class Location {
 			// Custom Fields panel, to prevent them from being accidentally
 			// overwritten with stale values.
 			// @todo: Make this a proper callback so that it can be unhooked.
-			add_filter(
-				'is_protected_meta',
-				function ( $is_protected, $meta_key ) {
-					if ( in_array( $meta_key, array( 'geo_latitude', 'geo_longitude', 'geo_address', ), true ) ) {
-						return true;
-					}
-
-					return $is_protected;
-				},
-				10,
-				2
-			);
+			add_filter( 'is_protected_meta', array( __CLASS__, 'hide_meta' ), 10, 2 );
 		}
 	}
 
@@ -175,6 +178,22 @@ class Location {
 	}
 
 	/**
+	 * Hides certain custom fields from the Custom Fields panel to prevent them
+	 * from getting accidentally overwritten.
+	 *
+	 * @param  bool   $is_protected Whether the key is considered protected.
+	 * @param  string $meta_key     Metadata key.
+	 * @return bool                 Whether the meta key is considered protected.
+	 */
+	public static function hide_meta( $is_protected, $meta_key ) {
+		if ( in_array( $meta_key, array( 'geo_latitude', 'geo_longitude', 'geo_address' ), true ) ) {
+			return true;
+		}
+
+		return $is_protected;
+	}
+
+	/**
 	 * Registers a custom REST API endpoint for reading (but not writing) our
 	 * location data. Used by the Location block.
 	 */
@@ -196,8 +215,8 @@ class Location {
 	/**
 	 * Returns location metadata.
 	 *
-	 * Can be used as both a `register_rest_route()` and `register_rest_field()`
-	 * callback.
+	 * Could be used as both a `register_rest_route()` and
+	 * `register_rest_field()` callback.
 	 *
 	 * @param  \WP_REST_Request|array $request API request (parameters).
 	 * @return array|\WP_Error                 Response (or error).
@@ -229,6 +248,18 @@ class Location {
 	 * Registers a new meta box.
 	 */
 	public static function add_meta_box() {
+		$options = get_options();
+
+		// This'll hide the meta box for Gutenberg users, who by default get the
+		// new sidebar panel.
+		$args = array(
+			'__back_compat_meta_box' => true,
+		);
+		if ( ! empty( $options['location_meta_box'] ) ) {
+			// And this will bring it back.
+			$args = null;
+		}
+
 		add_meta_box(
 			'indieblocks-location',
 			__( 'Location', 'indieblocks' ),
@@ -236,12 +267,12 @@ class Location {
 			apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ),
 			'side',
 			'default',
-			array( '__back_compat_meta_box' => true ) // Hide from Gutenberg users.
+			$args
 		);
 	}
 
 	/**
-	 * Renders the "classic" meta box.
+	 * ("Classic" meta box only.) Renders the meta box.
 	 *
 	 * @param WP_Post $post Post being edited.
 	 */
@@ -269,7 +300,7 @@ class Location {
 	}
 
 	/**
-	 * Asks browser for location coordinates.
+	 * ("Classic" meta box only.) Asks browsers for location coordinates.
 	 *
 	 * @todo: Move to, you know, an actual JS file.
 	 */

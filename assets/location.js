@@ -164,7 +164,7 @@
 					),
 					el( FlexItem, {},
 						el( Button, {
-							style: { height: 'auto', marginBottom: '8px', minHeight: '31px' },
+							className: 'indieblocks-location-fetch',
 							onClick: () => {
 								if ( ! navigator.geolocation ) {
 									return;

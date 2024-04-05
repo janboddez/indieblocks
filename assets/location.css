@@ -1,0 +1,10 @@
+.indieblocks-location-fetch {
+	margin-bottom: 8px;
+	height: 32px;
+}
+
+@media screen and (max-width: 782px) {
+	.indieblocks-location-fetch {
+		min-height: 40px;
+	}
+}

@@ -136,6 +136,10 @@ class Options_Handler {
 			'type'    => 'boolean',
 			'default' => false,
 		),
+		'location_meta_box'      => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
 		'weather_units'          => array(
 			'type'    => 'string',
 			'default' => 'metric',
@@ -343,6 +347,7 @@ class Options_Handler {
 				$options = array(
 					'add_featured_images' => isset( $settings['add_featured_images'] ) ? true : false,
 					'location_functions'  => isset( $settings['location_functions'] ) ? true : false,
+					'location_meta_box'   => isset( $settings['location_meta_box'] ) ? true : false,
 					'weather_units'       => isset( $settings['weather_units'] ) && in_array( $settings['weather_units'], array( 'metric', 'imperial' ), true )
 						? $settings['weather_units']
 						: 'metric',
@@ -516,8 +521,14 @@ class Options_Handler {
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Location and Weather', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[location_functions]" value="1" <?php checked( ! empty( $this->options['location_functions'] ) ); ?>/> <?php esc_html_e( 'Enable location functions', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts.', 'indieblocks' ); ?></p></td>
+							<td>
+								<label><input type="checkbox" name="indieblocks_settings[location_functions]" value="1" <?php checked( ! empty( $this->options['location_functions'] ) ); ?>/> <?php esc_html_e( 'Enable location functions', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Add basic location and weather data to posts.', 'indieblocks' ); ?></p>
+								<div style="margin-inline-start: 1.25em; margin-block-start: 0.25em;">
+									<label><input type="checkbox" name="indieblocks_settings[location_meta_box]" value="1" <?php checked( ! empty( $this->options['location_meta_box'] ) ); ?>/> <?php esc_html_e( 'Use &ldquo;classic&rdquo; meta box', 'indieblocks' ); ?></label><br />
+									<p class="description"><?php esc_html_e( 'Use a classic meta box, also for post types that support the block editor.', 'indieblocks' ); ?></p>
+								</div>
+							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Weather Units', 'indieblocks' ); ?></th>

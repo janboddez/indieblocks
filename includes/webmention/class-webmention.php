@@ -22,7 +22,7 @@ class Webmention {
 	public static function register() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
-		add_action( 'enqueue_block_editor_assets', array( Webmention_Sender::class, 'enqueue_scripts' ) );
+		add_action( 'enqueue_block_editor_assets', array( Webmention_Sender::class, 'enqueue_scripts' ), PHP_INT_MAX );
 		add_action( 'rest_api_init', array( Webmention_Sender::class, 'register_rest_field' ) );
 		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
 		add_action( 'add_meta_boxes_comment', array( Webmention_Sender::class, 'add_meta_box' ) );

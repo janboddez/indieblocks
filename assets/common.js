@@ -1,9 +1,45 @@
+// Renders an "IndieBlocks" sidebar for other modules and plugins to hook into.
+( ( element, components, plugins, editPost, i18n ) => {
+	const { createElement, Fragment } = element;
+	const { SlotFillProvider, Slot, withFilters } = components;
+	const { registerPlugin } = plugins;
+	const { PluginSidebar, PluginSidebarMoreMenuItem } = editPost;
+	const { __ } = i18n;
+
+	const IndieBlocksSlotComponent = () => {
+		const SidebarPanels = withFilters( 'IndieBlocks.SidebarPanels' )( ( props ) => createElement( Fragment, {} ) );
+
+		return createElement( SlotFillProvider, {},
+			createElement( SidebarPanels ),
+			createElement( Slot, { name: 'IndieBlocksSidebarPanelSlot' } )
+		)
+	};
+
+	// IndieBlocks sidebar. Use `addFilter( 'IndieBlocks.SidebarPanels',
+	// 'indieblocks/sidebar-panels', yourFunction )` to add additional panels.
+	// If IndieBlocks is active, of course.
+	registerPlugin( 'indieblocks-sidebar', {
+		icon: 'block-default',
+		render: () => {
+			return createElement( Fragment, {},
+				createElement( PluginSidebarMoreMenuItem , { target: 'indieblocks-sidebar' }, __( 'IndieBlocks', 'indieblocks' ) ),
+				createElement( PluginSidebar, {
+						icon: 'block-default',
+						name: 'indieblocks-sidebar',
+						title: __( 'IndieBlocks', 'indieblocks' ),
+					},
+					createElement( IndieBlocksSlotComponent )
+				)
+			);
+		},
+	} );
+} )( window.wp.element, window.wp.components, window.wp.plugins, window.wp.editPost, window.wp.i18n );
+
+// (Global) class that holds some helper functions.
 var IndieBlocks = {
 	hCite: ( className, attributes, innerBlocks = null ) => {
-		const el          = window.wp.element.createElement;
-		const interpolate = window.wp.element.createInterpolateElement;
-		const __          = window.wp.i18n.__;
-		const sprintf     = window.wp.i18n.sprintf;
+		const { createElement, createInterpolateElement } = window.wp.element;
+		const { __, sprintf }                             = window.wp.i18n;
 
 		const messagesWithByline = {
 			/* translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page. */
@@ -33,14 +69,14 @@ var IndieBlocks = {
 
 		const name = attributes.title || attributes.url;
 
-		return el( 'div', { className: className + ' h-cite' },
-			el( 'p', {}, // Adding paragraphs this time around.
-				el( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
+		return createElement( 'div', { className: className + ' h-cite' },
+			createElement( 'p', {}, // Adding paragraphs this time around.
+				createElement( 'i', {}, // Could've been `span`, with a `className` or something, but works well enough.
 					( ! attributes.author || 'undefined' === attributes.author )
-						? interpolate(
+						? createInterpolateElement(
 							sprintf(  message, '<a>' + name + '</a>' ),
 							{
-								a: el( 'a', {
+								a: createElement( 'a', {
 									className: attributes.title && attributes.url !== attributes.title
 										? 'u-url p-name' // No title means no `p-name`.
 										: 'u-url',
@@ -48,23 +84,23 @@ var IndieBlocks = {
 								} ),
 							}
 						)
-						: interpolate(
+						: createInterpolateElement(
 							sprintf( message, '<a>' + name + '</a>', '<span>' + attributes.author + '</span>' ),
 							{
-								a: el( 'a', {
+								a: createElement( 'a', {
 									className: attributes.title && attributes.url !== attributes.title
 										? 'u-url p-name'
 										: 'u-url',
 									href: attributes.url,
 								} ),
-								span: el( 'span', { className: 'p-author' } ),
+								span: createElement( 'span', { className: 'p-author' } ),
 							}
 						)
 				),
 			),
 			'u-repost-of' === className && innerBlocks && ! attributes.empty
-				? el( 'blockquote', { className: 'wp-block-quote e-content' },
-					el( innerBlocks )
+				? createElement( 'blockquote', { className: 'wp-block-quote e-content' },
+					createElement( innerBlocks )
 				)
 				: null,
 		);

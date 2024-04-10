@@ -1,17 +1,9 @@
-( ( element, components, i18n, data, coreData, plugins, editPost, apiFetch ) => {
-	const el                         = element.createElement;
-	const useEffect                  = element.useEffect;
-	const useState                   = element.useState;
-	const useRef                     = element.useRef;
-	const Button                     = components.Button;
-	const Flex                       = components.Flex;
-	const FlexBlock                  = components.FlexBlock;
-	const FlexItem                   = components.FlexItem;
-	const TextControl                = components.TextControl;
-	const __                         = i18n.__;
-	const useSelect                  = data.useSelect;
-	const registerPlugin             = plugins.registerPlugin;
-	const PluginDocumentSettingPanel = editPost.PluginDocumentSettingPanel;
+( ( element, components, i18n, data, coreData, apiFetch, hooks ) => {
+	const { createElement, useEffect, useState, useRef } = element;
+	const { Button, Fill, Flex, FlexBlock, FlexItem, TextControl, PanelBody, PanelRow } = components;
+	const { __ } = i18n;
+	const { useSelect } = data;
+	const { addFilter } = hooks;
 
 	// @link https://wordpress.stackexchange.com/questions/362975/admin-notification-after-save-post-when-ajax-saving-in-gutenberg
 	const doneSaving = () => {
@@ -37,22 +29,22 @@
 		return false;
 	};
 
-	registerPlugin( 'indieblocks-location-panel', {
-		render: () => {
+	const extraPanel = ( FilteredComponent ) => {
+		return ( props ) => {
 			const { postId, postType } = useSelect( ( select ) => {
 				return {
 					postId: select( 'core/editor' ).getCurrentPostId(),
 					postType: select( 'core/editor' ).getCurrentPostType()
 				}
-			 }, [] );
+			}, [] );
 
 			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
 
-			const latitude   = meta?.geo_latitude ?? '';
-			const longitude  = meta?.geo_longitude ?? '';
+			const latitude = meta?.geo_latitude ?? '';
+			const longitude = meta?.geo_longitude ?? '';
 			const geoAddress = meta?.geo_address ?? '';
 
-			const stateRef   = useRef();
+			const stateRef = useRef();
 			stateRef.current = meta;
 
 			// This seems superfluous, but let's leave it in place, in case our
@@ -135,59 +127,68 @@
 				} );
 			}, [] );
 
-			// useEffect( () => {
-			// 	console.table( meta );
-			// }, [ meta ] );
+			return [
+				createElement( FilteredComponent, { ...props } ),
+				createElement( Fill, { name: 'IndieBlocksSidebarPanelSlot' },
+					createElement( PanelBody, { title: __( 'Location', 'indieblocks' ) },
+						createElement( PanelRow, {},
+							createElement( Flex, { align: 'end' },
+								createElement( FlexBlock, {},
+									createElement( TextControl, {
+										label: __( 'Latitude', 'indieblocks' ),
+										value: latitude,
+										onChange: ( value ) => {
+											setMeta( { ...meta, geo_latitude: value } );
+										},
+									} )
+								),
+								createElement( FlexBlock, {},
+									createElement( TextControl, {
+										label: __( 'Longitude', 'indieblocks' ),
+										value: longitude,
+										onChange: ( value ) => {
+											setMeta( { ...meta, geo_longitude: value } );
+										},
+									} )
+								),
+								createElement( FlexItem, {},
+									createElement( Button, {
+										className: 'indieblocks-location__fetch-button',
+										onClick: () => {
+											if ( ! navigator.geolocation ) {
+												return;
+											}
 
-			return el( PluginDocumentSettingPanel, {
-					name: 'indieblocks-location-panel',
-					title: __( 'Location', 'indieblocks' ),
-				},
-				el( Flex, { align: 'end' },
-					el( FlexBlock, {},
-						el( TextControl, {
-							label: __( 'Latitude', 'indieblocks' ),
-							value: latitude,
-							onChange: ( value ) => {
-								setMeta( { ...meta, geo_latitude: value } );
-							},
-						} )
-					),
-					el( FlexBlock, {},
-						el( TextControl, {
-							label: __( 'Longitude', 'indieblocks' ),
-							value: longitude,
-							onChange: ( value ) => {
-								setMeta( { ...meta, geo_longitude: value } );
-							},
-						} )
-					),
-					el( FlexItem, {},
-						el( Button, {
-							className: 'indieblocks-location-fetch',
-							onClick: () => {
-								if ( ! navigator.geolocation ) {
-									return;
-								}
-
-								navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
-									// Do nothing.
-									console.log( error );
-								} );
-							},
-							variant: 'secondary',
-						}, __( 'Fetch', 'indieblocks' )	),
+											navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
+												// Do nothing.
+												console.log( error );
+											} );
+										},
+										variant: 'secondary',
+									}, __( 'Fetch', 'indieblocks' )	),
+								)
+							)
+						),
+						createElement( PanelRow, {},
+							// To allow authors to manually override or pass on a location.
+							createElement( TextControl, {
+								className: 'indieblocks-location__address-field',
+								label: __( 'Location', 'indieblocks' ),
+								value: geoAddress,
+								onChange: ( value ) => {
+									setMeta( { ...meta, geo_address: value } );
+								},
+							} )
+						)
 					)
 				),
-				// To allow authors to manually override or pass on a location.
-				el( TextControl, {
-					label: __( 'Location', 'indieblocks' ),
-					value: geoAddress,
-					onChange: ( value ) => {
-						setMeta( { ...meta, geo_address: value } );
-					},
-				} )
-			);
-		},
-	} );
-} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.plugins, window.wp.editPost, window.wp.apiFetch );
+			];
+		}
+	};
+
+	addFilter(
+		'IndieBlocks.SidebarPanels',
+		'indieblocks/location-panel',
+		extraPanel
+	);
+} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.apiFetch, window.wp.hooks );

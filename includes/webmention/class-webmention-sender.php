@@ -431,10 +431,8 @@ class Webmention_Sender {
 					'wp-i18n',
 					'wp-data',
 					'wp-core-data',
-					'wp-plugins',
-					'wp-edit-post',
-					'wp-api-fetch',
-					'wp-url',
+					'wp-hooks',
+					'indieblocks-common',
 				),
 				\IndieBlocks\Plugin::PLUGIN_VERSION,
 				false

@@ -1,9 +1,9 @@
-( ( element, components, i18n, data, coreData, apiFetch, hooks ) => {
+( ( element, components, i18n, data, coreData, apiFetch, plugins ) => {
 	const { createElement, useEffect, useState, useRef } = element;
 	const { Button, Fill, Flex, FlexBlock, FlexItem, TextControl, PanelBody, PanelRow } = components;
 	const { __ } = i18n;
 	const { useSelect } = data;
-	const { addFilter } = hooks;
+	const { registerPlugin } = plugins;
 
 	// @link https://wordpress.stackexchange.com/questions/362975/admin-notification-after-save-post-when-ajax-saving-in-gutenberg
 	const doneSaving = () => {
@@ -29,8 +29,8 @@
 		return false;
 	};
 
-	const extraPanel = ( FilteredComponent ) => {
-		return ( props ) => {
+	registerPlugin( 'indieblocks-location-panel', {
+		render: () => {
 			const { postId, postType } = useSelect( ( select ) => {
 				return {
 					postId: select( 'core/editor' ).getCurrentPostId(),
@@ -127,68 +127,60 @@
 				} );
 			}, [] );
 
-			return [
-				createElement( FilteredComponent, { ...props } ),
-				createElement( Fill, { name: 'IndieBlocksSidebarPanelSlot' },
-					createElement( PanelBody, { title: __( 'Location', 'indieblocks' ) },
-						createElement( PanelRow, {},
-							createElement( Flex, { align: 'end' },
-								createElement( FlexBlock, {},
-									createElement( TextControl, {
-										label: __( 'Latitude', 'indieblocks' ),
-										value: latitude,
-										onChange: ( value ) => {
-											setMeta( { ...meta, geo_latitude: value } );
-										},
-									} )
-								),
-								createElement( FlexBlock, {},
-									createElement( TextControl, {
-										label: __( 'Longitude', 'indieblocks' ),
-										value: longitude,
-										onChange: ( value ) => {
-											setMeta( { ...meta, geo_longitude: value } );
-										},
-									} )
-								),
-								createElement( FlexItem, {},
-									createElement( Button, {
-										className: 'indieblocks-location__fetch-button',
-										onClick: () => {
-											if ( ! navigator.geolocation ) {
-												return;
-											}
+			return createElement( Fill, { name: 'IndieBlocksSidebarPanelSlot' },
+				createElement( PanelBody, { title: __( 'Location', 'indieblocks' ) },
+					createElement( PanelRow, {},
+						createElement( Flex, { align: 'end' },
+							createElement( FlexBlock, {},
+								createElement( TextControl, {
+									label: __( 'Latitude', 'indieblocks' ),
+									value: latitude,
+									onChange: ( value ) => {
+										setMeta( { ...meta, geo_latitude: value } );
+									},
+								} )
+							),
+							createElement( FlexBlock, {},
+								createElement( TextControl, {
+									label: __( 'Longitude', 'indieblocks' ),
+									value: longitude,
+									onChange: ( value ) => {
+										setMeta( { ...meta, geo_longitude: value } );
+									},
+								} )
+							),
+							createElement( FlexItem, {},
+								createElement( Button, {
+									className: 'indieblocks-location__fetch-button',
+									onClick: () => {
+										if ( ! navigator.geolocation ) {
+											return;
+										}
 
-											navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
-												// Do nothing.
-												console.log( error );
-											} );
-										},
-										variant: 'secondary',
-									}, __( 'Fetch', 'indieblocks' )	),
-								)
+										navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
+											// Do nothing.
+											console.log( error );
+										} );
+									},
+									variant: 'secondary',
+								}, __( 'Fetch', 'indieblocks' )	),
 							)
-						),
-						createElement( PanelRow, {},
-							// To allow authors to manually override or pass on a location.
-							createElement( TextControl, {
-								className: 'indieblocks-location__address-field',
-								label: __( 'Location', 'indieblocks' ),
-								value: geoAddress,
-								onChange: ( value ) => {
-									setMeta( { ...meta, geo_address: value } );
-								},
-							} )
 						)
+					),
+					createElement( PanelRow, {},
+						// To allow authors to manually override or pass on a location.
+						createElement( TextControl, {
+							className: 'indieblocks-location__address-field',
+							label: __( 'Location', 'indieblocks' ),
+							value: geoAddress,
+							onChange: ( value ) => {
+								setMeta( { ...meta, geo_address: value } );
+							},
+						} )
 					)
-				),
-			];
-		}
-	};
-
-	addFilter(
-		'IndieBlocks.SidebarPanels',
-		'indieblocks/location-panel',
-		extraPanel
-	);
-} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.apiFetch, window.wp.hooks );
+				)
+			);
+		},
+		scope: 'my-custom-scope',
+	} );
+} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.apiFetch, window.wp.plugins );

@@ -69,7 +69,7 @@ class Location {
 					'wp-data',
 					'wp-core-data',
 					'wp-api-fetch',
-					'wp-hooks',
+					'wp-plugins',
 					'indieblocks-common',
 				),
 				\IndieBlocks\Plugin::PLUGIN_VERSION,

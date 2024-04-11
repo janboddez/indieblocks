@@ -1,12 +1,12 @@
-( ( element, components, i18n, data, coreData, hooks ) => {
+( ( element, components, i18n, data, coreData, plugins ) => {
 	const { createElement, createInterpolateElement, useState } = element;
 	const { Button, Fill, PanelBody, PanelRow } = components;
 	const { __, sprintf } = i18n;
 	const { useSelect } = data;
-	const { addFilter } = hooks;
+	const { registerPlugin } = plugins;
 
-	const extraPanel = ( FilteredComponent ) => {
-		return ( props ) => {
+	registerPlugin( 'indieblocks-webmention-panel', {
+		render: () => {
 			const { postId, postType } = useSelect( ( select ) => {
 				return {
 					postId: select( 'core/editor' ).getCurrentPostId(),
@@ -31,60 +31,64 @@
 
 					if ( value.sent ) {
 						line = sprintf( __( 'Sent to %1$s on %2$s. Response code: %3$d.', 'indieblocks' ), '<a>' + value.endpoint + '</a>', value.sent, value.code );
-						line = createElement( 'p', {}, createInterpolateElement( line, {
-							a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
-						} ) );
+						line = createElement( PanelRow, {},
+							createElement( 'p', {},
+								createInterpolateElement( line, {
+									a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+								} )
+							)
+						);
 						output.push( line );
 					} else if ( value.retries ) {
 						if ( value.retries >= 3 ) {
 							line = sprintf( __( 'Could not send webmention to %s.', 'indieblocks' ), value.endpoint );
-							line = createElement( 'p', {}, createInterpolateElement( line, {
-								a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
-							} ) );
+							line = createElement( PanelRow, {},
+								createElement( 'p', {},
+									createInterpolateElement( line, {
+										a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+									} )
+								)
+							);
 							output.push( line );
 						} else {
 							line = sprintf( __( 'Could not send webmention to %s. Trying again soon.', 'indieblocks' ), value.endpoint );
-							line = createElement( 'p', {}, createInterpolateElement( line, {
-								a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
-							} ) );
+							line = createElement( PanelRow, {},
+								createElement( 'p', {},
+									createInterpolateElement( line, {
+										a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+									} )
+								)
+							);
 							output.push( line );
 						}
 					}
 				} );
 			} else if ( 'scheduled' === webmention ) {
-				line = createElement( 'p', {}, __( 'Webmention scheduled.', 'indieblocks' ) );
+				line = createElement( PanelRow, {},
+					createElement( 'p', {}, __( 'Webmention scheduled.', 'indieblocks' ) )
+				);
 				output.push( line );
 			}
 
 			if ( ! output.length ) {
 				// return;
-				output.push( createElement( 'p', {}, __( 'No endpoints found.', 'indieblocks' ) ) );
+				output.push( createElement( PanelRow, {}, __( 'No endpoints found.', 'indieblocks' ) ) );
 			}
 
-			return [
-				createElement( FilteredComponent, { ...props } ),
-				createElement( Fill, { name: 'IndieBlocksSidebarPanelSlot' },
-					createElement( PanelBody, { title: __( 'Webmention', 'indieblocks' ) },
-						createElement( PanelRow, {},
-							output
-						),
-						createElement( PanelRow, {},
-							createElement( Button, {
-								onClick: () => {
-									return;
-								},
-								variant: 'secondary',
-							}, __( 'Resend', 'indieblocks' ) ),
-						)
+			return createElement( Fill, { name: 'IndieBlocksSidebarPanelSlot' },
+				createElement( PanelBody, { title: __( 'Webmention', 'indieblocks' ) },
+					output,
+					createElement( PanelRow, {},
+						createElement( Button, {
+							onClick: () => {
+								return;
+							},
+							variant: 'secondary',
+						}, __( 'Resend', 'indieblocks' ) ),
 					)
-				),
-			];
-		}
-	};
-
-	addFilter(
-		'IndieBlocks.SidebarPanels',
-		'indieblocks/location-panel',
-		extraPanel
-	);
-} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.hooks );
+				)
+			);
+		},
+		scope: 'my-custom-scope',
+	} );
+} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.plugins );

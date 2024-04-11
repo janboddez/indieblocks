@@ -1,17 +1,16 @@
 // Renders an "IndieBlocks" sidebar for other modules and plugins to hook into.
 ( ( element, components, plugins, editPost, i18n ) => {
 	const { createElement, Fragment } = element;
-	const { SlotFillProvider, Slot, withFilters } = components;
+	const { SlotFillProvider, Slot } = components;
 	const { registerPlugin } = plugins;
 	const { PluginSidebar, PluginSidebarMoreMenuItem } = editPost;
 	const { __ } = i18n;
+	const { PluginArea } = plugins;
 
 	const IndieBlocksSlotComponent = () => {
-		const SidebarPanels = withFilters( 'IndieBlocks.SidebarPanels' )( ( props ) => createElement( Fragment, {} ) );
-
 		return createElement( SlotFillProvider, {},
-			createElement( SidebarPanels ),
-			createElement( Slot, { name: 'IndieBlocksSidebarPanelSlot' } )
+			createElement( Slot, { name: 'IndieBlocksSidebarPanelSlot' } ),
+			createElement( PluginArea, { scope: 'my-custom-scope' } )
 		)
 	};
 

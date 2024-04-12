@@ -30,11 +30,16 @@
 					let line = '';
 
 					if ( value.sent ) {
-						line = sprintf( __( 'Sent to %1$s on %2$s. Response code: %3$d.', 'indieblocks' ), '<a>' + value.endpoint + '</a>', value.sent, value.code );
+						line = sprintf( __( 'Sent to %1$s: %2$d.', 'indieblocks' ), '<a>' + value.endpoint + '</a>', value.code );
 						line = createElement( PanelRow, {},
 							createElement( 'p', {},
 								createInterpolateElement( line, {
-									a: createElement( 'a', { href: encodeURI( value.endpoint ), target: '_blank', rel: 'noreferrer noopener' } ),
+									a: createElement( 'a', {
+										href: encodeURI( value.endpoint ),
+										title: value.sent,
+										target: '_blank',
+										rel: 'noreferrer noopener',
+									} ),
 								} )
 							)
 						);

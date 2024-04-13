@@ -6,6 +6,41 @@
 	const { registerPlugin } = plugins;
 	const { PluginSidebar, PluginSidebarMoreMenuItem } = editPost;
 
+	const reschedule = ( postId, setWebmention ) => {
+		if ( ! postId ) {
+			return false;
+		}
+
+		// Like a time-out.
+		const controller = new AbortController();
+		const timeoutId  = setTimeout( () => {
+			controller.abort();
+		}, 6000 );
+
+		try {
+			fetch( indieblocks_webmention_obj.ajaxurl, {
+				signal: controller.signal, // That time-out thingy.
+				method: 'POST',
+				body: new URLSearchParams( {
+					action: 'indieblocks_resend_webmention',
+					type: 'post',
+					obj_id: postId,
+					_wp_nonce: indieblocks_webmention_obj.nonce,
+				} ),
+			} ).then( ( response ) => {
+				clearTimeout( timeoutId );
+				setWebmention( 'scheduled' ); // So as to trigger a re-render.
+			} ).catch( ( error ) => {
+				// The request timed out or otherwise failed. Leave as is.
+				throw new Error( 'The "Resend" request failed.' )
+			} );
+		} catch ( error ) {
+			return false;
+		}
+
+		return true;
+	};
+
 	if ( '1' === indieblocks_webmention_obj.show_meta_box ) {
 		// Gutenberg sidebar.
 		registerPlugin( 'indieblocks-webmention-sidebar', {
@@ -102,7 +137,9 @@
 							createElement( 'p', {},
 								createElement( Button, {
 									onClick: () => {
-										return;
+										if ( confirm( __( 'Reschedule webmentions?', 'indieblocks' ) ) ) {
+											reschedule( postId, setWebmention );
+										}
 									},
 									variant: 'secondary',
 								}, __( 'Resend', 'indieblocks' ) ),

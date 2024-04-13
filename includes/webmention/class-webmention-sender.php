@@ -441,14 +441,21 @@ class Webmention_Sender {
 
 			global $post;
 
+			$args = array(
+				'ajaxurl'       => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+				'show_meta_box' => ! empty( $post->ID ) && null !== static::get_webmention_meta( $post )
+					? '1'
+					: '0',
+			);
+
+			if ( ! empty( $post->ID ) ) {
+				$args['nonce'] = wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID );
+			}
+
 			wp_localize_script(
 				'indieblocks-webmention',
 				'indieblocks_webmention_obj',
-				array(
-					'show_meta_box' => ! empty( $post->ID ) && null !== static::get_webmention_meta( $post )
-						? '1'
-						: '0',
-				)
+				$args
 			);
 		}
 	}
@@ -653,7 +660,7 @@ class Webmention_Sender {
 	 */
 	public static function reschedule_webmention() {
 		if ( ! isset( $_POST['_wp_nonce'] ) ) {
-			status_header( 400 );
+			status_header( 400 ); // Guess this doesn't work ...
 			esc_html_e( 'Missing nonce.', 'indieblocks' );
 			wp_die();
 		}
@@ -692,6 +699,7 @@ class Webmention_Sender {
 				delete_post_meta( $obj_id, '_indieblocks_webmention' );
 			}
 
+			echo 'Rescheduling mentions for post ' . intval( $obj_id ) . '.';
 			static::schedule_webmention( $obj_id, get_post( $obj_id ) );
 		} elseif ( 'comment' === $_POST['type'] ) {
 			if ( ! current_user_can( 'edit_comment', $obj_id ) ) {
@@ -707,6 +715,7 @@ class Webmention_Sender {
 				delete_comment_meta( $obj_id, '_indieblocks_webmention' );
 			}
 
+			echo 'Rescheduling mentions for comment ' . intval( $obj_id ) . '.';
 			static::schedule_webmention( $obj_id, get_comment( $obj_id ) );
 		}
 

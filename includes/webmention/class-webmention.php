@@ -151,7 +151,7 @@ class Webmention {
 		wp_enqueue_script( 'indieblocks-webmention-legacy', plugins_url( '/assets/webmention-legacy.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
 		wp_localize_script(
 			'indieblocks-webmention-legacy',
-			'indieblocks_webmention_obj',
+			'indieblocks_webmention_legacy_obj',
 			array(
 				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
 			)

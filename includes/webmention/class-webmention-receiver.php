@@ -51,7 +51,7 @@ class Webmention_Receiver {
 		$post = get_page_by_path( $slug, OBJECT, $supported_post_types );
 		$post = apply_filters( 'indieblocks_webmention_post', $post, $request['target'], $supported_post_types );
 
-		if ( empty( $post ) || 'publish' !== get_post_status( $post->ID ) ) {
+		if ( empty( $post ) || 'publish' !== $post->post_status ) {
 			// Not found.
 			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Target post not found.' );
 			return new \WP_Error( 'not_found', 'Not found', array( 'status' => 404 ) );

@@ -126,7 +126,7 @@
 					// Do nothing.
 					console.log( error );
 				} );
-			}, [] );
+			}, [ updatePosition ] );
 
 			return createElement( PluginDocumentSettingPanel, {
 					name: 'indieblocks-location-panel',

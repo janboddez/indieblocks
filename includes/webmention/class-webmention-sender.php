@@ -133,7 +133,7 @@ class Webmention_Sender {
 					\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." );
 				}
 
-				add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
+				\IndieBlocks\add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
 				wp_schedule_single_event( time() + $delay, 'indieblocks_webmention_send', array( $obj ) );
 			} else {
 				// Send inline (although retries will be scheduled as always).
@@ -432,10 +432,23 @@ class Webmention_Sender {
 					'wp-data',
 					'wp-core-data',
 					'wp-plugins',
+					'wp-edit-post',
 					'indieblocks-common',
 				),
 				\IndieBlocks\Plugin::PLUGIN_VERSION,
 				false
+			);
+
+			global $post;
+
+			wp_localize_script(
+				'indieblocks-webmention',
+				'indieblocks_webmention_obj',
+				array(
+					'show_meta_box' => ! empty( $post->ID ) && null !== static::get_webmention_meta( $post )
+						? '1'
+						: '0',
+				)
 			);
 		}
 	}
@@ -463,7 +476,7 @@ class Webmention_Sender {
 	 * `register_rest_field()` callback.
 	 *
 	 * @param  \WP_REST_Request|array $request API request (parameters).
-	 * @return array|\WP_Error                 Response (or error).
+	 * @return array|string|\WP_Error          Response (or error).
 	 */
 	public static function get_meta( $request ) {
 		if ( is_array( $request ) ) {
@@ -481,11 +494,11 @@ class Webmention_Sender {
 		$post_id = (int) $post_id;
 		$meta    = get_post_meta( $post_id, '_indieblocks_webmention', true );
 
-		if ( is_array( $meta ) ) {
+		if ( ! empty( $meta ) ) {
 			return $meta;
 		}
 
-		return array();
+		return '';
 	}
 
 	/**
@@ -558,15 +571,16 @@ class Webmention_Sender {
 	 */
 	public static function render_meta_box( $obj ) {
 		if ( $obj instanceof \WP_Post ) {
-			// Webmention data.
-			$webmention = get_post_meta( $obj->ID, '_indieblocks_webmention', true );
-			$type       = 'post';
+			$type = 'post';
 		} elseif ( $obj instanceof \WP_Comment ) {
-			$webmention = get_comment_meta( $obj->comment_ID, '_indieblocks_webmention', true );
-			$type       = 'comment';
+			$type = 'comment';
+		} else {
+			return;
 		}
 
-		if ( ! empty( $webmention ) && is_array( $webmention ) ) :
+		$webmention = static::get_webmention_meta( $obj );
+
+		if ( is_array( $webmention ) ) :
 			?>
 			<div style="display: flex; gap: 1em; align-items: start; justify-content: space-between;">
 				<p style="margin: 6px 0;">
@@ -612,6 +626,24 @@ class Webmention_Sender {
 			<p style="margin: 6px 0;"><?php esc_html_e( 'No endpoints found.', 'indieblocks' ); ?></p>
 			<?php
 		endif;
+	}
+
+	/**
+	 * Returns Webmention metadata, like where and when mentions were sent.
+	 *
+	 * @param  \WP_Post|\WP_Comment $obj Post or comment being edited.
+	 * @return array                     Webmention metadata.
+	 */
+	protected static function get_webmention_meta( $obj ) {
+		$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention' );
+
+		\IndieBlocks\debug_log( $webmention );
+
+		if ( empty( $webmention ) ) {
+			return null;
+		}
+
+		return $webmention;
 	}
 
 	/**

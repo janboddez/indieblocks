@@ -41,11 +41,10 @@ class Blocks {
 	 * `wp-element`, `wp-i18n`, `wp-api-fetch` assets.
 	 */
 	public static function register_scripts() {
-		// wp_register_script(
-		wp_enqueue_script(
+		wp_register_script(
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
-			array( 'wp-element', 'wp-components', 'wp-plugins', 'wp-edit-post', 'wp-i18n', 'wp-api-fetch' ),
+			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
 			Plugin::PLUGIN_VERSION,
 			true
 		);

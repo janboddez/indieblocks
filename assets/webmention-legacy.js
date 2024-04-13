@@ -11,7 +11,7 @@ jQuery( document ).ready( function ( $ ) {
 
 		$.post( ajaxurl, data, function( response ) {
 			button.parent().find( 'p' ).remove();
-			button.parent().append( '<p style="margin: 6px 0;">' + indieblocks_webmention_obj.message + '</p>' );
+			button.parent().append( '<p style="margin: 6px 0;">' + indieblocks_webmention_legacy_obj.message + '</p>' );
 			button.remove();
 		} );
 	} );

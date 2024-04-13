@@ -16,7 +16,7 @@ class Location {
 	 */
 	public static function register() {
 		// Enqueue block editor script.
-		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ), PHP_INT_MAX );
 
 		// Allow location meta to be edited through the block editor.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_meta' ) );

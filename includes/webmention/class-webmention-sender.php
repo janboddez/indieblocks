@@ -419,6 +419,11 @@ class Webmention_Sender {
 			return;
 		}
 
+		if ( apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
+			// Using a classic meta box instead.
+			return;
+		}
+
 		$current_screen = get_current_screen();
 
 		if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
@@ -538,6 +543,12 @@ class Webmention_Sender {
 				return;
 			}
 
+			$args = array();
+
+			if ( ! apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
+				$args['__back_compat_meta_box'] = true; // Hide for Gutenberg post types.
+			}
+
 			// Add meta box, for those post types that are supported.
 			add_meta_box(
 				'indieblocks-webmention',
@@ -546,7 +557,7 @@ class Webmention_Sender {
 				$supported_post_types,
 				'normal',
 				'default',
-				array( '__back_compat_meta_box' => true ) // Hide for Gutenberg post types.
+				$args
 			);
 		} elseif ( 'add_meta_boxes_comment' === current_action() ) {
 			// "Edit Comment" screen.

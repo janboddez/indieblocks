@@ -41,8 +41,7 @@ class Location {
 	 * Adds the Location panel to Gutenberg's document sidebar.
 	 */
 	public static function enqueue_scripts() {
-		$options = get_options();
-		if ( ! empty( $options['location_meta_box'] ) ) {
+		if ( apply_filters( 'indieblocks_location_meta_box', false ) ) {
 			// Using a classic meta box instead.
 			return;
 		}
@@ -257,7 +256,8 @@ class Location {
 		$args = array(
 			'__back_compat_meta_box' => true,
 		);
-		if ( ! empty( $options['location_meta_box'] ) ) {
+
+		if ( apply_filters( 'indieblocks_location_meta_box', false ) ) {
 			// And this will bring it back.
 			$args = null;
 		}

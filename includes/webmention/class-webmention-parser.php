@@ -241,6 +241,6 @@ class Webmention_Parser {
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
-		return store_image( $url, $filename, $dir );
+		return \IndieBlocks\store_image( $url, $filename, $dir );
 	}
 }

@@ -31,6 +31,7 @@ class Location {
 		foreach ( apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ) as $post_type ) {
 			add_action( "save_post_{$post_type}", array( __CLASS__, 'update_meta' ) );
 			add_action( "save_post_{$post_type}", array( __CLASS__, 'set_location' ), 20 );
+			add_action( "rest_after_insert_{$post_type}", array( __CLASS__, 'set_location' ), 20 );
 		}
 
 		add_action( 'admin_footer', array( __CLASS__, 'add_script' ) );
@@ -395,23 +396,20 @@ class Location {
 	 * @param int|\WP_Post $post Post ID or object.
 	 */
 	public static function set_location( $post ) {
+		debug_log( '[IndieBlocks/Location] Attempting to set location name.' );
+		debug_log( current_action() );
+
 		$post = get_post( $post );
-
-		if ( 0 === strpos( current_action(), 'save_' ) && defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			// For REST requests, we use a *later* hook, which runs *after*
-			// metadata, if any, has been saved.
-			add_action( "rest_after_insert_{$post->post_type}", array( __CLASS__, 'set_location' ), 20 );
-
-			// Don't do anything just yet.
-			return;
-		}
+		debug_log( get_post_meta( $post->ID ) );
 
 		if ( wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ) {
+			debug_log( '[IndieBlocks/Location] Autosave. Bye.' );
 			return;
 		}
 
 		if ( ! in_array( $post->post_type, apply_filters( 'indieblocks_location_post_types', array( 'post', 'indieblocks_note' ) ), true ) ) {
 			// Unsupported post type.
+			debug_log( '[IndieBlocks/Location] Unsupported post type.' );
 			return;
 		}
 
@@ -421,6 +419,7 @@ class Location {
 
 		if ( '' === $lat || '' === $lon ) {
 			// Nothing to do.
+			debug_log( '[IndieBlocks/Location] Could not find previously saved coordinates.' );
 			return;
 		}
 
@@ -447,6 +446,7 @@ class Location {
 
 		if ( $updated || empty( $indieblocks_weather ) ) {
 			// Let's do weather information, too.
+			debug_log( '[IndieBlocks/Location] Attempting to fetch weather info.' );
 			$weather = static::get_weather( $lat, $lon );
 
 			if ( ! empty( $weather ) ) {

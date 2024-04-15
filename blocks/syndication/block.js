@@ -1,26 +1,21 @@
-( function ( blocks, element, blockEditor, coreData, i18n ) {
-	const el       = element.createElement;
-	const useState = element.useState;
+( ( blocks, element, blockEditor, coreData, i18n ) => {
+	const { createElement, useState } = element;
+	const { BlockControls, useBlockProps } = blockEditor;
+	const { __, sprintf } = i18n;
 
-	const BlockControls = blockEditor.BlockControls;
-	const useBlockProps = blockEditor.useBlockProps;
-
-	const __      = i18n.__;
-	const sprintf = i18n.sprintf;
-
-	function render( urls ) {
+	const render = ( urls ) => {
 		let output = '';
 
-		urls.forEach( function( url ) {
+		urls.forEach( ( url ) => {
 			output += '<a class="u-syndication" href="' + encodeURI( url.value ) + '" target="_blank" rel="noopener noreferrer">' + url.name + '</a>, ';
 		} );
 
 		/* translators: %s: plain-text "list" of links. */
 		return sprintf( __( 'Also on %s', 'indieblocks' ), output.replace( /[,\s]+$/, '' ) );
-	}
+	};
 
 	blocks.registerBlockType( 'indieblocks/syndication', {
-		edit: function ( props ) {
+		edit: ( props ) => {
 			// We'd use `serverSideRender` but it doesn't support passing block
 			// context to PHP. I.e., rendering in JS better reflects what the
 			// block will look like on the front end.
@@ -39,8 +34,8 @@
 				urls.push( { name: __( 'Pixelfed', 'indieblocks' ), value: pixelfedUrl } );
 			}
 
-			return el( 'div', useBlockProps(),
-				el( BlockControls ),
+			return createElement( 'div', useBlockProps(),
+				createElement( BlockControls ),
 				urls.length
 					? element.RawHTML( { children: render( urls ) } )
 					: props.context.postId

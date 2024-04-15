@@ -1,13 +1,10 @@
 ( ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) => {
-	const createBlock   = blocks.createBlock;
-	const el            = element.createElement;
-	const useEffect     = element.useEffect;
-	const InnerBlocks   = blockEditor.InnerBlocks;
-	const useBlockProps = blockEditor.useBlockProps;
-	const ToggleControl = components.ToggleControl;
-	const TextControl   = components.TextControl;
-	const useSelect     = data.useSelect;
-	const __            = i18n.__;
+	const { InnerBlocks, useBlockProps } = blockEditor;
+	const { ToggleControl, TextControl } = components;
+	const { __ } = i18n;
+	const { createBlock } = blocks;
+	const { useSelect } = data;
+	const el = element.createElement;
 
 	blocks.registerBlockType( 'indieblocks/reply', {
 		description: __( 'Reply to others’ (or your own) posts and pages.', 'indieblocks' ),
@@ -33,7 +30,7 @@
 
 			// To determine whether `.e-content` and `InnerBlocks.Content`
 			// should be saved (and echoed).
-			useEffect( () => {
+			element.useEffect( () => {
 				var empty = true;
 
 				if ( innerBlocks.length > 1 ) {

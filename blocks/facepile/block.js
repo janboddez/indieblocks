@@ -1,11 +1,7 @@
-( function ( blocks, element, blockEditor, i18n ) {
-	var el = element.createElement;
-
-	var BlockControls = blockEditor.BlockControls;
-	var InnerBlocks   = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	var __ = i18n.__;
+( ( blocks, element, blockEditor, i18n ) => {
+	const { createElement } = element;
+	const { BlockControls, InnerBlocks, useBlockProps } = blockEditor;
+	const { __ } = i18n;
 
 	blocks.registerBlockType( 'indieblocks/facepile', {
 		icon: el( 'svg', {
@@ -17,9 +13,9 @@
 		),
 		description: __( 'Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile.', 'indieblocks' ),
 		edit: ( props ) => {
-			return el( 'div', useBlockProps(),
-				el( BlockControls ),
-				el( InnerBlocks, {
+			return createElement( 'div', useBlockProps(),
+				createElement( BlockControls ),
+				createElement( InnerBlocks, {
 					template: [
 						[ 'core/heading', { content: __( 'Likes, Bookmarks, and Reposts', 'indieblocks' ) } ],
 						[ 'indieblocks/facepile-content' ]
@@ -28,8 +24,8 @@
 				} )
 			);
 		},
-		save: ( props ) => el( 'div', useBlockProps.save(),
-			el( InnerBlocks.Content )
+		save: ( props ) => createElement( 'div', useBlockProps.save(),
+			createElement( InnerBlocks.Content )
 		),
 	} );
 } )( window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.i18n );

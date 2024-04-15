@@ -1,5 +1,5 @@
 jQuery( document ).ready( function ( $ ) {
-	$( '#indieblocks-webmention .indieblocks-resend-webmention' ).click( function() {
+	$( '#indieblocks-webmention .indieblocks-resend-webmention' ).click( function () {
 		var button = $( this );
 		var type   = button.data( 'type' );
 		var data   = {
@@ -9,14 +9,14 @@ jQuery( document ).ready( function ( $ ) {
 			'_wp_nonce': button.data( 'nonce' ), // Nonce.
 		};
 
-		$.post( ajaxurl, data, function( response ) {
+		$.post( ajaxurl, data, function ( response ) {
 			button.parent().find( 'p' ).remove();
 			button.parent().append( '<p style="margin: 6px 0;">' + indieblocks_webmention_legacy_obj.message + '</p>' );
 			button.remove();
 		} );
 	} );
 
-	$( '.indieblocks-delete-avatar' ).click( function() {
+	$( '.indieblocks-delete-avatar' ).click( function () {
 		var button = $( this );
 		var data   = {
 			'action': 'indieblocks_delete_avatar',
@@ -24,7 +24,7 @@ jQuery( document ).ready( function ( $ ) {
 			'_wp_nonce': button.data( 'nonce' ), // Nonce.
 		};
 
-		$.post( ajaxurl, data, function( response ) {
+		$.post( ajaxurl, data, function ( response ) {
 			// Bit lazy, but 'kay.
 			location.reload();
 		} );

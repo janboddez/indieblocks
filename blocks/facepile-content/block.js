@@ -1,36 +1,27 @@
-( function ( blocks, element, blockEditor, components, i18n ) {
-	var el       = element.createElement;
-	var useState = element.useState;
-
-	var BlockControls = blockEditor.BlockControls;
-	var useBlockProps = blockEditor.useBlockProps;
-	var useSetting    = blockEditor.useSetting;
-
-	var BaseControl   = components.BaseControl;
-	var ColorPalette  = components.ColorPalette;
-	var RangeControl  = components.RangeControl;
-	var ToggleControl = components.ToggleControl;
-
-	var __      = i18n.__;
+( ( blocks, element, blockEditor, components, i18n ) => {
+	const { BlockControls, useBlockProps, useSetting } = blockEditor;
+	const { BaseControl, ColorPalette, RangeControl, ToggleControl } = components;
+	const { __ } = i18n;
+	const el = element.createElement;
 
 	blocks.registerBlockType( 'indieblocks/facepile-content', {
 		icon: el( 'svg', {
 				xmlns: 'http://www.w3.org/2000/svg',
 				viewBox: '0 0 24 24',
-			}, el ( 'path', {
+			}, el( 'path', {
 				d: 'M12 4a8 8 0 0 0-8 8 8 8 0 0 0 6.64 7.883 8 8 0 0 0 .786.096A8 8 0 0 0 12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8zm0 1.5a6.5 6.5 0 0 1 6.5 6.5 6.5 6.5 0 0 1-.678 2.875 12.5 9 0 0 0-4.576-.855 3.5 3.5 0 0 0 2.254-3.27 3.5 3.5 0 0 0-3.5-3.5 3.5 3.5 0 0 0-3.5 3.5 3.5 3.5 0 0 0 2.432 3.332 12.5 9 0 0 0-4.59 1.1A6.5 6.5 0 0 1 5.5 12 6.5 6.5 0 0 1 12 5.5z',
 			} )
 		),
 		description: __( 'Outputs the actual “facepile” avatars.', 'indieblocks' ),
 		edit: ( props ) => {
-			var avatarSize  = props.attributes.avatarSize || 2;
-			var bgColor     = props.attributes.backgroundColor || 'transparent';
-			var icons       = props.attributes.icons;
-			var color       = props.attributes.color || '#000';
-			var iconBgColor = props.attributes.iconBackgroundColor || '#fff';
-			var colors      = useSetting( 'color.palette' );
+			const avatarSize  = props.attributes.avatarSize || 2;
+			const bgColor     = props.attributes.backgroundColor || 'transparent';
+			const icons       = props.attributes.icons;
+			const color       = props.attributes.color || '#000';
+			const iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+			const colors      = useSetting( 'color.palette' );
 
-			var imgProps = {
+			const imgProps = {
 				src: indieblocks_common_obj.assets_url + 'mm.png', // "Fallback" avatar.
 				className: 'avatar photo',
 				width: avatarSize,
@@ -40,7 +31,7 @@
 			};
 
 			// SVG sprites.
-			var html = `<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+			const html = `<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 				<defs>
 				<symbol id="indieblocks-icon-bookmark" viewBox="0 0 24 24">
 					<path fill="currentColor" d="M8.1 5a2 2 0 0 0-2 2v12.1L12 15l5.9 4.1V7a2 2 0 0 0-2-2H8.1z"/>
@@ -69,7 +60,7 @@
 							onChange: ( value ) => { props.setAttributes( { avatarSize: value } ) },
 						} ),
 						el( BaseControl, { label: __( 'Background color', 'indieblocks' ) },
-							el( ColorPalette, {
+						el( ColorPalette, {
 								colors: [ { name: 'None', color: 'transparent' }, ...colors ],
 								value: bgColor,
 								onChange: ( value ) => { props.setAttributes( { backgroundColor: value } ) },

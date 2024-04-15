@@ -77,8 +77,8 @@
 			const url = props.attributes.url;
 
 			if ( props.attributes.customTitle && props.attributes.customAuthor ) {
-				// We're using custom values for both title and author;/ nothing to
-				// do here.
+				// We're using custom values for both title and author; nothing
+				// to do here.
 				return;
 			}
 
@@ -88,7 +88,7 @@
 
 			// Like a time-out.
 			const controller = new AbortController();
-			const timeoutId = setTimeout( function() {
+			const timeoutId = setTimeout( () => {
 				controller.abort();
 			}, 6000 );
 

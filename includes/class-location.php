@@ -318,14 +318,14 @@ class Location {
 			if ( indieblocks_lat && '' === indieblocks_lat.value && indieblocks_lon && '' === indieblocks_lon.value ) {
 				// If the "Latitude" and "Longitude" fields are empty, ask the
 				// browser for location information.
-				navigator.geolocation.getCurrentPosition( function( position ) {
+				navigator.geolocation.getCurrentPosition( function ( position ) {
 					indieblocks_lat.value = position.coords.latitude;
 					indieblocks_lon.value = position.coords.longitude;
 
 					<?php if ( static::is_recent() ) : // If the post is less than one hour old. ?>
 						indieblocks_loc.checked = true; // Auto-enable.
 					<?php endif; ?>
-				}, function( error ) {
+				}, function ( error ) {
 					// Do nothing.
 				} );
 			}
@@ -334,7 +334,7 @@ class Location {
 		indieblocks_update_location();
 
 		if ( indieblocks_loc ) {
-			indieblocks_loc.addEventListener( 'click', function( event ) {
+			indieblocks_loc.addEventListener( 'click', function ( event ) {
 				if ( indieblocks_loc.checked ) {
 					indieblocks_update_location();
 				}

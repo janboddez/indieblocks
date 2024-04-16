@@ -1,6 +1,6 @@
 ( ( blocks, element, blockEditor, components, i18n ) => {
-	const { BlockControls, useBlockProps, useSetting } = blockEditor;
-	const { BaseControl, ColorPalette, RangeControl, ToggleControl } = components;
+	const { BlockControls, InspectorControls, useBlockProps, useSetting } = blockEditor;
+	const { BaseControl, ColorPalette, PanelBody, RangeControl, ToggleControl } = components;
 	const { __ } = i18n;
 	const el = element.createElement;
 
@@ -47,8 +47,8 @@
 
 			return el( 'div', useBlockProps(),
 				el( BlockControls ),
-				el( blockEditor.InspectorControls, { key: 'inspector' },
-					el( components.PanelBody, {
+				el( InspectorControls, { key: 'inspector' },
+					el( PanelBody, {
 							title: __( 'Avatars', 'indieblocks' ),
 							initialOpen: true,
 						},

@@ -1,7 +1,7 @@
 ( ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) => {
 	const { createBlock, registerBlockType } = blocks;
-	const { InnerBlocks, useBlockProps } = blockEditor;
-	const { ToggleControl, TextControl } = components;
+	const { BlockControls, InnerBlocks, InspectorControls, useBlockProps } = blockEditor;
+	const { PanelBody, Placeholder, ToggleControl, TextControl } = components;
 	const { useSelect } = data;
 	const { __ } = i18n;
 	const el = element.createElement;
@@ -101,11 +101,11 @@
 			}
 
 			return el( 'div', useBlockProps(),
-				el( blockEditor.BlockControls ),
+				el( BlockControls ),
 				( props.isSelected || ! url || 'undefined' === url )
-					? el( components.Placeholder, placeholderProps,
-						el( blockEditor.InspectorControls, { key: 'inspector' },
-							el( components.PanelBody, {
+					? el( Placeholder, placeholderProps,
+						el( InspectorControls, { key: 'inspector' },
+							el( PanelBody, {
 									title: __( 'Title and Author' ),
 									initialOpen: true,
 								},

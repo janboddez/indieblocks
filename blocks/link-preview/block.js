@@ -1,28 +1,23 @@
-( function ( blocks, element, blockEditor, coreData, i18n ) {
-	var el = element.createElement;
-
-	var BlockControls  = blockEditor.BlockControls;
-	var useBlockProps  = blockEditor.useBlockProps;
-	var useBorderProps = blockEditor.__experimentalUseBorderProps;
-
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
+( ( blocks, element, blockEditor, coreData, i18n ) => {
+	const { BlockControls, useBlockProps, __experimentalUseBorderProps } = blockEditor;
+	const { __ } = i18n;
+	const el = element.createElement;
 
 	blocks.registerBlockType( 'indieblocks/link-preview', {
-		edit: function ( props ) {
+		edit: ( props ) => {
 			const { record, isResolving } = coreData.useEntityRecord( 'postType', props.context.postType, props.context.postId );
 
-			var title     = record?.indieblocks_link_preview?.title ?? '';
-			var cardUrl   = record?.indieblocks_link_preview?.url ?? '';
-			var thumbnail = record?.indieblocks_link_preview?.thumbnail ?? '';
+			const title     = record?.indieblocks_link_preview?.title ?? '';
+			const cardUrl   = record?.indieblocks_link_preview?.url ?? '';
+			const thumbnail = record?.indieblocks_link_preview?.thumbnail ?? '';
 
-			var borderProps = useBorderProps( props.attributes );
-			var bodyProps   = { className: 'indieblocks-card-body' };
+			const borderProps = __experimentalUseBorderProps( props.attributes );
+			const bodyProps   = { className: 'indieblocks-card-body' };
 			if ( 'undefined' !== typeof borderProps.style && 'undefined' !== typeof borderProps.style.borderWidth ) {
 				bodyProps.style = { width: 'calc(100% - 90px - ' + borderProps.style.borderWidth + ')' };
 			}
 
-			var blockProps = useBlockProps();
+			const blockProps = useBlockProps();
 
 			return el( 'div', { ...blockProps, style: { ...blockProps.style, ...borderProps.style } },
 				el( BlockControls ),

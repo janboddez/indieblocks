@@ -1,12 +1,12 @@
 ( ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) => {
+	const { createBlock, registerBlockType } = blocks;
 	const { InnerBlocks, useBlockProps } = blockEditor;
 	const { ToggleControl, TextControl } = components;
-	const { __ } = i18n;
-	const { createBlock } = blocks;
 	const { useSelect } = data;
+	const { __ } = i18n;
 	const el = element.createElement;
 
-	blocks.registerBlockType( 'indieblocks/like', {
+	registerBlockType( 'indieblocks/like', {
 		description: __( 'Show your appreciation for a certain web page or post.', 'indieblocks' ),
 		icon: el( 'svg', {
 				xmlns: 'http://www.w3.org/2000/svg',
@@ -38,7 +38,7 @@
 			// To determine whether `.e-content` and `InnerBlocks.Content`
 			// should be saved (and echoed).
 			element.useEffect( () => {
-				var empty = true;
+				let empty = true;
 
 				if ( innerBlocks.length > 1 ) {
 					// More than one child block.

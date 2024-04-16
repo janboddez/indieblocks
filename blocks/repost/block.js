@@ -1,12 +1,13 @@
 ( ( blocks, element, blockEditor, components, data, i18n, IndieBlocks ) => {
+	const { createBlock, registerBlockType } = blocks;
 	const { InnerBlocks, useBlockProps } = blockEditor;
 	const { ToggleControl, TextControl } = components;
-	const { __ } = i18n;
-	const { createBlock } = blocks;
 	const { useSelect } = data;
+	const { __ } = i18n;
 	const el = element.createElement;
 
-	blocks.registerBlockType( 'indieblocks/repost', {
+	registerBlockType( 'indieblocks/repost', {
+		description: __( 'Use the Repost block to “reblog” another (short) post verbatim while still giving credit.', 'indieblocks' ),
 		icon: el( 'svg', {
 				xmlns: 'http://www.w3.org/2000/svg',
 				viewBox: '0 0 24 24',
@@ -14,7 +15,6 @@
 				d: 'M7.25 6a2 2 0 0 0-2 2v6.1l-3-.1 4 4 4-4-3 .1V8h6.25l2-2zM16.75 9.9l-3 .1 4-4 4 4-3-.1V16a2 2 0 0 1-2 2H8.5l2-2h6.25z',
 			} )
 		),
-		description: __( 'Use the Repost block to “reblog” another (short) post verbatim while still giving credit.', 'indieblocks' ),
 		edit: ( props ) => {
 			const url          = props.attributes.url;
 			const customTitle  = props.attributes.customTitle;
@@ -38,7 +38,7 @@
 			// To determine whether `.e-content` and `InnerBlocks.Content`
 			// should be saved (and echoed).
 			element.useEffect( () => {
-				var empty = true;
+				let empty = true;
 
 				if ( innerBlocks.length > 1 ) {
 					// More than one child block.

@@ -272,7 +272,6 @@ class Webmention_Sender {
 				if ( is_wp_error( $response ) ) {
 					\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() . '.' );
 				}
-				\IndieBlocks\debug_log( $response );
 
 				$webmention[ $hash ]['retries'] = $retries + 1;
 				\IndieBlocks\update_meta( $obj, '_indieblocks_webmention', $webmention );

@@ -202,7 +202,7 @@ class Webmention_Sender {
 		$urls = array_unique( $urls );
 
 		// Fetch whatever Webmention-related stats we've got for this post.
-		$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention' );
+		$webmention = static::get_webmention_meta( $obj );
 
 		if ( empty( $webmention ) || ! is_array( $webmention ) ) {
 			// Ensure `$webmention` is an array.
@@ -447,7 +447,7 @@ class Webmention_Sender {
 
 			$args = array(
 				'ajaxurl'       => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
-				'show_meta_box' => ! empty( $post->ID ) && null !== static::get_webmention_meta( $post )
+				'show_meta_box' => ! empty( $post->ID ) && '' !== static::get_webmention_meta( $post )
 					? '1'
 					: '0',
 			);
@@ -503,13 +503,13 @@ class Webmention_Sender {
 		}
 
 		$post_id = (int) $post_id;
-		$meta    = get_post_meta( $post_id, '_indieblocks_webmention', true );
+		$meta    = get_post_meta( $post_id, '_indieblocks_webmention', true ); // Using `$post_id` rather than `$post`, hence `get_post_meta()`.
 
-		if ( ! empty( $meta ) ) {
-			return $meta;
+		if ( empty( $meta ) ) {
+			return '';
 		}
 
-		return '';
+		return $meta;
 	}
 
 	/**
@@ -529,7 +529,7 @@ class Webmention_Sender {
 				return;
 			}
 
-			if ( '' === get_post_meta( $post->ID, '_indieblocks_webmention', true ) ) {
+			if ( '' === static::get_webmention_meta( $post ) ) {
 				return;
 			}
 
@@ -566,7 +566,7 @@ class Webmention_Sender {
 				return;
 			}
 
-			if ( '' === get_comment_meta( $comment->comment_ID, '_indieblocks_webmention', true ) ) {
+			if ( '' === static::get_webmention_meta( $comment ) ) {
 				return;
 			}
 
@@ -649,7 +649,7 @@ class Webmention_Sender {
 	 * Returns Webmention metadata, like where and when mentions were sent.
 	 *
 	 * @param  \WP_Post|\WP_Comment $obj Post or comment being edited.
-	 * @return array                     Webmention metadata.
+	 * @return array|string              Webmention metadata.
 	 */
 	protected static function get_webmention_meta( $obj ) {
 		$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention' );
@@ -657,7 +657,7 @@ class Webmention_Sender {
 		\IndieBlocks\debug_log( $webmention );
 
 		if ( empty( $webmention ) ) {
-			return null;
+			return '';
 		}
 
 		return $webmention;
@@ -702,9 +702,9 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = get_post_meta( $obj_id, '_indieblocks_webmention', true );
+			$history = static::get_webmention_meta( $obj );
 
-			if ( '' !== $history && is_array( $history ) ) {
+			if ( ! empty( $history ) && is_array( $history ) ) {
 				add_post_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
 				delete_post_meta( $obj_id, '_indieblocks_webmention' );
 			}
@@ -718,7 +718,7 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = get_comment_meta( $obj_id, '_indieblocks_webmention', true );
+			$history = static::get_webmention_meta( $obj );
 
 			if ( '' !== $history && is_array( $history ) ) {
 				add_comment_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );

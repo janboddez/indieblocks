@@ -1,8 +1,9 @@
 ( ( element, components, i18n, data, coreData, apiFetch, plugins, editPost ) => {
-	const { createElement, useEffect, useState, useRef } = element;
+	const { createElement: el, useEffect, useState, useRef } = element;
 	const { Button, Flex, FlexBlock, FlexItem, TextControl, PanelRow } = components;
 	const { __ } = i18n;
 	const { useSelect } = data;
+	const { useEntityProp } = coreData;
 	const { registerPlugin } = plugins;
 	const { PluginDocumentSettingPanel } = editPost;
 
@@ -35,11 +36,11 @@
 			const { postId, postType } = useSelect( ( select ) => {
 				return {
 					postId: select( 'core/editor' ).getCurrentPostId(),
-					postType: select( 'core/editor' ).getCurrentPostType()
-				}
+					postType: select( 'core/editor' ).getCurrentPostType(),
+				};
 			}, [] );
 
-			const [ meta, setMeta ] = coreData.useEntityProp( 'postType', postType, 'meta' );
+			const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
 
 			const latitude = meta?.geo_latitude ?? '';
 			const longitude = meta?.geo_longitude ?? '';
@@ -69,23 +70,28 @@
 
 				// Like a time-out.
 				const controller = new AbortController();
-				const timeoutId  = setTimeout( () => {
+				const timeoutId = setTimeout( () => {
 					controller.abort();
 				}, 6000 );
 
 				apiFetch( {
 					path: '/wp/v2/' + postType + '/' + postId,
 					signal: controller.signal, // That time-out thingy.
-				} ).then( ( response ) => {
-					clearTimeout( timeoutId );
+				} )
+					.then( ( response ) => {
+						clearTimeout( timeoutId );
 
-					if ( response.indieblocks_location && response.indieblocks_location.geo_address ) {
-						// This function does not do anything besides displaying a location name.
-						setMeta( { ...stateRef.current, geo_address: response.indieblocks_location.geo_address } );
-					}
-				} ).catch( ( error ) => {
-					// The request timed out or otherwise failed. Leave as is.
-				} );
+						if ( response.indieblocks_location && response.indieblocks_location.geo_address ) {
+							// This function does not do anything besides displaying a location name.
+							setMeta( {
+								...stateRef.current,
+								geo_address: response.indieblocks_location.geo_address,
+							} );
+						}
+					} )
+					.catch( ( error ) => {
+						// The request timed out or otherwise failed. Leave as is.
+					} );
 			};
 
 			if ( doneSaving() && ! geoAddress ) {
@@ -100,7 +106,11 @@
 
 			// `navigator.geolocation.getCurrentPosition` callback.
 			const updatePosition = ( position ) => {
-				setMeta( { ...stateRef.current, geo_latitude: position.coords.latitude.toString(), geo_longitude: position.coords.longitude.toString() } );
+				setMeta( {
+					...stateRef.current,
+					geo_latitude: position.coords.latitude.toString(),
+					geo_longitude: position.coords.longitude.toString(),
+				} );
 			};
 
 			// Runs once.
@@ -128,14 +138,22 @@
 				} );
 			}, [ updatePosition ] );
 
-			return createElement( PluginDocumentSettingPanel, {
+			return el(
+				PluginDocumentSettingPanel,
+				{
 					name: 'indieblocks-location-panel',
 					title: __( 'Location', 'indieblocks' ),
 				},
-				createElement( PanelRow, {},
-					createElement( Flex, { align: 'end' },
-						createElement( FlexBlock, {},
-							createElement( TextControl, {
+				el(
+					PanelRow,
+					{},
+					el(
+						Flex,
+						{ align: 'end' },
+						el(
+							FlexBlock,
+							{},
+							el( TextControl, {
 								label: __( 'Latitude', 'indieblocks' ),
 								value: latitude,
 								onChange: ( value ) => {
@@ -143,36 +161,49 @@
 								},
 							} )
 						),
-						createElement( FlexBlock, {},
-							createElement( TextControl, {
+						el(
+							FlexBlock,
+							{},
+							el( TextControl, {
 								label: __( 'Longitude', 'indieblocks' ),
 								value: longitude,
 								onChange: ( value ) => {
-									setMeta( { ...meta, geo_longitude: value } );
+									setMeta( {
+										...meta,
+										geo_longitude: value,
+									} );
 								},
 							} )
 						),
-						createElement( FlexItem, {},
-							createElement( Button, {
-								className: 'indieblocks-location__fetch-button',
-								onClick: () => {
-									if ( ! navigator.geolocation ) {
-										return;
-									}
+						el(
+							FlexItem,
+							{},
+							el(
+								Button,
+								{
+									className: 'indieblocks-location__fetch-button',
+									onClick: () => {
+										if ( ! navigator.geolocation ) {
+											return;
+										}
 
-									navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
-										// Do nothing.
-										console.log( error );
-									} );
+										navigator.geolocation.getCurrentPosition( updatePosition, ( error ) => {
+											// Do nothing.
+											console.log( error );
+										} );
+									},
+									variant: 'secondary',
 								},
-								variant: 'secondary',
-							}, __( 'Fetch', 'indieblocks' )	),
-						),
+								__( 'Fetch', 'indieblocks' )
+							)
+						)
 					)
 				),
-				createElement( PanelRow, {},
+				el(
+					PanelRow,
+					{},
 					// To allow authors to manually override or pass on a location.
-					createElement( TextControl, {
+					el( TextControl, {
 						className: 'indieblocks-location__address-field',
 						label: __( 'Location', 'indieblocks' ),
 						value: geoAddress,
@@ -184,4 +215,13 @@
 			);
 		},
 	} );
-} )( window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.coreData, window.wp.apiFetch, window.wp.plugins, window.wp.editPost );
+} )(
+	window.wp.element,
+	window.wp.components,
+	window.wp.i18n,
+	window.wp.data,
+	window.wp.coreData,
+	window.wp.apiFetch,
+	window.wp.plugins,
+	window.wp.editPost
+);

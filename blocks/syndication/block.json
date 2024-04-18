@@ -7,6 +7,16 @@
 	"editorScript": "file:./block.js",
 	"render": "file:./render.php",
 	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
+		}
+	},
 	"textdomain": "indieblocks",
 	"supports": {
 		"color": {

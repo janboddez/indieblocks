@@ -84,6 +84,7 @@
 
 						if ( value.sent ) {
 							line = sprintf(
+								/* translators: %1$s: Webmention endpoint. %2$s: HTTP response code. */
 								__( 'Sent to %1$s: %2$d.', 'indieblocks' ),
 								'<a>' + value.endpoint + '</a>',
 								value.code

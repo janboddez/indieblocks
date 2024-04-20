@@ -1,21 +1,11 @@
-( function ( blocks, element, blockEditor, components, i18n ) {
-	var createBlock    = blocks.createBlock;
-	var getSaveContent = blocks.getSaveContent;
+( ( blocks, element, blockEditor, components, i18n ) => {
+	const { createBlock, getSaveContent, registerBlockType } = blocks;
+	const { createElement: el, createInterpolateElement: interpolate } = element;
+	const { BlockControls, useBlockProps } = blockEditor;
+	const { Placeholder, RadioControl, TextControl } = components;
+	const { __, sprintf } = i18n;
 
-	var el          = element.createElement;
-	var interpolate = element.createInterpolateElement;
-
-	var BlockControls = blockEditor.BlockControls;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	var Placeholder  = components.Placeholder;
-	var RadioControl = components.RadioControl;
-	var TextControl  = components.TextControl;
-
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
-
-	var messages = {
+	const messages = {
 		/* translators: %s: Link to the bookmarked page. */
 		'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
 		/* translators: %s: Link to the "liked" page. */
@@ -26,42 +16,52 @@
 		'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 	};
 
-	function render( blockProps, url, kind ) {
-		return el( 'div', blockProps,
-			( ! url || 'undefined' === url )
+	const render = ( blockProps, url, kind ) => {
+		return el(
+			'div',
+			blockProps,
+			! url || 'undefined' === url
 				? null // Return nothing.
-				: el( 'i', {},
-					interpolate( sprintf( messages[ kind ], '<a>' + encodeURI( url ) + '</a>' ), {
-						a: el( 'a', { className: kind, href: encodeURI( url ) } ),
-					} )
-				)
+				: el(
+						'i',
+						{},
+						interpolate( sprintf( messages[ kind ], '<a>' + encodeURI( url ) + '</a>' ), {
+							a: el( 'a', { className: kind, href: encodeURI( url ) } ),
+						} )
+				  )
 		);
-	}
+	};
 
-	blocks.registerBlockType( 'indieblocks/context', {
-		edit: function ( props ) {
-			var url  = props.attributes.url;
-			var kind = props.attributes.kind;
+	registerBlockType( 'indieblocks/context', {
+		edit: ( props ) => {
+			const url = props.attributes.url;
+			const kind = props.attributes.kind;
 
-			var placeholderProps = {
+			const placeholderProps = {
 				icon: 'format-status',
 				label: __( 'Context', 'indieblocks' ),
 				isColumnLayout: true,
 			};
 
 			if ( ! url || 'undefined' === url ) {
-				placeholderProps.instructions = __( 'Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph.', 'indieblocks' );
+				placeholderProps.instructions = __(
+					'Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph.',
+					'indieblocks'
+				);
 			}
 
-			return el( 'div', useBlockProps(),
+			return el(
+				'div',
+				useBlockProps(),
 				el( BlockControls ),
-				( props.isSelected || ! url || 'undefined' === url )
-					? el( Placeholder, placeholderProps,
-						[
+				props.isSelected || ! url || 'undefined' === url
+					? el( Placeholder, placeholderProps, [
 							el( TextControl, {
 								label: __( 'URL', 'indieblocks' ),
 								value: url,
-								onChange: ( value ) => { props.setAttributes( { url: value } ) },
+								onChange: ( value ) => {
+									props.setAttributes( { url: value } );
+								},
 							} ),
 							el( RadioControl, {
 								label: __( 'Type', 'indieblocks' ),
@@ -72,23 +72,24 @@
 									{ label: __( 'Reply', 'indieblocks' ), value: 'u-in-reply-to' },
 									{ label: __( 'Repost', 'indieblocks' ), value: 'u-repost-of' },
 								],
-								onChange: ( value ) => { props.setAttributes( { kind: value } ) },
+								onChange: ( value ) => {
+									props.setAttributes( { kind: value } );
+								},
 							} ),
-						]
-					)
+					  ] )
 					: render( {}, url, kind )
 			);
 		},
-		save: function ( props ) {
+		save: ( props ) => {
 			return render( useBlockProps.save(), props.attributes.url, props.attributes.kind );
 		},
 		deprecated: [
 			{
-				save: function ( props ) {
-					var url  = props.attributes.url;
-					var kind = props.attributes.kind;
+				save: ( props ) => {
+					const url = props.attributes.url;
+					const kind = props.attributes.kind;
 
-					var messages = {
+					const messages = {
 						/* translators: %s: Link to the bookmarked page. */
 						'u-bookmark-of': __( 'Bookmarked %s.', 'indieblocks' ),
 						/* translators: %s: Link to the "liked" page. */
@@ -99,8 +100,12 @@
 						'u-repost-of': __( 'Reposted %s.', 'indieblocks' ),
 					};
 
-					return el( 'div', useBlockProps.save(),
-						el( 'i', {},
+					return el(
+						'div',
+						useBlockProps.save(),
+						el(
+							'i',
+							{},
 							interpolate( sprintf( messages[ kind ], '<a>' + url + '</a>' ), {
 								a: el( 'a', { className: kind, href: url } ),
 							} )

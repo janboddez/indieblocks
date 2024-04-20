@@ -1,49 +1,90 @@
-( function ( blocks, element, blockEditor, coreData, i18n ) {
-	var el = element.createElement;
+( ( blocks, element, blockEditor, coreData, i18n ) => {
+	const { registerBlockType } = blocks;
+	const { createElement: el } = element;
+	const { BlockControls, useBlockProps, __experimentalUseBorderProps } = blockEditor;
+	const { useEntityRecord } = coreData;
+	const { __ } = i18n;
 
-	var BlockControls  = blockEditor.BlockControls;
-	var useBlockProps  = blockEditor.useBlockProps;
-	var useBorderProps = blockEditor.__experimentalUseBorderProps;
+	registerBlockType( 'indieblocks/link-preview', {
+		edit: ( props ) => {
+			const { record, isResolving } = useEntityRecord( 'postType', props.context.postType, props.context.postId );
 
-	var __      = i18n.__;
-	var sprintf = i18n.sprintf;
+			const title = record?.indieblocks_link_preview?.title ?? '';
+			const cardUrl = record?.indieblocks_link_preview?.url ?? '';
+			const thumbnail = record?.indieblocks_link_preview?.thumbnail ?? '';
 
-	blocks.registerBlockType( 'indieblocks/link-preview', {
-		edit: function ( props ) {
-			const { record, isResolving } = coreData.useEntityRecord( 'postType', props.context.postType, props.context.postId );
-
-			var title     = record?.indieblocks_link_preview?.title ?? '';
-			var cardUrl   = record?.indieblocks_link_preview?.url ?? '';
-			var thumbnail = record?.indieblocks_link_preview?.thumbnail ?? '';
-
-			var borderProps = useBorderProps( props.attributes );
-			var bodyProps   = { className: 'indieblocks-card-body' };
+			const borderProps = __experimentalUseBorderProps( props.attributes );
+			const bodyProps = { className: 'indieblocks-card-body' };
 			if ( 'undefined' !== typeof borderProps.style && 'undefined' !== typeof borderProps.style.borderWidth ) {
-				bodyProps.style = { width: 'calc(100% - 90px - ' + borderProps.style.borderWidth + ')' };
+				bodyProps.style = {
+					width: 'calc(100% - 90px - ' + borderProps.style.borderWidth + ')',
+				};
 			}
 
-			var blockProps = useBlockProps();
+			const blockProps = useBlockProps();
 
-			return el( 'div', { ...blockProps, style: { ...blockProps.style, ...borderProps.style } },
+			return el(
+				'div',
+				{
+					...blockProps,
+					style: { ...blockProps.style, ...borderProps.style },
+				},
 				el( BlockControls ),
 				title.length && cardUrl.length
-					? el( 'a', { className: 'indieblocks-card' },
-						el( 'div', { className: 'indieblocks-card-thumbnail', style: { ...borderProps.style, borderBlock: 'none', borderInlineStart: 'none', borderRadius: '0 !important' } },
-							thumbnail
-								? el( 'img', { src: thumbnail, width: 90, height: 90, alt: '' } )
-								: null
-						),
-						el( 'div', bodyProps,
-							el( 'strong', {}, title ),
-							el( 'small', {}, ( new URL( cardUrl ) ).hostname.replace( /^www\./, '' ) )
-						)
-					)
-					: el( 'div', { className: 'indieblocks-card' },
-						el( 'div', { className: 'indieblocks-card-thumbnail', style: { ...borderProps.style, borderBlock: 'none', borderInlineStart: 'none', borderRadius: '0 !important' } } ),
-						el( 'div', bodyProps,
-							el( 'strong', { style: { fontWeight: 'normal' } }, props.context.postId ? __( 'No link preview card', 'indieblocks' ) : __( 'Link Preview', 'indieblocks' ) )
-						)
-					)
+					? el(
+							'a',
+							{ className: 'indieblocks-card' },
+							el(
+								'div',
+								{
+									className: 'indieblocks-card-thumbnail',
+									style: {
+										...borderProps.style,
+										borderBlock: 'none',
+										borderInlineStart: 'none',
+										borderRadius: '0 !important',
+									},
+								},
+								thumbnail
+									? el( 'img', {
+											src: thumbnail,
+											width: 90,
+											height: 90,
+											alt: '',
+									  } )
+									: null
+							),
+							el(
+								'div',
+								bodyProps,
+								el( 'strong', {}, title ),
+								el( 'small', {}, new URL( cardUrl ).hostname.replace( /^www\./, '' ) )
+							)
+					  )
+					: el(
+							'div',
+							{ className: 'indieblocks-card' },
+							el( 'div', {
+								className: 'indieblocks-card-thumbnail',
+								style: {
+									...borderProps.style,
+									borderBlock: 'none',
+									borderInlineStart: 'none',
+									borderRadius: '0 !important',
+								},
+							} ),
+							el(
+								'div',
+								bodyProps,
+								el(
+									'strong',
+									{ style: { fontWeight: 'normal' } },
+									props.context.postId
+										? __( 'No link preview card', 'indieblocks' )
+										: __( 'Link Preview', 'indieblocks' )
+								)
+							)
+					  )
 			);
 		},
 	} );

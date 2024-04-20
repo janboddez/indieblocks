@@ -1,11 +1,11 @@
 <?php
 /**
- * Main plugin class.
+ * Main Webmention class.
  *
  * @package IndieBlocks
  */
 
-namespace IndieBlocks;
+namespace IndieBlocks\Webmention;
 
 /**
  * Main Webmention class.
@@ -22,31 +22,8 @@ class Webmention {
 	public static function register() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
-		add_action( 'add_meta_boxes', array( Webmention_Sender::class, 'add_meta_box' ) );
-		add_action( 'add_meta_boxes_comment', array( Webmention_Sender::class, 'add_meta_box' ) );
-
-		foreach ( static::get_supported_post_types() as $post_type ) {
-			add_action( "publish_{$post_type}", array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
-		}
-
-		// When a comment is first inserted into the database.
-		add_action( 'comment_post', array( Webmention_Sender::class, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
-		// When a comment is approved. Or a previously approved comment updated.
-		add_action( 'comment_approved_comment', array( Webmention_Sender::class, 'schedule_webmention' ), 10, 2 );
-
-		add_action( 'indieblocks_webmention_send', array( Webmention_Sender::class, 'send_webmention' ) );
-
-		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
-		add_action( 'wp_ajax_indieblocks_resend_webmention', array( Webmention_Sender::class, 'reschedule_webmention' ) );
-		add_action( 'wp_ajax_indieblocks_delete_avatar', array( Webmention_Receiver::class, 'delete_avatar' ) );
-
-		add_action( 'add_meta_boxes_comment', array( Webmention_Receiver::class, 'add_meta_box' ) );
-		add_action( 'rest_api_init', array( Webmention_Receiver::class, 'register_api_endpoint' ) );
-		add_action( 'wp_head', array( Webmention_Receiver::class, 'webmention_link' ) );
-		add_action( 'template_redirect', array( Webmention_Receiver::class, 'webmention_link' ) );
-		add_action( 'indieblocks_process_webmentions', array( Webmention_Receiver::class, 'process_webmentions' ) );
-
-		add_filter( 'wp_kses_allowed_html', array( Webmention_Receiver::class, 'allowed_html' ), 10, 2 );
+		Webmention_Sender::register();
+		Webmention_Receiver::register();
 	}
 
 	/**
@@ -145,11 +122,11 @@ class Webmention {
 			return;
 		}
 
-		// Enqueue CSS and JS.
-		wp_enqueue_script( 'indieblocks-webmention', plugins_url( '/assets/webmention.js', __DIR__ ), array( 'jquery' ), Plugin::PLUGIN_VERSION, false );
+		// Enqueue JS.
+		wp_enqueue_script( 'indieblocks-webmention-legacy', plugins_url( '/assets/webmention-legacy.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
 		wp_localize_script(
-			'indieblocks-webmention',
-			'indieblocks_webmention_obj',
+			'indieblocks-webmention-legacy',
+			'indieblocks_webmention_legacy_obj',
 			array(
 				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
 			)
@@ -162,7 +139,7 @@ class Webmention {
 	 * @return array Supported post types.
 	 */
 	public static function get_supported_post_types() {
-		$options = get_options();
+		$options = \IndieBlocks\get_options();
 
 		$supported_post_types = isset( $options['webmention_post_types'] ) ? $options['webmention_post_types'] : array( 'post', 'indieblocks_note' );
 		$supported_post_types = (array) apply_filters( 'indieblocks_webmention_post_types', $supported_post_types );

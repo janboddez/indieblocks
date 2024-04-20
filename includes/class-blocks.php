@@ -7,16 +7,21 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Webmention\Webmention;
+
 class Blocks {
 	/**
 	 * Hooks and such.
 	 */
 	public static function register() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_scripts' ) );
+
 		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
 		add_action( 'init', array( __CLASS__, 'register_block_patterns' ), 15 );
 		add_action( 'init', array( __CLASS__, 'register_block_templates' ), 20 );
-		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoint' ) );
+
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoints' ) );
+
 		add_filter( 'excerpt_allowed_wrapper_blocks', array( __CLASS__, 'excerpt_allow_wrapper_blocks' ) );
 		add_filter( 'excerpt_allowed_blocks', array( __CLASS__, 'excerpt_allow_blocks' ) );
 		add_filter( 'the_excerpt_rss', array( __CLASS__, 'excerpt_feed' ) );
@@ -40,7 +45,7 @@ class Blocks {
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
 			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
-			\IndieBlocks\Plugin::PLUGIN_VERSION,
+			Plugin::PLUGIN_VERSION,
 			true
 		);
 
@@ -85,47 +90,6 @@ class Blocks {
 				dirname( __DIR__ ) . '/languages'
 			);
 		}
-	}
-
-	/**
-	 * Registers block patterns.
-	 */
-	public static function register_block_patterns() {
-		register_block_pattern(
-			'indieblocks/note-starter-pattern',
-			array(
-				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
-				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
-				'categories'  => array( 'text' ),
-				'content'     => '<!-- wp:indieblocks/context -->
-					<div class="wp-block-indieblocks-context"></div>
-					<!-- /wp:indieblocks/context -->
-
-					<!-- wp:group {"className":"e-content"} -->
-					<div class="wp-block-group e-content"><!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph --></div>
-					<!-- /wp:group -->',
-			)
-		);
-
-		register_block_pattern(
-			'indieblocks/repost-starter-pattern',
-			array(
-				'title'       => __( 'Repost Starter Pattern', 'indieblocks' ),
-				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts.', 'indieblocks' ),
-				'categories'  => array( 'text' ),
-				'content'     => '<!-- wp:indieblocks/context -->
-					<div class="wp-block-indieblocks-context"></div>
-					<!-- /wp:indieblocks/context -->
-
-					<!-- wp:quote {"className":"e-content"} -->
-					<blockquote class="wp-block-quote e-content"><!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph --></blockquote>
-					<!-- /wp:quote -->',
-			)
-		);
 	}
 
 	/**
@@ -207,25 +171,18 @@ class Blocks {
 	/**
 	 * Registers (block-related) REST API endpoints.
 	 */
-	public static function register_api_endpoint() {
+	public static function register_api_endpoints() {
 		register_rest_route(
 			'indieblocks/v1',
 			'/meta',
 			array(
 				'methods'             => array( 'GET' ),
-				'callback'            => array( __CLASS__, 'get_meta' ),
-				'permission_callback' => array( __CLASS__, 'permission_callback' ),
+				'callback'            => array( __CLASS__, 'get_url_meta' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
 			)
 		);
-	}
-
-	/**
-	 * The one, for now, REST API permission callback.
-	 *
-	 * @return bool If the request's authorized or not.
-	 */
-	public static function permission_callback() {
-		return current_user_can( 'edit_posts' );
 	}
 
 	/**
@@ -234,7 +191,7 @@ class Blocks {
 	 * @param  \WP_REST_Request $request   WP REST API request.
 	 * @return \WP_REST_Response|\WP_Error Response.
 	 */
-	public static function get_meta( $request ) {
+	public static function get_url_meta( $request ) {
 		$url = $request->get_param( 'url' );
 
 		if ( empty( $url ) ) {
@@ -265,6 +222,49 @@ class Blocks {
 					'name' => sanitize_text_field( $parser->get_author() ),
 					'url'  => esc_url_raw( $parser->get_author_url() ), // Not currently used by any block.
 				),
+			)
+		);
+	}
+
+	/**
+	 * Registers block patterns.
+	 *
+	 * These are mostly outdated now.
+	 */
+	public static function register_block_patterns() {
+		register_block_pattern(
+			'indieblocks/note-starter-pattern',
+			array(
+				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
+
+					<!-- wp:group {"className":"e-content"} -->
+					<div class="wp-block-group e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></div>
+					<!-- /wp:group -->',
+			)
+		);
+
+		register_block_pattern(
+			'indieblocks/repost-starter-pattern',
+			array(
+				'title'       => __( 'Repost Starter Pattern', 'indieblocks' ),
+				'description' => __( 'A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts.', 'indieblocks' ),
+				'categories'  => array( 'text' ),
+				'content'     => '<!-- wp:indieblocks/context -->
+					<div class="wp-block-indieblocks-context"></div>
+					<!-- /wp:indieblocks/context -->
+
+					<!-- wp:quote {"className":"e-content"} -->
+					<blockquote class="wp-block-quote e-content"><!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph --></blockquote>
+					<!-- /wp:quote -->',
 			)
 		);
 	}

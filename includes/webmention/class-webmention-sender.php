@@ -5,12 +5,45 @@
  * @package IndieBlocks
  */
 
-namespace IndieBlocks;
+namespace IndieBlocks\Webmention;
 
 /**
  * Webmention sender.
  */
 class Webmention_Sender {
+	/**
+	 * Registers hook callbacks.
+	 */
+	public static function register() {
+		// Schedule sending of mentions when a supported post is published ...
+		foreach ( Webmention::get_supported_post_types() as $post_type ) {
+			add_action( "publish_{$post_type}", array( __CLASS__, 'schedule_webmention' ), 10, 2 );
+		}
+
+		// And when a comment is first inserted into the database ...
+		add_action( 'comment_post', array( __CLASS__, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
+
+		// And when a comment is approved. Or a previously approved comment updated.
+		add_action( 'comment_approved_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
+
+		// Send previously scheduled mentions.
+		add_action( 'indieblocks_webmention_send', array( __CLASS__, 'send_webmention' ) );
+
+		// Add a "classic" meta box.
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
+		add_action( 'add_meta_boxes_comment', array( __CLASS__, 'add_meta_box' ) );
+
+		// Enqueue classic editor JS.
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+
+		// Enqueue block editor sidebar.
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
+
+		// Support (explicit) re-scheduling.
+		add_action( 'wp_ajax_indieblocks_resend_webmention', array( __CLASS__, 'reschedule_webmention' ) );
+	}
+
 	/**
 	 * Schedules the sending of webmentions, if enabled.
 	 *
@@ -23,7 +56,7 @@ class Webmention_Sender {
 	 */
 	public static function schedule_webmention( $obj_id, $obj = null, $deprecated = null ) {
 		if ( null !== $deprecated ) {
-			_deprecated_argument( 'post', '0.10.0', 'Passing a third argument to `\IndieBlocks\Webmention_Sender::schedule_webmention()` is deprecated.' );
+			_deprecated_argument( 'post', '0.10.0', 'Passing a third argument to `\IndieBlocks\Webmention\Webmention_Sender::schedule_webmention()` is deprecated.' );
 		}
 
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
@@ -78,7 +111,7 @@ class Webmention_Sender {
 
 		// Parse in targets that may have been there previously, but don't
 		// delete them, yet.
-		$history = get_meta( $obj, '_indieblocks_webmention_history' );
+		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
 
 		if ( ! empty( $history ) && is_array( $history ) ) {
 			$urls = array_merge( $urls, $history );
@@ -119,7 +152,7 @@ class Webmention_Sender {
 		}
 
 		if ( $schedule ) {
-			$options = get_options();
+			$options = \IndieBlocks\get_options();
 
 			if ( ! isset( $options['webmention_delay'] ) || intval( $options['webmention_delay'] ) > 0 ) {
 				$delay = empty( $options['webmention_delay'] )
@@ -128,12 +161,12 @@ class Webmention_Sender {
 
 				// Schedule sending out the actual webmentions.
 				if ( $obj instanceof \WP_Post ) {
-					debug_log( "[IndieBlocks/Webmention] Scheduling webmention for post {$obj->ID}." );
+					\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Scheduling webmention for post {$obj->ID}." );
 				} else {
-					debug_log( "[IndieBlocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." );
+					\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." );
 				}
 
-				add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
+				\IndieBlocks\add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
 				wp_schedule_single_event( time() + $delay, 'indieblocks_webmention_send', array( $obj ) );
 			} else {
 				// Send inline (although retries will be scheduled as always).
@@ -152,17 +185,17 @@ class Webmention_Sender {
 		if ( $obj instanceof \WP_Post ) {
 			if ( 'publish' !== $obj->post_status ) {
 				// Do not send webmention on delete/unpublish, for now.
-				debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is not published.' );
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is not published.' );
 				return;
 			}
 
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				// This post type doesn't support Webmention.
-				debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
 		} elseif ( '1' !== $obj->comment_approved ) {
-			debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
+			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
 			return;
 		}
 
@@ -186,8 +219,8 @@ class Webmention_Sender {
 		// This also means that "historic" targets are excluded from retries!
 		// Note that we _also_ retarget pages that threw an error or we
 		// otherwise failed to reach previously. Both are probably acceptable.
-		$history = get_meta( $obj, '_indieblocks_webmention_history' );
-		delete_meta( $obj, '_indieblocks_webmention_history' );
+		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
+		\IndieBlocks\delete_meta( $obj, '_indieblocks_webmention_history' );
 
 		if ( ! empty( $history ) && is_array( $history ) ) {
 			$urls = array_merge( $urls, $history );
@@ -195,14 +228,14 @@ class Webmention_Sender {
 
 		if ( empty( $urls ) ) {
 			// One or more links must've been removed. Nothing to do. Bail.
-			debug_log( '[IndieBlocks/Webmention] No outgoing URLs found.' );
+			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] No outgoing URLs found.' );
 			return;
 		}
 
 		$urls = array_unique( $urls );
 
 		// Fetch whatever Webmention-related stats we've got for this post.
-		$webmention = get_meta( $obj, '_indieblocks_webmention' );
+		$webmention = static::get_webmention_meta( $obj );
 
 		if ( empty( $webmention ) || ! is_array( $webmention ) ) {
 			// Ensure `$webmention` is an array.
@@ -216,7 +249,7 @@ class Webmention_Sender {
 
 			if ( empty( $endpoint ) || false === wp_http_validate_url( $endpoint ) ) {
 				// Skip.
-				debug_log( '[IndieBlocks/Webmention] Could not find a Webmention endpoint for target ' . esc_url_raw( $url ) . '.' );
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Could not find a Webmention endpoint for target ' . esc_url_raw( $url ) . '.' );
 				continue;
 			}
 
@@ -230,7 +263,7 @@ class Webmention_Sender {
 				// resending after an update quite a bit. In a future version,
 				// we could store a hash of the post content, too, and use that
 				// to send webmentions on actual updates.
-				debug_log( '[IndieBlocks/Webmention] Previously sent webmention for target ' . esc_url_raw( $url ) . '. Skipping.' );
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Previously sent webmention for target ' . esc_url_raw( $url ) . '. Skipping.' );
 				continue;
 			}
 
@@ -240,7 +273,7 @@ class Webmention_Sender {
 
 			if ( $retries >= 3 ) {
 				// Stop here.
-				debug_log( '[IndieBlocks/Webmention] Sending webmention to ' . esc_url_raw( $url ) . ' failed 3 times before. Not trying again.' );
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Sending webmention to ' . esc_url_raw( $url ) . ' failed 3 times before. Not trying again.' );
 				continue;
 			}
 
@@ -256,7 +289,7 @@ class Webmention_Sender {
 			// @codingStandardsIgnoreEnd
 
 			// Send the webmention.
-			$response = remote_post(
+			$response = \IndieBlocks\remote_post(
 				esc_url_raw( $endpoint ),
 				false,
 				array(
@@ -270,12 +303,11 @@ class Webmention_Sender {
 			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 500 ) {
 				// Something went wrong.
 				if ( is_wp_error( $response ) ) {
-					debug_log( '[IndieBlocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() . '.' );
+					\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Error trying to send a webmention to ' . esc_url_raw( $endpoint ) . ': ' . $response->get_error_message() . '.' );
 				}
-				debug_log( $response );
 
 				$webmention[ $hash ]['retries'] = $retries + 1;
-				update_meta( $obj, '_indieblocks_webmention', $webmention );
+				\IndieBlocks\update_meta( $obj, '_indieblocks_webmention', $webmention );
 
 				// Schedule a retry in 5 to 15 minutes.
 				wp_schedule_single_event( time() + wp_rand( 300, 900 ), 'indieblocks_webmention_send', array( $obj ) );
@@ -287,10 +319,10 @@ class Webmention_Sender {
 			$webmention[ $hash ]['sent'] = current_time( 'mysql' );
 			$webmention[ $hash ]['code'] = wp_remote_retrieve_response_code( $response );
 
-			debug_log( '[IndieBlocks/Webmention] Sent webmention to ' . esc_url_raw( $endpoint ) . '. Response code: ' . wp_remote_retrieve_response_code( $response ) . '.' );
+			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Sent webmention to ' . esc_url_raw( $endpoint ) . '. Response code: ' . wp_remote_retrieve_response_code( $response ) . '.' );
 		}
 
-		update_meta( $obj, '_indieblocks_webmention', $webmention );
+		\IndieBlocks\update_meta( $obj, '_indieblocks_webmention', $webmention );
 	}
 
 	/**
@@ -304,7 +336,7 @@ class Webmention_Sender {
 			return array();
 		}
 
-		$html = '<div>' . convert_encoding( $html ) . '</div>';
+		$html = '<div>' . \IndieBlocks\convert_encoding( $html ) . '</div>';
 
 		libxml_use_internal_errors( true );
 
@@ -334,7 +366,7 @@ class Webmention_Sender {
 
 		if ( ! empty( $endpoint ) ) {
 			// We've previously established the endpoint for this web page.
-			debug_log( '[IndieBlocks/Webmention] Found endpoint (' . esc_url_raw( $endpoint ) . ') for ' . esc_url_raw( $url ) . ' in cache.' );
+			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Found endpoint (' . esc_url_raw( $endpoint ) . ') for ' . esc_url_raw( $url ) . ' in cache.' );
 			return $endpoint;
 		}
 
@@ -380,7 +412,7 @@ class Webmention_Sender {
 
 		// Now do a GET since we're going to look in the HTML headers (and we're
 		// sure its not a binary file).
-		$response = remote_get( $url );
+		$response = \IndieBlocks\remote_get( $url );
 		if ( is_wp_error( $response ) ) {
 			return null;
 		}
@@ -390,7 +422,7 @@ class Webmention_Sender {
 			return null;
 		}
 
-		$content = convert_encoding( $content );
+		$content = \IndieBlocks\convert_encoding( $content );
 		libxml_use_internal_errors( true );
 		$doc = new \DOMDocument();
 		$doc->loadHTML( $content );
@@ -411,31 +443,142 @@ class Webmention_Sender {
 	}
 
 	/**
+	 * Adds the Webmention panel to Gutenberg's document sidebar.
+	 */
+	public static function enqueue_scripts() {
+		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
+			// Outgoing mentions disabled.
+			return;
+		}
+
+		if ( apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
+			// Using a classic meta box instead.
+			return;
+		}
+
+		$current_screen = get_current_screen();
+
+		if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
+			wp_enqueue_script(
+				'indieblocks-webmention',
+				plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ),
+				array(
+					'wp-element',
+					'wp-components',
+					'wp-i18n',
+					'wp-data',
+					'wp-core-data',
+					'wp-plugins',
+					'wp-edit-post',
+					'indieblocks-common',
+				),
+				\IndieBlocks\Plugin::PLUGIN_VERSION,
+				false
+			);
+
+			global $post;
+
+			$args = array(
+				'ajaxurl'       => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+				'show_meta_box' => ! empty( $post->ID ) && '' !== static::get_webmention_meta( $post )
+					? '1'
+					: '0',
+			);
+
+			if ( ! empty( $post->ID ) ) {
+				$args['nonce'] = wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID );
+			}
+
+			wp_localize_script(
+				'indieblocks-webmention',
+				'indieblocks_webmention_obj',
+				$args
+			);
+		}
+	}
+
+	/**
+	 * In the REST API, adds webmention meta to post objects.
+	 */
+	public static function register_rest_field() {
+		foreach ( Webmention::get_supported_post_types() as $post_type ) {
+			register_rest_field(
+				$post_type,
+				'indieblocks_webmention',
+				array(
+					'get_callback'    => array( __CLASS__, 'get_meta' ),
+					'update_callback' => null,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Returns webmention metadata.
+	 *
+	 * Could be used as both a `register_rest_route()` and
+	 * `register_rest_field()` callback.
+	 *
+	 * @param  \WP_REST_Request|array $request API request (parameters).
+	 * @return array|string|\WP_Error          Response (or error).
+	 */
+	public static function get_meta( $request ) {
+		if ( is_array( $request ) ) {
+			// `register_rest_field()` callback.
+			$post_id = $request['id'];
+		} else {
+			// `register_rest_route()` callback.
+			$post_id = $request->get_param( 'post_id' );
+		}
+
+		if ( empty( $post_id ) || ! is_int( $post_id ) ) {
+			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
+		}
+
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+		$meta = get_post_meta( (int) $post_id, '_indieblocks_webmention', true ); // Using `$post_id` rather than `$post`, hence `get_post_meta()`.
+
+		if ( empty( $meta ) ) {
+			return '';
+		}
+
+		return $meta;
+	}
+
+	/**
 	 * Adds meta box.
 	 */
 	public static function add_meta_box() {
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
-			// Disabled.
+			// Outgoing mentions disabled.
 			return;
 		}
 
 		if ( 'add_meta_boxes' === current_action() ) {
+			// "Create/Edit Post" screen.
 			global $post;
 
 			if ( empty( $post->ID ) ) {
 				return;
 			}
 
-			if ( '' === get_post_meta( $post->ID, '_indieblocks_webmention', true ) ) {
+			if ( '' === static::get_webmention_meta( $post ) ) {
 				return;
 			}
 
 			// We may no longer need this, because if the `_indieblocks_webmention`
-			// custom field is non-empty, we'll likely want to show it.
+			// custom field is non-empty, we'll likely want to show it even if
+			// the post type does not currently support webmentions.
 			$supported_post_types = Webmention::get_supported_post_types();
 
 			if ( empty( $supported_post_types ) ) {
 				return;
+			}
+
+			$args = array();
+
+			if ( ! apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
+				$args['__back_compat_meta_box'] = true; // Hide for Gutenberg post types.
 			}
 
 			// Add meta box, for those post types that are supported.
@@ -445,16 +588,18 @@ class Webmention_Sender {
 				array( __CLASS__, 'render_meta_box' ),
 				$supported_post_types,
 				'normal',
-				'default'
+				'default',
+				$args
 			);
 		} elseif ( 'add_meta_boxes_comment' === current_action() ) {
+			// "Edit Comment" screen.
 			global $comment;
 
 			if ( empty( $comment->comment_ID ) ) {
 				return;
 			}
 
-			if ( '' === get_comment_meta( $comment->comment_ID, '_indieblocks_webmention', true ) ) {
+			if ( '' === static::get_webmention_meta( $comment ) ) {
 				return;
 			}
 
@@ -476,15 +621,16 @@ class Webmention_Sender {
 	 */
 	public static function render_meta_box( $obj ) {
 		if ( $obj instanceof \WP_Post ) {
-			// Webmention data.
-			$webmention = get_post_meta( $obj->ID, '_indieblocks_webmention', true );
-			$type       = 'post';
+			$type = 'post';
 		} elseif ( $obj instanceof \WP_Comment ) {
-			$webmention = get_comment_meta( $obj->comment_ID, '_indieblocks_webmention', true );
-			$type       = 'comment';
+			$type = 'comment';
+		} else {
+			return;
 		}
 
-		if ( ! empty( $webmention ) && is_array( $webmention ) ) :
+		$webmention = static::get_webmention_meta( $obj );
+
+		if ( is_array( $webmention ) ) :
 			?>
 			<div style="display: flex; gap: 1em; align-items: start; justify-content: space-between;">
 				<p style="margin: 6px 0;">
@@ -533,13 +679,31 @@ class Webmention_Sender {
 	}
 
 	/**
+	 * Returns Webmention metadata, like where and when mentions were sent.
+	 *
+	 * @param  \WP_Post|\WP_Comment $obj Post or comment being edited.
+	 * @return array|string              Webmention metadata.
+	 */
+	protected static function get_webmention_meta( $obj ) {
+		$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention' );
+
+		\IndieBlocks\debug_log( $webmention );
+
+		if ( empty( $webmention ) ) {
+			return '';
+		}
+
+		return $webmention;
+	}
+
+	/**
 	 * Reschedules a previously sent webmention.
 	 *
 	 * Should only ever be called through AJAX.
 	 */
 	public static function reschedule_webmention() {
 		if ( ! isset( $_POST['_wp_nonce'] ) ) {
-			status_header( 400 );
+			status_header( 400 ); // Guess this doesn't work ...
 			esc_html_e( 'Missing nonce.', 'indieblocks' );
 			wp_die();
 		}
@@ -571,13 +735,15 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = get_post_meta( $obj_id, '_indieblocks_webmention', true );
+			$post    = get_post( $obj_id );
+			$history = static::get_webmention_meta( $post );
 
-			if ( '' !== $history && is_array( $history ) ) {
+			if ( ! empty( $history ) && is_array( $history ) ) {
 				add_post_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
 				delete_post_meta( $obj_id, '_indieblocks_webmention' );
 			}
 
+			echo 'Rescheduling mentions for post ' . intval( $obj_id ) . '.';
 			static::schedule_webmention( $obj_id, get_post( $obj_id ) );
 		} elseif ( 'comment' === $_POST['type'] ) {
 			if ( ! current_user_can( 'edit_comment', $obj_id ) ) {
@@ -586,13 +752,15 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = get_comment_meta( $obj_id, '_indieblocks_webmention', true );
+			$comment = get_comment( $obj_id );
+			$history = static::get_webmention_meta( $comment );
 
 			if ( '' !== $history && is_array( $history ) ) {
 				add_comment_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
 				delete_comment_meta( $obj_id, '_indieblocks_webmention' );
 			}
 
+			echo 'Rescheduling mentions for comment ' . intval( $obj_id ) . '.';
 			static::schedule_webmention( $obj_id, get_comment( $obj_id ) );
 		}
 

@@ -7,11 +7,13 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Webmention\Webmention;
+
 class Plugin {
 	/**
 	 * Plugin version.
 	 */
-	const PLUGIN_VERSION = '0.12.0';
+	const PLUGIN_VERSION = '0.13.0';
 
 	/**
 	 * Options handler.

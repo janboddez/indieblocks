@@ -7,6 +7,8 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Webmention\Webmention;
+
 /**
  * Returns this plugin's options.
  *
@@ -388,7 +390,7 @@ function get_facepile_comments( $post_id ) {
 	// When the "facepile" setting's enabled, we _remove_ the very comments
 	// we now want to fetch, so we have to temporarily disable that
 	// behavior.
-	remove_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+	remove_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 
 	// Placeholder.
 	$facepile_comments           = new \stdClass();
@@ -446,7 +448,7 @@ function get_facepile_comments( $post_id ) {
 	$options = get_options();
 	if ( ! empty( $options['webmention_facepile'] ) ) {
 		// Restore the filter disabled above, but only if it was active before!
-		add_action( 'pre_get_comments', array( \IndieBlocks\Webmention::class, 'comment_query' ) );
+		add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 	}
 
 	// Allow filtering the resulting comments.

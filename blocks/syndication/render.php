@@ -3,6 +3,8 @@
  * @package IndieBlocks
  */
 
+use function IndieBlocks\debug_log;
+
 if ( ! isset( $block->context['postId'] ) ) {
 	return;
 }
@@ -21,15 +23,17 @@ if ( empty( $syndication_urls ) ) {
 	return;
 }
 
-$output = esc_html__( 'Also on', 'indieblocks' ) . ' ';
+$output = esc_html( isset( $attributes['prefix'] ) ? trim( $attributes['prefix'] ) . ' ' : '' );
 
 foreach ( $syndication_urls as $name => $syndication_url ) {
-	$output .= ' <a class="u-syndication" href="' . esc_url( $syndication_url ) . '">' . esc_html( $name ) . '</a>, ';
+	$output .= '<a class="u-syndication" href="' . esc_url( $syndication_url ) . '">' . esc_html( $name ) . '</a>, ';
 }
+
+$output = rtrim( $output, ', ' ) . esc_html( isset( $attributes['suffix'] ) ? ' ' . trim( $attributes['suffix'] ) : '' );
 
 $wrapper_attributes = get_block_wrapper_attributes();
 ?>
 
 <div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<?php echo rtrim( $output, ', ' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	<?php echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>

@@ -1,26 +1,31 @@
 <?php
 /**
- * Webmention/microformats parser.
+ * Webmention parser.
  *
  * @package IndieBlocks
  */
 
-namespace IndieBlocks;
+namespace IndieBlocks\Webmention;
+
+use IndieBlocks\Parser;
 
 /**
- * Microformats parser.
+ * Parses a webmention's source page for microformats.
  */
 class Webmention_Parser {
 	/**
 	 * Updates comment (meta)data using microformats.
 	 *
-	 * @param array  $commentdata Comment (meta)data.
-	 * @param string $html        HTML of the webmention source.
-	 * @param string $source      Webmention source URL.
-	 * @param string $target      Webmention target URL.
+	 * @param  array  $commentdata Comment (meta)data.
+	 * @param  string $html        HTML of the webmention source.
+	 * @param  string $source      Webmention source URL.
+	 * @param  string $target      Webmention target URL.
+	 * @return void
 	 */
 	public static function parse_microformats( &$commentdata, $html, $source, $target ) {
 		if ( preg_match( '~/\?c=\d+$~', $source ) ) {
+			// Source looks like a comment shortlink. Let's try to get the full
+			// URL.
 			$response = wp_remote_head(
 				esc_url_raw( $source ),
 				array(
@@ -44,8 +49,8 @@ class Webmention_Parser {
 
 		$kind = $parser->get_type();
 		if ( empty( $kind ) || 'feed' === $kind ) {
-			// Source doesn't appear to be a "h-entry" (or similar). Still, we
-			// can attempt to set a (better) comment content.
+			// Source doesn't appear to be a single entry. Still, we can try to
+			// set a (better) comment content.
 			$comment_content = $commentdata['comment_content'];
 
 			$content = $parser->get_content();
@@ -226,7 +231,7 @@ class Webmention_Parser {
 	 * @return string|null Local avatar path, or nothing on failure.
 	 */
 	protected static function store_avatar( $url ) {
-		$options = get_options();
+		$options = \IndieBlocks\get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			return null;
 		}
@@ -237,6 +242,6 @@ class Webmention_Parser {
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
-		return store_image( $url, $filename, $dir );
+		return \IndieBlocks\store_image( $url, $filename, $dir );
 	}
 }

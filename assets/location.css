@@ -1,0 +1,13 @@
+.indieblocks-location__fetch-button {
+	height: 32px;
+}
+
+@media screen and (max-width: 782px) {
+	.indieblocks-location__fetch-button {
+		min-height: 40px;
+	}
+}
+
+.indieblocks-location__address-field {
+	width: 100%;
+}

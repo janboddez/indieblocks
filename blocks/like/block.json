@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Like",
+	"description": "Show your appreciation for a certain web page or post.",
 	"name": "indieblocks/like",
 	"category": "text",
 	"editorScript": "file:./block.js",

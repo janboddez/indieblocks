@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Link Preview",
+	"description": "Highlight a post’s first hyperlink with a link preview card.",
 	"name": "indieblocks/link-preview",
 	"category": "theme",
 	"icon": "admin-links",

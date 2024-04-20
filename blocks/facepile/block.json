@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Facepile",
+	"description": "Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile.",
 	"name": "indieblocks/facepile",
 	"category": "theme",
 	"editorScript": "file:./block.js",

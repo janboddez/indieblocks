@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Location",
+	"description": "Display a post’s location and weather metadata.",
 	"name": "indieblocks/location",
 	"category": "theme",
 	"icon": "location",

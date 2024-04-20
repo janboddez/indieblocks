@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Syndication",
+	"description": "Display syndication links.",
 	"name": "indieblocks/syndication",
 	"category": "theme",
 	"icon": "admin-links",

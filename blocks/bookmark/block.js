@@ -7,7 +7,6 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'indieblocks/bookmark', {
-		description: __( 'Bookmark and annotate web pages or posts.', 'indieblocks' ),
 		icon: el(
 			'svg',
 			{

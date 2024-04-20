@@ -7,7 +7,6 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'indieblocks/reply', {
-		description: __( 'Reply to others’ (or your own) posts and pages.', 'indieblocks' ),
 		edit: ( props ) => {
 			const url = props.attributes.url;
 			const customTitle = props.attributes.customTitle;

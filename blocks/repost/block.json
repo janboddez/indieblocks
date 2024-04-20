@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Repost",
+	"description": "Use the Repost block to “reblog” another (short) post verbatim while still giving credit.",
 	"name": "indieblocks/repost",
 	"category": "text",
 	"editorScript": "file:./block.js",

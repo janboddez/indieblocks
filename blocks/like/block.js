@@ -7,7 +7,6 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'indieblocks/like', {
-		description: __( 'Show your appreciation for a certain web page or post.', 'indieblocks' ),
 		icon: el(
 			'svg',
 			{

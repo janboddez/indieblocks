@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Facepile Content",
+	"description": "Outputs the actual “facepile” avatars.",
 	"name": "indieblocks/facepile-content",
 	"category": "theme",
 	"editorScript": "file:./block.js",

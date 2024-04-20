@@ -7,10 +7,6 @@
 	const { __ } = i18n;
 
 	registerBlockType( 'indieblocks/repost', {
-		description: __(
-			'Use the Repost block to “reblog” another (short) post verbatim while still giving credit.',
-			'indieblocks'
-		),
 		icon: el(
 			'svg',
 			{

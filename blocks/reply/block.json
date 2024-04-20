@@ -1,6 +1,7 @@
 {
 	"apiVersion": 2,
 	"title": "Reply",
+	"description": "Reply to others’ (or your own) posts and pages.",
 	"name": "indieblocks/reply",
 	"category": "text",
 	"icon": "admin-comments",

@@ -12,6 +12,28 @@ namespace IndieBlocks\Webmention;
  */
 class Webmention_Receiver {
 	/**
+	 * Registers hook callbacks.
+	 */
+	public static function register() {
+		// Register Webmention endpoint.
+		add_action( 'rest_api_init', array( __CLASS__, 'register_api_endpoint' ) );
+
+		// Publicize Webmention endpoint.
+		add_action( 'wp_head', array( __CLASS__, 'webmention_link' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'webmention_link' ) );
+
+		// Process stored mentions.
+		add_action( 'indieblocks_process_webmentions', array( __CLASS__, 'process_webmentions' ) );
+		add_filter( 'wp_kses_allowed_html', array( __CLASS__, 'allowed_html' ), 10, 2 );
+
+		// If applicable, add a comment meta box.
+		add_action( 'add_meta_boxes_comment', array( __CLASS__, 'add_meta_box' ) );
+
+		// Support avatar deletion.
+		add_action( 'wp_ajax_indieblocks_delete_avatar', array( __CLASS__, 'delete_avatar' ) );
+	}
+
+	/**
 	 * Registers a new REST API route.
 	 */
 	public static function register_api_endpoint() {

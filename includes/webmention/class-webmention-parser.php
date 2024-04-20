@@ -16,10 +16,11 @@ class Webmention_Parser {
 	/**
 	 * Updates comment (meta)data using microformats.
 	 *
-	 * @param array  $commentdata Comment (meta)data.
-	 * @param string $html        HTML of the webmention source.
-	 * @param string $source      Webmention source URL.
-	 * @param string $target      Webmention target URL.
+	 * @param  array  $commentdata Comment (meta)data.
+	 * @param  string $html        HTML of the webmention source.
+	 * @param  string $source      Webmention source URL.
+	 * @param  string $target      Webmention target URL.
+	 * @return void
 	 */
 	public static function parse_microformats( &$commentdata, $html, $source, $target ) {
 		if ( preg_match( '~/\?c=\d+$~', $source ) ) {
@@ -48,8 +49,8 @@ class Webmention_Parser {
 
 		$kind = $parser->get_type();
 		if ( empty( $kind ) || 'feed' === $kind ) {
-			// Source doesn't appear to be a "h-entry" (or similar). Still, we
-			// can attempt to set a (better) comment content.
+			// Source doesn't appear to be a single entry. Still, we can try to
+			// set a (better) comment content.
 			$comment_content = $commentdata['comment_content'];
 
 			$content = $parser->get_content();

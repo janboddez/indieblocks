@@ -12,6 +12,39 @@ namespace IndieBlocks\Webmention;
  */
 class Webmention_Sender {
 	/**
+	 * Registers hook callbacks.
+	 */
+	public static function register() {
+		// Schedule sending of mentions when a supported post is published ...
+		foreach ( Webmention::get_supported_post_types() as $post_type ) {
+			add_action( "publish_{$post_type}", array( __CLASS__, 'schedule_webmention' ), 10, 2 );
+		}
+
+		// And when a comment is first inserted into the database ...
+		add_action( 'comment_post', array( __CLASS__, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
+
+		// And when a comment is approved. Or a previously approved comment updated.
+		add_action( 'comment_approved_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
+
+		// Send previously scheduled mentions.
+		add_action( 'indieblocks_webmention_send', array( __CLASS__, 'send_webmention' ) );
+
+		// Add a "classic" meta box.
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
+		add_action( 'add_meta_boxes_comment', array( __CLASS__, 'add_meta_box' ) );
+
+		// Enqueue classic editor JS.
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+
+		// Enqueue block editor sidebar.
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_field' ) );
+
+		// Support (explicit) re-scheduling.
+		add_action( 'wp_ajax_indieblocks_resend_webmention', array( __CLASS__, 'reschedule_webmention' ) );
+	}
+
+	/**
 	 * Schedules the sending of webmentions, if enabled.
 	 *
 	 * Scans for outgoing links, but leaves fetching Webmention endpoints to the
@@ -502,8 +535,8 @@ class Webmention_Sender {
 			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
 		}
 
-		$post_id = (int) $post_id;
-		$meta    = get_post_meta( $post_id, '_indieblocks_webmention', true ); // Using `$post_id` rather than `$post`, hence `get_post_meta()`.
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+		$meta = get_post_meta( (int) $post_id, '_indieblocks_webmention', true ); // Using `$post_id` rather than `$post`, hence `get_post_meta()`.
 
 		if ( empty( $meta ) ) {
 			return '';
@@ -702,7 +735,8 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = static::get_webmention_meta( $obj );
+			$post    = get_post( $obj_id );
+			$history = static::get_webmention_meta( $post );
 
 			if ( ! empty( $history ) && is_array( $history ) ) {
 				add_post_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
@@ -718,7 +752,8 @@ class Webmention_Sender {
 				wp_die();
 			}
 
-			$history = static::get_webmention_meta( $obj );
+			$comment = get_comment( $obj_id );
+			$history = static::get_webmention_meta( $comment );
 
 			if ( '' !== $history && is_array( $history ) ) {
 				add_comment_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );

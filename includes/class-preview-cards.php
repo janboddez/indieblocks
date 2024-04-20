@@ -137,8 +137,6 @@ class Preview_Cards {
 			return new \WP_Error( 'invalid_id', 'Invalid post ID.', array( 'status' => 400 ) );
 		}
 
-		$post_id = (int) $post_id;
-
-		return get_post_meta( $post_id, '_indieblocks_link_preview', true ); // Either an empty string, or an associated array (which gets translated into a JSON object).
+		return get_post_meta( (int) $post_id, '_indieblocks_link_preview', true ); // Either an empty string, or an associated array (which gets translated into a JSON object).
 	}
 }

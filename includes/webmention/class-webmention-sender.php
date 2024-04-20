@@ -114,7 +114,7 @@ class Webmention_Sender {
 		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
 
 		if ( ! empty( $history ) && is_array( $history ) ) {
-			$urls = array_merge( $urls, $history );
+			$urls = array_merge( $urls, array_column( $history, 'target' ) );
 		}
 
 		$urls = array_unique( $urls ); // For `array_search()` to work more reliably.
@@ -140,6 +140,16 @@ class Webmention_Sender {
 		foreach ( $urls as $url ) {
 			// Try to find a Webmention endpoint.
 			$endpoint = static::webmention_discover_endpoint( $url );
+
+			if ( empty( $endpoint ) && ! empty( $history ) && is_array( $history ) ) {
+				// Could this be an "old" target, and, if so, don't we have a
+				// known endpoint for it?
+				$key = array_search( $url, array_column( $history, 'target' ), true );
+
+				if ( false !== $key && ! empty( $history[ $key ]['endpoint'] ) ) {
+					$endpoint = $history[ $key ]['endpoint'];
+				}
+			}
 
 			if ( empty( $endpoint ) || false === wp_http_validate_url( $endpoint ) ) {
 				// Skip.
@@ -223,7 +233,7 @@ class Webmention_Sender {
 		\IndieBlocks\delete_meta( $obj, '_indieblocks_webmention_history' );
 
 		if ( ! empty( $history ) && is_array( $history ) ) {
-			$urls = array_merge( $urls, $history );
+			$urls = array_merge( $urls, array_column( $history, 'target' ) );
 		}
 
 		if ( empty( $urls ) ) {
@@ -738,7 +748,7 @@ class Webmention_Sender {
 			$history = static::get_webmention_meta( $post );
 
 			if ( ! empty( $history ) && is_array( $history ) ) {
-				add_post_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
+				add_post_meta( $obj_id, '_indieblocks_webmention_history', $history, true );
 				delete_post_meta( $obj_id, '_indieblocks_webmention' );
 			}
 
@@ -755,7 +765,7 @@ class Webmention_Sender {
 			$history = static::get_webmention_meta( $comment );
 
 			if ( '' !== $history && is_array( $history ) ) {
-				add_comment_meta( $obj_id, '_indieblocks_webmention_history', array_column( $history, 'target' ), true );
+				add_comment_meta( $obj_id, '_indieblocks_webmention_history', $history, true );
 				delete_comment_meta( $obj_id, '_indieblocks_webmention' );
 			}
 

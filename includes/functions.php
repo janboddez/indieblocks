@@ -465,7 +465,7 @@ function get_facepile_comments( $post_id ) {
  *
  * @param  \WP_Post|\WP_Comment $obj      Post or comment.
  * @param  string               $meta_key The meta key.
- * @return string                         The meta value (or an empty) string.
+ * @return mixed                          The meta value (or an empty string).
  */
 function get_meta( $obj, $meta_key ) {
 	if ( $obj instanceof \WP_Post ) {

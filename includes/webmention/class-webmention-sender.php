@@ -156,7 +156,7 @@ class Webmention_Sender {
 				continue;
 			}
 
-			// Found an endpoint.
+			// Found at least one endpoint.
 			$schedule = true;
 			break; // No need to look up _all_ endpoints (even though they're normally cached) to determine whether to schedule mentions.
 		}
@@ -225,10 +225,7 @@ class Webmention_Sender {
 			}
 		}
 
-		// Parse in (_and_ then forget) targets that may have been there before.
-		// This also means that "historic" targets are excluded from retries!
-		// Note that we _also_ retarget pages that threw an error or we
-		// otherwise failed to reach previously. Both are probably acceptable.
+		// Parse in (and then forget) targets that may have been there before.
 		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
 		\IndieBlocks\delete_meta( $obj, '_indieblocks_webmention_history' );
 
@@ -256,6 +253,16 @@ class Webmention_Sender {
 			// Try to find a Webmention endpoint. If we're lucky, one was
 			// cached previously.
 			$endpoint = static::webmention_discover_endpoint( $url );
+
+			if ( empty( $endpoint ) && ! empty( $history ) && is_array( $history ) ) {
+				// Could this be an "old" target, and, if so, don't we have a
+				// known endpoint for it?
+				$key = array_search( $url, array_column( $history, 'target' ), true );
+
+				if ( false !== $key && ! empty( $history[ $key ]['endpoint'] ) ) {
+					$endpoint = $history[ $key ]['endpoint'];
+				}
+			}
 
 			if ( empty( $endpoint ) || false === wp_http_validate_url( $endpoint ) ) {
 				// Skip.

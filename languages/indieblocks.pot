@@ -2,19 +2,20 @@
 # This file is distributed under the GNU General Public License v3.
 msgid ""
 msgstr ""
-"Project-Id-Version: IndieBlocks 0.12.0\n"
+"Project-Id-Version: IndieBlocks 0.13.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/indieblocks\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-02-11T11:50:00+00:00\n"
+"POT-Creation-Date: 2024-04-20T20:19:52+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.9.0\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: indieblocks\n"
 
 #. Plugin Name of the plugin
+#: indieblocks.php
 #: includes/class-options-handler.php:211
 #: includes/class-options-handler.php:212
 #: includes/class-options-handler.php:365
@@ -22,48 +23,48 @@ msgid "IndieBlocks"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: indieblocks.php
 msgid "https://indieblocks.xyz/"
 msgstr ""
 
 #. Description of the plugin
+#: indieblocks.php
 msgid "Leverage blocks and custom post types to easily \"IndieWebify\" your WordPress site."
 msgstr ""
 
 #. Author of the plugin
+#: indieblocks.php
 msgid "Jan Boddez"
 msgstr ""
 
 #. Author URI of the plugin
+#: indieblocks.php
 msgid "https://jan.boddez.net/"
 msgstr ""
 
-#: blocks/syndication/class-syndication-block.php:38
-#: blocks/syndication/block.js:35
+#: blocks/syndication/render.php:14
+#: blocks/syndication/block.js:41
 msgid "Mastodon"
 msgstr ""
 
-#: blocks/syndication/class-syndication-block.php:39
-#: blocks/syndication/block.js:39
+#: blocks/syndication/render.php:15
+#: blocks/syndication/block.js:48
 msgid "Pixelfed"
 msgstr ""
 
-#: blocks/syndication/class-syndication-block.php:50
-msgid "Also on"
-msgstr ""
-
-#: includes/class-blocks.php:91
+#: includes/class-blocks.php:238
 msgid "Note Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:92
+#: includes/class-blocks.php:239
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style notes."
 msgstr ""
 
-#: includes/class-blocks.php:109
+#: includes/class-blocks.php:256
 msgid "Repost Starter Pattern"
 msgstr ""
 
-#: includes/class-blocks.php:110
+#: includes/class-blocks.php:257
 msgid "A nearly blank starter pattern for &ldquo;IndieWeb&rdquo;-style reposts."
 msgstr ""
 
@@ -72,84 +73,88 @@ msgstr ""
 msgid "Posts &#8211; %s"
 msgstr ""
 
-#: includes/class-location.php:42
+#: includes/class-location.php:266
+#: assets/location.js:145
+#: assets/location.js:208
+#: blocks/location/block.js:57
+#: blocks/location/block.js:157
+msgid "Location"
+msgstr ""
+
+#: includes/class-location.php:287
 msgid "Update location data?"
 msgstr ""
 
-#: includes/class-location.php:45
+#: includes/class-location.php:290
+#: assets/location.js:157
 msgid "Latitude"
 msgstr ""
 
-#: includes/class-location.php:48
+#: includes/class-location.php:293
+#: assets/location.js:168
 msgid "Longitude"
 msgstr ""
 
-#: includes/class-location.php:52
+#: includes/class-location.php:297
 msgid "Name"
-msgstr ""
-
-#: includes/class-location.php:107
-#: blocks/location/block.js:46
-#: blocks/location/block.js:83
-msgid "Location"
 msgstr ""
 
 #. translators: %1$s: Link to the "liked" page. %2$s: Author of the "liked" page.
 #: includes/class-micropub-compat.php:280
-#: assets/common.js:13
+#: assets/common.js:12
 msgid "Likes %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
 #: includes/class-micropub-compat.php:303
 #: includes/class-micropub-compat.php:318
-#: assets/common.js:24
-#: blocks/context/block.js:22
+#: assets/common.js:23
+#: blocks/context/block.js:12
 msgid "Likes %s."
 msgstr ""
 
 #. translators: %1$s: Link to the bookmarked page. %2$s: Author of the bookmarked page.
 #: includes/class-micropub-compat.php:343
-#: assets/common.js:11
+#: assets/common.js:10
 msgid "Bookmarked %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the bookmarked page.
 #: includes/class-micropub-compat.php:366
 #: includes/class-micropub-compat.php:381
-#: assets/common.js:22
-#: blocks/context/block.js:20
-#: blocks/context/block.js:93
+#: assets/common.js:21
+#: blocks/context/block.js:10
+#: blocks/context/block.js:94
 msgid "Bookmarked %s."
 msgstr ""
 
 #. translators: %1$s: Link to the page being replied to. %2$s: Author of the page being replied to.
 #: includes/class-micropub-compat.php:406
-#: assets/common.js:15
+#: assets/common.js:14
 msgid "In reply to %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the page being replied to.
 #: includes/class-micropub-compat.php:429
 #: includes/class-micropub-compat.php:444
-#: assets/common.js:26
-#: blocks/context/block.js:24
-#: blocks/context/block.js:97
+#: assets/common.js:25
+#: blocks/context/block.js:14
+#: blocks/context/block.js:98
 msgid "In reply to %s."
 msgstr ""
 
 #. translators: %1$s: Link to the "page" being reposted. %2$s: Author of the "page" being reposted.
 #: includes/class-micropub-compat.php:469
-#: assets/common.js:17
+#: assets/common.js:16
 msgid "Reposted %1$s by %2$s."
 msgstr ""
 
 #. translators: %s: Link to the "page" being reposted.
 #: includes/class-micropub-compat.php:492
 #: includes/class-micropub-compat.php:507
-#: assets/common.js:28
-#: blocks/context/block.js:26
-#: blocks/context/block.js:99
+#: assets/common.js:27
+#: blocks/context/block.js:16
+#: blocks/context/block.js:100
 msgid "Reposted %s."
 msgstr ""
 
@@ -164,9 +169,11 @@ msgstr ""
 
 #: includes/class-options-handler.php:376
 #: includes/class-options-handler.php:479
-#: includes/class-webmention-receiver.php:316
-#: includes/class-webmention-sender.php:444
-#: includes/class-webmention-sender.php:463
+#: includes/webmention/class-webmention-receiver.php:338
+#: includes/webmention/class-webmention-sender.php:586
+#: includes/webmention/class-webmention-sender.php:607
+#: assets/webmention.js:157
+#: assets/webmention.js:173
 msgid "Webmention"
 msgstr ""
 
@@ -389,7 +396,7 @@ msgid "Enable location functions"
 msgstr ""
 
 #: includes/class-options-handler.php:520
-msgid "(Experimental) Add basic location and weather data&mdash;not yet shown on the front end&mdash;to posts."
+msgid "(Experimental) Add basic location and weather data to posts."
 msgstr ""
 
 #: includes/class-options-handler.php:523
@@ -492,7 +499,7 @@ msgstr ""
 
 #: includes/class-post-types.php:114
 #: blocks/context/block.js:71
-#: blocks/like/block.js:78
+#: blocks/like/block.js:88
 msgid "Like"
 msgstr ""
 
@@ -532,262 +539,265 @@ msgstr ""
 msgid "likes"
 msgstr ""
 
-#: includes/class-webmention-parser.php:118
+#: includes/webmention/class-webmention-parser.php:123
 msgid "&hellip; bookmarked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:123
+#: includes/webmention/class-webmention-parser.php:128
 msgid "&hellip; liked this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:127
+#: includes/webmention/class-webmention-parser.php:132
 msgid "&hellip; reposted this!"
 msgstr ""
 
-#: includes/class-webmention-parser.php:131
+#: includes/webmention/class-webmention-parser.php:136
 msgid "&hellip; (wants to) read this!"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:232
+#: includes/webmention/class-webmention-receiver.php:254
 msgid "&hellip; commented on this."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:335
+#: includes/webmention/class-webmention-receiver.php:357
 msgid "Source"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:338
+#: includes/webmention/class-webmention-receiver.php:360
 #: blocks/context/block.js:67
 msgid "Type"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:342
+#: includes/webmention/class-webmention-receiver.php:364
 msgid "Avatar"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:346
+#: includes/webmention/class-webmention-receiver.php:368
 msgid "Delete"
 msgstr ""
 
-#: includes/class-webmention-receiver.php:384
+#: includes/webmention/class-webmention-receiver.php:406
 msgid "Missing or invalid nonce."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:390
+#: includes/webmention/class-webmention-receiver.php:412
 msgid "Invalid comment ID."
 msgstr ""
 
-#: includes/class-webmention-receiver.php:398
-#: includes/class-webmention-sender.php:570
-#: includes/class-webmention-sender.php:585
+#: includes/webmention/class-webmention-receiver.php:420
+#: includes/webmention/class-webmention-sender.php:733
+#: includes/webmention/class-webmention-sender.php:750
 msgid "Insufficient rights."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:502
+#: includes/webmention/class-webmention-sender.php:647
 msgid "Sent to %1$s on %2$s. Response code: %3$d."
 msgstr ""
 
 #. translators: 1: Webmention endpoint 2: Date sent
-#: includes/class-webmention-sender.php:502
+#: includes/webmention/class-webmention-sender.php:647
 msgid "M j, Y \\a\\t H:i"
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:505
+#: includes/webmention/class-webmention-sender.php:650
+#: assets/webmention.js:108
 msgid "Could not send webmention to %s."
 msgstr ""
 
 #. translators: Webmention endpoint
-#: includes/class-webmention-sender.php:508
+#: includes/webmention/class-webmention-sender.php:653
+#: assets/webmention.js:125
 msgid "Could not send webmention to %s. Trying again soon."
 msgstr ""
 
-#: includes/class-webmention-sender.php:518
-#: includes/class-webmention-sender.php:526
+#: includes/webmention/class-webmention-sender.php:663
+#: includes/webmention/class-webmention-sender.php:671
+#: assets/webmention.js:192
 msgid "Resend"
 msgstr ""
 
-#: includes/class-webmention-sender.php:523
-#: includes/class-webmention.php:154
+#: includes/webmention/class-webmention-sender.php:668
+#: includes/webmention/class-webmention.php:131
+#: assets/webmention.js:144
 msgid "Webmention scheduled."
 msgstr ""
 
-#: includes/class-webmention-sender.php:530
+#: includes/webmention/class-webmention-sender.php:675
+#: assets/webmention.js:150
 msgid "No endpoints found."
 msgstr ""
 
-#: includes/class-webmention-sender.php:543
+#: includes/webmention/class-webmention-sender.php:706
 msgid "Missing nonce."
 msgstr ""
 
-#: includes/class-webmention-sender.php:549
+#: includes/webmention/class-webmention-sender.php:712
 msgid "Missing webmention type."
 msgstr ""
 
-#: includes/class-webmention-sender.php:555
+#: includes/webmention/class-webmention-sender.php:718
 msgid "Invalid nonce."
 msgstr ""
 
-#: includes/class-webmention-sender.php:561
+#: includes/webmention/class-webmention-sender.php:724
 msgid "Invalid object ID."
 msgstr ""
 
-#: blocks/bookmark/block.js:26
-msgid "Bookmark and annotate web pages or posts."
+#: assets/location.js:197
+msgid "Fetch"
 msgstr ""
 
-#: blocks/bookmark/block.js:78
+#. translators: %1$s: Webmention endpoint. %2$s: HTTP response code.
+#: assets/webmention.js:88
+msgid "Sent to %1$s: %2$d."
+msgstr ""
+
+#: assets/webmention.js:186
+msgid "Reschedule webmentions?"
+msgstr ""
+
+#: blocks/bookmark/block.js:88
 #: blocks/context/block.js:70
 msgid "Bookmark"
 msgstr ""
 
-#: blocks/bookmark/block.js:83
-#: blocks/like/block.js:83
-#: blocks/reply/block.js:70
-#: blocks/repost/block.js:83
+#: blocks/bookmark/block.js:93
+#: blocks/like/block.js:93
+#: blocks/reply/block.js:74
+#: blocks/repost/block.js:93
 msgid "Add a URL and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
-#: blocks/bookmark/block.js:87
-#: blocks/like/block.js:87
-#: blocks/reply/block.js:74
-#: blocks/repost/block.js:87
+#: blocks/bookmark/block.js:100
+#: blocks/like/block.js:100
+#: blocks/reply/block.js:81
+#: blocks/repost/block.js:100
 msgid "Title"
 msgstr ""
 
-#: blocks/bookmark/block.js:97
-#: blocks/like/block.js:97
-#: blocks/reply/block.js:84
-#: blocks/repost/block.js:97
+#: blocks/bookmark/block.js:112
+#: blocks/like/block.js:112
+#: blocks/reply/block.js:93
+#: blocks/repost/block.js:112
 msgid "Author"
 msgstr ""
 
-#: blocks/bookmark/block.js:117
-#: blocks/like/block.js:117
-#: blocks/reply/block.js:104
-#: blocks/repost/block.js:117
+#: blocks/bookmark/block.js:142
+#: blocks/like/block.js:142
+#: blocks/reply/block.js:123
+#: blocks/repost/block.js:142
 msgid "Customize title"
 msgstr ""
 
-#: blocks/bookmark/block.js:123
-#: blocks/like/block.js:123
-#: blocks/reply/block.js:110
-#: blocks/repost/block.js:123
+#: blocks/bookmark/block.js:152
+#: blocks/like/block.js:152
+#: blocks/reply/block.js:133
+#: blocks/repost/block.js:152
 msgid "Customize author"
 msgstr ""
 
-#: blocks/bookmark/block.js:130
-#: blocks/context/block.js:62
-#: blocks/like/block.js:130
-#: blocks/reply/block.js:117
-#: blocks/repost/block.js:130
+#: blocks/bookmark/block.js:163
+#: blocks/context/block.js:60
+#: blocks/like/block.js:163
+#: blocks/reply/block.js:144
+#: blocks/repost/block.js:163
 msgid "URL"
 msgstr ""
 
-#: blocks/context/block.js:48
+#: blocks/context/block.js:42
 msgid "Context"
 msgstr ""
 
-#: blocks/context/block.js:53
+#: blocks/context/block.js:47
 msgid "Add a URL and post type, and have WordPress automatically generate a correctly microformatted introductory paragraph."
 msgstr ""
 
 #: blocks/context/block.js:72
-#: blocks/reply/block.js:65
+#: blocks/reply/block.js:69
 msgid "Reply"
 msgstr ""
 
 #: blocks/context/block.js:73
-#: blocks/repost/block.js:78
+#: blocks/repost/block.js:88
 msgid "Repost"
 msgstr ""
 
 #. translators: %s: Link to the "liked" page.
-#: blocks/context/block.js:95
+#: blocks/context/block.js:96
 msgid "Liked %s."
-msgstr ""
-
-#: blocks/facepile-content/block.js:24
-msgid "Outputs the actual “facepile” avatars."
 msgstr ""
 
 #: blocks/facepile-content/block.js:65
 msgid "Avatar size"
 msgstr ""
 
-#: blocks/facepile-content/block.js:71
+#: blocks/facepile-content/block.js:75
 msgid "Background color"
 msgstr ""
 
-#: blocks/facepile-content/block.js:79
+#: blocks/facepile-content/block.js:87
 msgid "Show icons"
 msgstr ""
 
-#: blocks/facepile-content/block.js:83
+#: blocks/facepile-content/block.js:95
 msgid "Icon color"
 msgstr ""
 
-#: blocks/facepile-content/block.js:90
+#: blocks/facepile-content/block.js:107
 msgid "Icon background color"
 msgstr ""
 
-#: blocks/facepile/block.js:18
-msgid "Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile."
-msgstr ""
-
-#: blocks/facepile/block.js:24
+#: blocks/facepile/block.js:28
 msgid "Likes, Bookmarks, and Reposts"
 msgstr ""
 
-#: blocks/like/block.js:19
-msgid "Show your appreciation for a certain web page or post."
-msgstr ""
-
-#: blocks/link-preview/block.js:44
+#: blocks/link-preview/block.js:83
 msgid "No link preview card"
 msgstr ""
 
-#: blocks/link-preview/block.js:44
+#: blocks/link-preview/block.js:84
 msgid "Link Preview"
 msgstr ""
 
-#: blocks/location/block.js:50
+#: blocks/location/block.js:61
 msgid "Display weather information"
 msgstr ""
 
-#: blocks/location/block.js:57
+#: blocks/location/block.js:76
 msgid "Separator"
 msgstr ""
 
-#: blocks/location/block.js:82
+#: blocks/location/block.js:156
 msgid "No location"
 msgstr ""
 
-#: blocks/reply/block.js:19
-msgid "Reply to others’ (or your own) posts and pages."
+#: blocks/syndication/block.js:64
+msgid "Prefix and Suffix"
 msgstr ""
 
-#: blocks/repost/block.js:26
-msgid "Use the Repost block to “reblog” another (short) post verbatim while still giving credit."
+#: blocks/syndication/block.js:69
+msgid "Prefix"
 msgstr ""
 
-#. translators: %s: plain-text "list" of links.
-#: blocks/syndication/block.js:19
-msgid "Also on %s"
+#: blocks/syndication/block.js:76
+msgid "Suffix"
 msgstr ""
 
-#: blocks/syndication/block.js:47
-msgid "No syndication links"
-msgstr ""
-
-#: blocks/syndication/block.js:48
+#: blocks/syndication/block.js:86
+#: blocks/syndication/block.js:89
 msgid "Syndication Links"
 msgstr ""
 
 #: blocks/bookmark/block.json
 msgctxt "block title"
 msgid "Bookmark"
+msgstr ""
+
+#: blocks/bookmark/block.json
+msgctxt "block description"
+msgid "Bookmark and annotate web pages or posts."
 msgstr ""
 
 #: blocks/context/block.json
@@ -800,9 +810,19 @@ msgctxt "block title"
 msgid "Facepile Content"
 msgstr ""
 
+#: blocks/facepile-content/block.json
+msgctxt "block description"
+msgid "Outputs the actual “facepile” avatars."
+msgstr ""
+
 #: blocks/facepile/block.json
 msgctxt "block title"
 msgid "Facepile"
+msgstr ""
+
+#: blocks/facepile/block.json
+msgctxt "block description"
+msgid "Contains the blocks to display Webmention “likes,” “reposts,” etc. as a so-called facepile."
 msgstr ""
 
 #: blocks/like/block.json
@@ -810,9 +830,19 @@ msgctxt "block title"
 msgid "Like"
 msgstr ""
 
+#: blocks/like/block.json
+msgctxt "block description"
+msgid "Show your appreciation for a certain web page or post."
+msgstr ""
+
 #: blocks/link-preview/block.json
 msgctxt "block title"
 msgid "Link Preview"
+msgstr ""
+
+#: blocks/link-preview/block.json
+msgctxt "block description"
+msgid "Highlight a post’s first hyperlink with a link preview card."
 msgstr ""
 
 #: blocks/location/block.json
@@ -820,9 +850,19 @@ msgctxt "block title"
 msgid "Location"
 msgstr ""
 
+#: blocks/location/block.json
+msgctxt "block description"
+msgid "Display a post’s location and weather metadata."
+msgstr ""
+
 #: blocks/reply/block.json
 msgctxt "block title"
 msgid "Reply"
+msgstr ""
+
+#: blocks/reply/block.json
+msgctxt "block description"
+msgid "Reply to others’ (or your own) posts and pages."
 msgstr ""
 
 #: blocks/repost/block.json
@@ -830,7 +870,17 @@ msgctxt "block title"
 msgid "Repost"
 msgstr ""
 
+#: blocks/repost/block.json
+msgctxt "block description"
+msgid "Use the Repost block to “reblog” another (short) post verbatim while still giving credit."
+msgstr ""
+
 #: blocks/syndication/block.json
 msgctxt "block title"
 msgid "Syndication"
+msgstr ""
+
+#: blocks/syndication/block.json
+msgctxt "block description"
+msgid "Display syndication links."
 msgstr ""

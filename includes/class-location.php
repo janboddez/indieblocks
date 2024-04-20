@@ -71,7 +71,6 @@ class Location {
 					'wp-api-fetch',
 					'wp-plugins',
 					'wp-edit-post',
-					'indieblocks-common',
 				),
 				\IndieBlocks\Plugin::PLUGIN_VERSION,
 				false

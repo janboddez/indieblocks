@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'IndieBlocks\\Blocks' => $baseDir . '/../includes/class-blocks.php',
+    'IndieBlocks\\Commands\\Commands' => $baseDir . '/../includes/commands/class-commands.php',
     'IndieBlocks\\Feeds' => $baseDir . '/../includes/class-feeds.php',
     'IndieBlocks\\Location' => $baseDir . '/../includes/class-location.php',
     'IndieBlocks\\Masterminds\\HTML5' => $vendorDir . '/masterminds/html5/src/HTML5.php',

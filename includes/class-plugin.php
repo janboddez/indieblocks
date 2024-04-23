@@ -46,6 +46,11 @@ class Plugin {
 	 * Hooks and such.
 	 */
 	public function register() {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			// Register our new CLI command.
+			\WP_CLI::add_command( 'indieblocks', \IndieBlocks\Commands\Commands::class );
+		}
+
 		// Enable i18n.
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 

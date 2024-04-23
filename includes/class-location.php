@@ -468,7 +468,19 @@ class Location {
 		$location = get_transient( "indieblocks_loc_{$lat}_{$lon}" );
 
 		if ( empty( $location ) ) {
-			$response = remote_get( "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lon}&zoom=18&addressdetails=1", true );
+			$response = remote_get(
+				add_query_arg(
+					array(
+						'format'         => 'json',
+						'lat'            => $lat,
+						'lon'            => $lon,
+						'zoom'           => 18,
+						'addressdetails' => 1,
+					),
+					'https://nominatim.openstreetmap.org/reverse'
+				),
+				true
+			);
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
 				debug_log( "[IndieBlocks/Location] Failed to retrieve address data for {$lat}, {$lon}" );
@@ -519,8 +531,19 @@ class Location {
 				return array();
 			}
 
-			// As of version 0.7, we no longer pass along `units=metric`, and temperatures are converted on display.
-			$response = remote_get( "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid=" . OPEN_WEATHER_MAP_API_KEY, true );
+			// As of version 0.7, we no longer pass along `units=metric`, and
+			// convert temperatures on display.
+			$response = remote_get(
+				add_query_arg(
+					array(
+						'lat'   => $lat,
+						'lon'   => $lon,
+						'appid' => OPEN_WEATHER_MAP_API_KEY,
+					),
+					'https://api.openweathermap.org/data/2.5/weather'
+				),
+				true
+			);
 
 			if ( is_wp_error( $response ) || empty( $response['body'] ) ) {
 				debug_log( "[IndieBlocks/Location]  Failed to retrieve weather data for {$lat}, {$lon}" );

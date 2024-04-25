@@ -71,7 +71,8 @@ class Feeds {
 
 		// Target only the main feed.
 		if ( isset( $query_vars['feed'] ) && ! isset( $query_vars['post_type'] ) ) {
-			$query_vars['post_type'] = array( 'post' );
+			// @link https://github.com/pfefferle/wordpress-rss-club/issues/1
+			$query_vars['post_type'] = array( 'post', 'rssclub' );
 
 			if ( ! empty( $options['notes_in_feed'] ) ) {
 				$query_vars['post_type'][] = 'indieblocks_note';

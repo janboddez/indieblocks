@@ -6,7 +6,7 @@ This plugin lets you:
 
 * Add a "microblog" to either a new or existing WordPress site
 * Add Webmention support to enable rich _cross-site_ conversations
-* Add "microformats" to your WordPress site's front end and posts, so that Webmention endpoints are able to correctly interpret your posts (short-form or otherwise)
+* Add "microformats" to your WordPress site's front end and posts, so that Webmention endpoints are able to correctly interpret your posts
 
 ## How
 IndieBlocks provides a number of blocks that can be used to add microformats to posts _without having to tweak or know HTML_. It also adds a number of "short-form" Custom Post Types to more easily add a "microblog" to your site. (Both are optional, like, well, all of IndieBlocks features.)

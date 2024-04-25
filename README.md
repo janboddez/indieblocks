@@ -13,9 +13,9 @@ IndieBlocks provides a number of blocks that can be used to add microformats to 
 
 IndieBlocks also "hooks" into the [Micropub](https://wordpress.org/plugins/micropub/) plugin, so that Micropub posts are given the correct post type, and, when applicable, "microformats" blocks.
 
-If you're running a "block theme," it will attempt to add "microformats" to it. (If your theme already supports microformats2, just leave this part disabled.)
+If you're running a "block theme," it will attempt to add "microformats" to it. (If your theme already supports microformats, just leave this part disabled.)
 
 There's also Webmention, which can be enabled for posts, notes, and likes (and any other post types of your choosing). This, in combination with the aforementioned microformats and this plugin's blocks, enables richer _cross-site_ conversations. (If you're perfectly happy with your existing Webmention setup, here, too, you can simply leave this setting disabled.)
 
 ## Classic Editor and Themes
-IndieBlocks, despite its name, runs just fine on sites that have the Classic Editor plugin installed, or don't (yet) use a "block theme." The Custom Post Types and Webmention options will just work, as will most of its smaller "modules." Microformats, however, will need to be added some other way. (It's absolutely okay to run a "classic" theme with microformats2 support and add microformats to posts by hand or through a different plugin.)
+IndieBlocks, despite its name, runs just fine on sites that have the Classic Editor plugin installed, or don't (yet) use a "block theme." The Custom Post Types and Webmention options will just work, as will most of its smaller "modules." Microformats, however, will need to be added some other way. (It's absolutely okay to run a "classic" theme with microformats support and add microformats to posts by hand or through a different plugin.)

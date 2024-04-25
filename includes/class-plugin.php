@@ -7,6 +7,7 @@
 
 namespace IndieBlocks;
 
+use IndieBlocks\Image_Proxy\Image_Proxy;
 use IndieBlocks\Webmention\Webmention;
 
 class Plugin {
@@ -47,8 +48,8 @@ class Plugin {
 	 */
 	public function register() {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			// Register our new CLI command.
-			\WP_CLI::add_command( 'indieblocks', \IndieBlocks\Commands\Commands::class );
+			// Register our new CLI commands.
+			\WP_CLI::add_command( 'indieblocks', Commands\Commands::class );
 		}
 
 		// Enable i18n.
@@ -103,6 +104,8 @@ class Plugin {
 		if ( ! empty( $options['preview_cards'] ) ) {
 			add_action( 'plugins_loaded', array( Preview_Cards::class, 'register' ) );
 		}
+
+		add_action( 'rest_api_init', array( Image_Proxy::class, 'register' ) );
 	}
 
 	/**

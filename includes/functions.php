@@ -539,3 +539,34 @@ function print_facepile_icons() {
 		require_once $icons;
 	}
 }
+
+/**
+ * Replaces a media URL with its "proxy" alternative.
+ *
+ * @param  string $url Media URL.
+ * @return string      Proxy URL.
+ */
+function proxy_image( $url ) {
+	$options = get_options();
+
+	if ( empty( $options['image_proxy'] ) ) {
+		return $url;
+	}
+
+	if ( empty( $options['image_proxy_secret'] ) ) {
+		return $url;
+	}
+
+	if ( ! empty( $options['image_proxy_http_only'] ) && 0 === stripos( $url, 'https://' ) ) {
+		return $url;
+	}
+
+	$query_string = http_build_query(
+		array(
+			'hash' => hash_hmac( 'sha1', $url, $options['image_proxy_secret'] ),
+			'url'  => rawurlencode( $url ),
+		)
+	);
+
+	return get_rest_url( null, '/indieblocks/v1/imageproxy' ) . "?$query_string";
+}

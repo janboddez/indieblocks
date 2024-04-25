@@ -468,12 +468,6 @@ class Theme_Mf2 {
 	 * @return string|null          Avatar HTML.
 	 */
 	public static function get_avatar_html( $avatar, $comment, $args ) {
-		$options = get_options();
-
-		if ( empty( $options['cache_avatars'] ) ) {
-			return null;
-		}
-
 		if ( ! $comment instanceof \WP_Comment ) {
 			return null;
 		}
@@ -486,7 +480,22 @@ class Theme_Mf2 {
 		}
 
 		if ( empty( $url ) ) {
+			// Created by the ActivityPub plugin.
+			$url = get_comment_meta( $comment->comment_ID, 'avatar_url', true );
+		}
+
+		if ( empty( $url ) && ! empty( $comment->user_id ) ) {
+			// Created by core.
+			$url = get_avatar_url( $comment->user_id );
+		}
+
+		if ( empty( $url ) ) {
 			return null;
+		}
+
+		$options = get_options();
+		if ( ! empty( $options['image_proxy'] ) && 0 !== strpos( $url, home_url() ) ) {
+			$url = proxy_image( $url );
 		}
 
 		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );

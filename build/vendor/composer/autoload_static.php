@@ -40,6 +40,7 @@ class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
         'IndieBlocks\\Blocks' => __DIR__ . '/../..' . '/../includes/class-blocks.php',
         'IndieBlocks\\Commands\\Commands' => __DIR__ . '/../..' . '/../includes/commands/class-commands.php',
         'IndieBlocks\\Feeds' => __DIR__ . '/../..' . '/../includes/class-feeds.php',
+        'IndieBlocks\\Image_Proxy\\Image_Proxy' => __DIR__ . '/../..' . '/../includes/image-proxy/class-image-proxy.php',
         'IndieBlocks\\Location' => __DIR__ . '/../..' . '/../includes/class-location.php',
         'IndieBlocks\\Masterminds\\HTML5' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5.php',
         'IndieBlocks\\Masterminds\\HTML5\\Elements' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Elements.php',

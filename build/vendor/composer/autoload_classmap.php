@@ -10,6 +10,7 @@ return array(
     'IndieBlocks\\Blocks' => $baseDir . '/../includes/class-blocks.php',
     'IndieBlocks\\Commands\\Commands' => $baseDir . '/../includes/commands/class-commands.php',
     'IndieBlocks\\Feeds' => $baseDir . '/../includes/class-feeds.php',
+    'IndieBlocks\\Image_Proxy\\Image_Proxy' => $baseDir . '/../includes/image-proxy/class-image-proxy.php',
     'IndieBlocks\\Location' => $baseDir . '/../includes/class-location.php',
     'IndieBlocks\\Masterminds\\HTML5' => $vendorDir . '/masterminds/html5/src/HTML5.php',
     'IndieBlocks\\Masterminds\\HTML5\\Elements' => $vendorDir . '/masterminds/html5/src/HTML5/Elements.php',

@@ -35,7 +35,7 @@ class Image_Proxy {
 		$url = is_string( $url ) ? rawurldecode( $url ) : null;
 
 		if ( empty( $url ) || ! wp_http_validate_url( $url ) ) {
-			return new \WP_Error( 'invalid_url', esc_html__( 'Invalid URL.', 'feed-reader' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_url', esc_html__( 'Invalid URL.', 'indieblocks' ), array( 'status' => 400 ) );
 		}
 
 		$hash = $request->get_param( 'hash' );
@@ -43,7 +43,7 @@ class Image_Proxy {
 		$options = \IndieBlocks\get_options();
 
 		if ( ! empty( $options['image_proxy'] ) && ! empty( $options['image_proxy_secret'] ) && hash_hmac( 'sha1', $url, $options['image_proxy_secret'] ) !== $hash ) {
-			return new \WP_Error( 'invalid_hash', esc_html__( 'Invalid hash.', 'feed-reader' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_hash', esc_html__( 'Invalid hash.', 'indieblocks' ), array( 'status' => 400 ) );
 		}
 
 		$headers = array_filter(
@@ -70,7 +70,7 @@ class Image_Proxy {
 				'follow_location' => true,
 				'ignore_errors'   => true, // "Allow," i.e., don't crash on, HTTP errors (4xx, 5xx).
 				'timeout'         => 11,
-				'user_agent'      => \FeedReader\Helpers\get_user_agent( $url ),
+				'user_agent'      => \IndieBlocks\get_user_agent( $url ),
 			),
 		);
 
@@ -84,7 +84,7 @@ class Image_Proxy {
 			// Return an empty response.
 			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-			return new \WP_Error( 'unkown_error', esc_html__( 'Something went wrong.', 'feed-reader' ), array( 'status' => $code ) );
+			return new \WP_Error( 'unkown_error', esc_html__( 'Something went wrong.', 'indieblocks' ), array( 'status' => $code ) );
 		}
 
 		$headers['Cache-Control'] = 'public, max-age=31536000';

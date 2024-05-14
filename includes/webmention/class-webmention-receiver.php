@@ -425,31 +425,15 @@ class Webmention_Receiver {
 			// Delete file.
 			wp_delete_file( $file_path );
 
-			global $wpdb;
-
-			// Fetch _all_ references to this file (i.e., not just this
+			// Delete all references to this file (i.e., not just this
 			// comment's meta field).
-			$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"SELECT meta_id, comment_id FROM $wpdb->commentmeta WHERE meta_key = %s AND meta_value = %s",
-					'indieblocks_webmention_avatar',
-					esc_url_raw( $url )
-				)
+			delete_metadata(
+				'comment',
+				$comment_id,
+				'indieblocks_webmention_avatar',
+				esc_url_raw( $url ),
+				true // Delete matching metadata entries for all objects.
 			);
-
-			// And then delete them.
-			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					sprintf(
-						"DELETE FROM $wpdb->commentmeta WHERE meta_id IN (%s)",
-						implode( ',', array_fill( 0, count( $results ), '%d' ) )
-					),
-					array_column( $results, 'meta_id' )
-				)
-			);
-
-			// Delete the affected comments' metadata cache.
-			wp_cache_delete_multiple( array_column( $results, 'comment_id' ), 'comment_meta' );
 		}
 
 		wp_die();

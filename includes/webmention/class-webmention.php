@@ -100,17 +100,9 @@ class Webmention {
 		if ( 'post-new.php' === $hook_suffix || 'post.php' === $hook_suffix ) {
 			global $post;
 
-			if ( empty( $post ) ) {
-				// Can't do much without a `$post` object.
-				return;
+			if ( ! empty( $post->post_type ) && in_array( $post->post_type, static::get_supported_post_types(), true ) ) {
+				$include = true;
 			}
-
-			if ( ! in_array( $post->post_type, static::get_supported_post_types(), true ) ) {
-				// Unsupported post type.
-				return;
-			}
-
-			$include = true;
 		}
 
 		if ( ! $include && 'comment.php' !== $hook_suffix ) {

@@ -1,9 +1,4 @@
 <?php
-/**
- * Main Webmention class.
- *
- * @package IndieBlocks
- */
 
 namespace IndieBlocks\Webmention;
 

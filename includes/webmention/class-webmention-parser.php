@@ -1,9 +1,4 @@
 <?php
-/**
- * Webmention parser.
- *
- * @package IndieBlocks
- */
 
 namespace IndieBlocks\Webmention;
 
@@ -26,11 +21,11 @@ class Webmention_Parser {
 		if ( preg_match( '~/\?c=\d+$~', $source ) ) {
 			// Source looks like a comment shortlink. Let's try to get the full
 			// URL.
-			$response = wp_remote_head(
+			$response = wp_safe_remote_head(
 				esc_url_raw( $source ),
 				array(
-					'timeout'             => 11,
 					'limit_response_size' => 1048576,
+					'timeout'             => 11,
 					'user-agent'          => get_user_agent(),
 				)
 			);

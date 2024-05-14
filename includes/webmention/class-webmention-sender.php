@@ -1,9 +1,4 @@
 <?php
-/**
- * Webmention sender.
- *
- * @package IndieBlocks
- */
 
 namespace IndieBlocks\Webmention;
 
@@ -394,7 +389,7 @@ class Webmention_Sender {
 			return null;
 		}
 
-		$response = wp_remote_head(
+		$response = wp_safe_remote_head(
 			esc_url_raw( $url ),
 			array(
 				'timeout'             => 11,

@@ -41,8 +41,7 @@ class Image_Proxy {
 		$hash = $request->get_param( 'hash' );
 
 		$options = \IndieBlocks\get_options();
-
-		if ( ! empty( $options['image_proxy'] ) && ! empty( $options['image_proxy_secret'] ) && hash_hmac( 'sha1', $url, $options['image_proxy_secret'] ) !== $hash ) {
+		if ( ! empty( $options['image_proxy_secret'] ) && hash_hmac( 'sha1', $url, $options['image_proxy_secret'] ) !== $hash ) {
 			return new \WP_Error( 'invalid_hash', esc_html__( 'Invalid hash.', 'indieblocks' ), array( 'status' => 400 ) );
 		}
 
@@ -124,7 +123,7 @@ class Image_Proxy {
 
 		foreach ( $metadata['wrapper_data'] as $line ) {
 			if ( preg_match( '~^http/.+? (\d+) .+?$~i', $line, $match ) ) {
-				// Also covers subsequent statuses, like after a redirect.
+				// Keeps only the most recent status code. E.g., after a redirect.
 				$status = (int) $match[1];
 				continue;
 			}

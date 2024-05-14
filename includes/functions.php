@@ -70,7 +70,7 @@ function convert_encoding( $text ) {
 }
 
 /**
- * Wrapper around `wp_remote_get()`.
+ * Wrapper around `wp_safe_remote_get()`.
  *
  * @param  string $url            URL to fetch.
  * @param  bool   $json           Whether to accept (only) JSON.
@@ -89,18 +89,18 @@ function remote_get( $url, $json = false ) {
 
 	$args = apply_filters( 'indieblocks_fetch_args', $args, $url );
 
-	return wp_remote_get(
+	return wp_safe_remote_get(
 		esc_url_raw( $url ),
 		$args
 	);
 }
 
 /**
- * Wrapper around `wp_remote_post()`.
+ * Wrapper around `wp_safe_remote_post()`.
  *
  * @param  string $url            URL to fetch.
  * @param  bool   $json           Whether to accept (only) JSON.
- * @param  array  $args           Arguments for `wp_remote_post()`.
+ * @param  array  $args           Arguments for `wp_safe_remote_post()`.
  * @return \WP_Response|\WP_Error Response.
  */
 function remote_post( $url, $json = false, $args = array() ) {
@@ -119,7 +119,7 @@ function remote_post( $url, $json = false, $args = array() ) {
 
 	$args = apply_filters( 'indieblocks_fetch_args', $args, $url );
 
-	return wp_remote_post(
+	return wp_safe_remote_post(
 		esc_url_raw( $url ),
 		$args
 	);

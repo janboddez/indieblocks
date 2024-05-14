@@ -1,9 +1,4 @@
 <?php
-/**
- * Webmention receiver.
- *
- * @package IndieBlocks
- */
 
 namespace IndieBlocks\Webmention;
 

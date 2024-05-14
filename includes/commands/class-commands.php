@@ -164,4 +164,58 @@ class Commands {
 			\WP_CLI::error( 'Something went wrong.' );
 		}
 	}
+
+	/**
+	 * Deletes an avatar and all references to it.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <url>
+	 * : The (local) image URL.
+	 *
+	 * [--key=<key>]
+	 * : The comment meta key that holds the (local) URL.
+	 *
+	 * @subcommand delete-image
+	 *
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args "Associated" arguments.
+	 */
+	public function delete_image( $args, $assoc_args ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		$url = trim( $args[0] );
+		if ( ! preg_match( '~^https?://~', $url ) ) {
+			$url = 'http://' . ltrim( $url, '/' );
+		}
+
+		if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			\WP_CLI::error( 'Invalid URL.' );
+			return;
+		}
+
+		$key = isset( $assoc_args['key'] )
+			? $assoc_args['key']
+			: 'indieblocks_webmention_avatar';
+
+		$upload_dir = wp_upload_dir();
+		$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+
+		// Delete file.
+		wp_delete_file( $file_path );
+
+		// Delete all references to this file (i.e., not just this
+		// comment's meta field).
+		$result = delete_metadata(
+			'comment',
+			0,
+			$key,
+			esc_url_raw( $url ),
+			true // Delete matching metadata entries for all objects.
+		);
+
+		if ( $result ) {
+			\WP_CLI::success( 'All done!' );
+		} else {
+			\WP_CLI::error( 'Something went wrong.' );
+		}
+	}
 }

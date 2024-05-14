@@ -202,8 +202,7 @@ class Commands {
 		// Delete file.
 		wp_delete_file( $file_path );
 
-		// Delete all references to this file (i.e., not just this
-		// comment's meta field).
+		// Delete all references to _this_ file.
 		$result = delete_metadata(
 			'comment',
 			0,

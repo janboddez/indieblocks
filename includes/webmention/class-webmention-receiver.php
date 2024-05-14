@@ -74,11 +74,6 @@ class Webmention_Receiver {
 			return new \WP_Error( 'not_found', 'Not found', array( 'status' => 404 ) );
 		}
 
-		if ( ! \IndieBlocks\webmentions_open( $post ) ) {
-			\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Webmentions closed for the post with ID {$post->ID}." );
-			return new \WP_Error( 'invalid_request', 'Invalid target', array( 'status' => 400 ) );
-		}
-
 		// Set sender's IP address.
 		$ip = ! empty( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$ip = preg_replace( '/[^0-9a-fA-F:., ]/', '', apply_filters( 'indieblocks_webmention_sender_ip', $ip, $request ) );
@@ -175,13 +170,14 @@ class Webmention_Receiver {
 			}
 
 			if ( ! empty( $comments ) && is_array( $comments ) ) {
+				// Found an existing comment. Treat mention as update or delete.
 				$update     = true;
 				$comment_id = reset( $comments );
 
 				\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Found an existing comment ({$comment_id}) for this mention." );
 
 				if ( in_array( wp_remote_retrieve_response_code( $response ), array( 404, 410 ), true ) ) {
-					// Delete instead.
+					// Delete.
 					if ( wp_delete_comment( $comment_id ) ) {
 						$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 							$table_name,
@@ -199,8 +195,14 @@ class Webmention_Receiver {
 
 					continue;
 				}
+			} elseif ( ! webmentions_open( $webmention->post_id ) ) {
+				// New mention, while comments are closed.
+				debug_log( "[IndieBlocks/Webmention] Webmentions closed for the post with ID {$webmention->post_id}." );
+				return;
 			}
 
+			// Continue onward. At this point, we're dealing with either an
+			// update, or a brand-new mention.
 			$html   = wp_remote_retrieve_body( $response );
 			$target = ! empty( $webmention->target )
 				? $webmention->target

@@ -3,11 +3,17 @@
  * @package IndieBlocks
  */
 
-if ( ! isset( $block->context['postId'] ) ) {
+if ( isset( $block->context['postId'] ) ) {
+	$post_id = $block->context['postId']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+} elseif ( in_the_loop() ) {
+	$post_id = get_the_ID(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+}
+
+if ( empty( $post_id ) ) {
 	return;
 }
 
-$facepile_comments = \IndieBlocks\get_facepile_comments( $block->context['postId'] );
+$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id );
 
 if ( empty( $facepile_comments ) ) {
 	return;
@@ -16,7 +22,7 @@ if ( empty( $facepile_comments ) ) {
 add_action( 'wp_footer', '\\IndieBlocks\\print_facepile_icons', 999 );
 
 // Limit comments. Might provide a proper option later.
-$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $block->context['postId'] );
+$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $post_id );
 $facepile_comments = array_slice( $facepile_comments, 0, $facepile_num );
 
 $output = '';

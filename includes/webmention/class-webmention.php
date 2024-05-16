@@ -229,4 +229,73 @@ class Webmention {
 
 		return $count;
 	}
+
+	/**
+	 * Automatically inserts a Facepile block in front of `core/comments`.
+	 *
+	 * @param  array                             $hooked_blocks Hooked block types.
+	 * @param  string                            $position      Relative position.
+	 * @param  string                            $anchor_block  Anchor block type.
+	 * @param  \WP_Block_Template|\WP_Post|array $context       Block template, template part, `wp_navigation` post type, or pattern that the anchor block belongs to.
+	 * @return array                                            Modified hook block types.
+	 */
+	public static function hook_facepile_block( $hooked_blocks, $position, $anchor_block, $context ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( 'core/comments' === $anchor_block && 'before' === $position ) {
+			$hooked_blocks[] = 'indieblocks/facepile';
+		}
+
+		return $hooked_blocks;
+	}
+
+	/**
+	 * Sets hooked Facepile blocks' attributes and the like.
+	 *
+	 * @param array|null                      $parsed_hooked_block Parsed block array for the given hooked block type, or `null`.
+	 * @param string                          $hooked_block        Hooked block type.
+	 * @param string                          $position            Relative position of the hooked block.
+	 * @param array                           $parsed_anchor_block Anchor block, in parsed block array format.
+	 * @param WP_Block_Template|WP_Post|array $context             Block template, template part, `wp_navigation` post type, or pattern that the anchor block belongs to.
+	 * @return array                                               Modified parsed block array.
+	 */
+	public static function modify_hooked_facepile_block( $parsed_hooked_block, $hooked_block, $position, $parsed_anchor_block, $context ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( null === $parsed_hooked_block ) {
+			return $parsed_hooked_block;
+		}
+
+		if (
+			'core/comments' === $parsed_anchor_block['blockName'] &&
+			'before' === $position
+		) {
+			$parsed_hooked_block = array(
+				'blockName'    => 'indieblocks/facepile',
+				'innerBlocks'  => array(
+					array(
+						'blockName'    => 'core/heading',
+						'innerHTML'    => '<h2 class="wp-block-heading">' . esc_html__( 'Likes, Bookmarks, and Reposts', 'indieblocks' ) . '</h2>',
+						'innerContent' => array(
+							'<h2 class="wp-block-heading">' . esc_html__( 'Likes, Bookmarks, and Reposts', 'indieblocks' ) . '</h2>',
+						),
+					),
+					array(
+						'blockName' => 'indieblocks/facepile-content',
+						'attrs'     => array(
+							'avatarSize'      => 3,
+							'icons'           => true,
+							'backgroundColor' => '#fff',
+						),
+					),
+				),
+				'innerHTML'    => '<div class="wp-block-indieblocks-facepile"></div>',
+				'innerContent' => array(
+					'<div class="wp-block-indieblocks-facepile">',
+					null,
+					'',
+					null,
+					'</div>',
+				),
+			);
+		}
+
+		return $parsed_hooked_block;
+	}
 }

@@ -128,6 +128,10 @@ class Options_Handler {
 			'type'    => 'boolean',
 			'default' => false,
 		),
+		'facepile_block_hook'    => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
 		'add_featured_images'    => array(
 			'type'    => 'boolean',
 			'default' => false,
@@ -343,6 +347,7 @@ class Options_Handler {
 						? (int) $settings['webmention_delay']
 						: 0,
 					'webmention_facepile' => isset( $settings['webmention_facepile'] ) ? true : false,
+					'facepile_block_hook' => isset( $settings['facepile_block_hook'] ) ? true : false,
 					'cache_avatars'       => isset( $settings['cache_avatars'] ) ? true : false,
 					'image_proxy'         => isset( $settings['image_proxy'] ) ? true : false,
 					'image_proxy_secret'  => isset( $settings['image_proxy_secret'] )
@@ -441,7 +446,7 @@ class Options_Handler {
 							<th scope="row" rowspan="2"><?php esc_html_e( 'Custom Post Types', 'indieblocks' ); ?></th>
 							<td>
 								<label><input type="checkbox" name="indieblocks_settings[enable_notes]" value="1" <?php checked( ! empty( $this->options['enable_notes'] ) ); ?>/> <?php esc_html_e( 'Enable &ldquo;Notes&rdquo;', 'indieblocks' ); ?></label>
-								<div style="margin-inline-start: 1.25em;">
+								<div style="margin-inline-start: 1.25em; margin-block-start: 0.25em;">
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_feed]" value="1" <?php checked( ! empty( $this->options['notes_in_feed'] ) ); ?>/> <?php esc_html_e( 'Include in main feed', 'indieblocks' ); ?></label><br />
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_home]" value="1" <?php checked( ! empty( $this->options['notes_in_home'] ) ); ?>/> <?php esc_html_e( 'Show on blog page', 'indieblocks' ); ?></label><br />
 									<label><input type="checkbox" name="indieblocks_settings[notes_in_author]" value="1" <?php checked( ! empty( $this->options['notes_in_author'] ) ); ?>/> <?php esc_html_e( 'Include in author archives', 'indieblocks' ); ?></label><br />
@@ -537,8 +542,12 @@ class Options_Handler {
 						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Facepile', 'indieblocks' ); ?></th>
-							<td><label><input type="checkbox" name="indieblocks_settings[webmention_facepile]" value="1" <?php checked( ! empty( $this->options['webmention_facepile'] ) ); ?>/> <?php esc_html_e( '&ldquo;Facepile&rdquo; bookmarks, likes, and reposts', 'indieblocks' ); ?></label>
-							<p class="description"><?php esc_html_e( '(Experimental) Display bookmarks, likes, and reposts separate from &ldquo;regular&rdquo; comments.', 'indieblocks' ); ?></p></td>
+							<td>
+								<label><input type="checkbox" name="indieblocks_settings[webmention_facepile]" value="1" <?php checked( ! empty( $this->options['webmention_facepile'] ) ); ?>/> <?php esc_html_e( '&ldquo;Facepile&rdquo; bookmarks, likes, and reposts', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Display bookmarks, likes, and reposts separate from &ldquo;regular&rdquo; comments.', 'indieblocks' ); ?></p>
+								<label style="display: inline-block; margin-block-start: 0.5em;"><input type="checkbox" name="indieblocks_settings[facepile_block_hook]" value="1" <?php checked( ! empty( $this->options['facepile_block_hook'] ) ); ?>/> <?php esc_html_e( 'Auto-insert Facepile block.', 'indieblocks' ); ?></label>
+								<p class="description"><?php esc_html_e( '(Experimental) Automatically insert a Facepile block in front of every Comments block. (You can still customize its look and feel by editing it in the Site Editor.)', 'indieblocks' ); ?></p>
+							</td>
 						</tr>
 					</table>
 				<?php endif; ?>

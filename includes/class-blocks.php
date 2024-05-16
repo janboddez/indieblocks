@@ -31,6 +31,11 @@ class Blocks {
 			add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 			add_filter( 'get_comments_number', array( Webmention::class, 'comment_count' ), 999, 2 );
 		}
+
+		if ( ! empty( $options['facepile_block_hook'] ) ) {
+			add_filter( 'hooked_block_types', array( Webmention::class, 'hook_facepile_block' ), 10, 4 );
+			add_filter( 'hooked_block_indieblocks/facepile', array( Webmention::class, 'modify_hooked_facepile_block' ), 10, 5 );
+		}
 	}
 
 	/**

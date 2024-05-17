@@ -236,7 +236,7 @@ class Webmention {
 	 * @param  array                             $hooked_blocks Hooked block types.
 	 * @param  string                            $position      Relative position.
 	 * @param  string                            $anchor_block  Anchor block type.
-	 * @param  \WP_Block_Template|\WP_Post|array $context       Block template, template part, `wp_navigation` post type, or pattern that the anchor block belongs to.
+	 * @param  \WP_Block_Template|\WP_Post|array $context       Block template, template part, `wp_navigation` post type, or pattern the anchor block belongs to.
 	 * @return array                                            Modified hook block types.
 	 */
 	public static function hook_facepile_block( $hooked_blocks, $position, $anchor_block, $context ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
@@ -248,14 +248,14 @@ class Webmention {
 	}
 
 	/**
-	 * Sets hooked Facepile blocks' attributes and the like.
+	 * Sets hooked Facepile blocks' inner content and the like.
 	 *
-	 * @param array|null                      $parsed_hooked_block Parsed block array for the given hooked block type, or `null`.
-	 * @param string                          $hooked_block        Hooked block type.
-	 * @param string                          $position            Relative position of the hooked block.
-	 * @param array                           $parsed_anchor_block Anchor block, in parsed block array format.
-	 * @param WP_Block_Template|WP_Post|array $context             Block template, template part, `wp_navigation` post type, or pattern that the anchor block belongs to.
-	 * @return array                                               Modified parsed block array.
+	 * @param  array|null                        $parsed_hooked_block Parsed block array for the given hooked block type, or `null`.
+	 * @param  string                            $hooked_block        Hooked block type.
+	 * @param  string                            $position            Relative position of the hooked block.
+	 * @param  array                             $parsed_anchor_block Anchor block, in parsed block array format.
+	 * @param  \WP_Block_Template|\WP_Post|array $context             Block template, template part, `wp_navigation` post type, or pattern the anchor block belongs to.
+	 * @return array                                                  Modified parsed block array.
 	 */
 	public static function modify_hooked_facepile_block( $parsed_hooked_block, $hooked_block, $position, $parsed_anchor_block, $context ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( null === $parsed_hooked_block ) {
@@ -266,6 +266,7 @@ class Webmention {
 			'core/comments' === $parsed_anchor_block['blockName'] &&
 			'before' === $position
 		) {
+			// Note that we don't specifiy font size or spacing attributes.
 			$parsed_hooked_block = array(
 				'blockName'    => 'indieblocks/facepile',
 				'innerBlocks'  => array(

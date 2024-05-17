@@ -171,7 +171,7 @@ class Webmention_Sender {
 					\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Scheduling webmention for comment {$obj->comment_ID}." );
 				}
 
-				\IndieBlocks\add_meta( $obj, '_indieblocks_webmention', 'scheduled' );
+				\IndieBlocks\update_meta( $obj, '_indieblocks_webmention_status', 'scheduled' );
 				wp_schedule_single_event( time() + $delay, 'indieblocks_webmention_send', array( $obj ) );
 			} else {
 				// Send inline (although retries will be scheduled as always).
@@ -335,6 +335,7 @@ class Webmention_Sender {
 		}
 
 		\IndieBlocks\update_meta( $obj, '_indieblocks_webmention', $webmention );
+		\IndieBlocks\delete_meta( $obj, '_indieblocks_webmention_status' );
 	}
 
 	/**
@@ -570,7 +571,7 @@ class Webmention_Sender {
 		$meta = get_post_meta( (int) $post_id, '_indieblocks_webmention', true ); // Using `$post_id` rather than `$post`, hence `get_post_meta()`.
 
 		if ( empty( $meta ) ) {
-			return '';
+			$meta = get_post_meta( (int) $post_id, '_indieblocks_webmention_status', true ); // Can still be empty.
 		}
 
 		return $meta;
@@ -718,10 +719,8 @@ class Webmention_Sender {
 	protected static function get_webmention_meta( $obj ) {
 		$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention' );
 
-		\IndieBlocks\debug_log( $webmention );
-
 		if ( empty( $webmention ) ) {
-			return '';
+			$webmention = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_status' );
 		}
 
 		return $webmention;

@@ -394,7 +394,7 @@ function get_facepile_comments( $post_id ) {
 
 	if ( class_exists( '\\Webmention\\Comment_Walker' ) && method_exists( \Webmention\Comment_Walker::class, 'comment_query' ) ) {
 		// The Webmention plugin, as of v5.3.0, also modifies the comment query.
-		remove_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
+		$webmention_removed = remove_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
 	}
 
 	// Placeholder.
@@ -456,7 +456,7 @@ function get_facepile_comments( $post_id ) {
 		add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 	}
 
-	if ( class_exists( '\\Webmention\\Comment_Walker' ) && method_exists( \Webmention\Comment_Walker::class, 'comment_query' ) ) {
+	if ( ! empty( $webmention_removed ) ) {
 		// Restore also the Webmention plugin's callback.
 		add_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
 	}

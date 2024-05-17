@@ -456,54 +456,74 @@ class Webmention_Sender {
 
 	/**
 	 * Adds the Webmention panel to Gutenberg's document sidebar.
+	 *
+	 * @param string $hook_suffix Current admin page.
 	 */
-	public static function enqueue_scripts() {
+	public static function enqueue_scripts( $hook_suffix = null ) {
 		if ( defined( 'OUTGOING_WEBMENTIONS' ) && ! OUTGOING_WEBMENTIONS ) {
 			// Outgoing mentions disabled.
 			return;
 		}
 
-		if ( apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
-			// Using a classic meta box instead.
+		if ( 'enqueue_block_editor_assets' === current_action() ) {
+			$current_screen = get_current_screen();
+			if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
+				wp_enqueue_script(
+					'indieblocks-webmention',
+					plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ),
+					array(
+						'wp-element',
+						'wp-components',
+						'wp-i18n',
+						'wp-data',
+						'wp-core-data',
+						'wp-plugins',
+						'wp-edit-post',
+					),
+					\IndieBlocks\Plugin::PLUGIN_VERSION,
+					false
+				);
+
+				global $post;
+
+				$args = array(
+					'ajaxurl'       => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+					'show_meta_box' => ! empty( $post->ID ) && '' !== static::get_webmention_meta( $post )
+						? '1'
+						: '0',
+				);
+
+				if ( ! empty( $post->ID ) ) {
+					$args['nonce'] = wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID );
+				}
+
+				wp_localize_script(
+					'indieblocks-webmention',
+					'indieblocks_webmention_obj',
+					$args
+				);
+			}
+
 			return;
 		}
 
-		$current_screen = get_current_screen();
-
-		if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
-			wp_enqueue_script(
-				'indieblocks-webmention',
-				plugins_url( '/assets/webmention.js', dirname( __DIR__ ) ),
-				array(
-					'wp-element',
-					'wp-components',
-					'wp-i18n',
-					'wp-data',
-					'wp-core-data',
-					'wp-plugins',
-					'wp-edit-post',
-				),
-				\IndieBlocks\Plugin::PLUGIN_VERSION,
-				false
-			);
-
+		if ( ( 'post-new.php' === $hook_suffix || 'post.php' === $hook_suffix ) && apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
 			global $post;
 
-			$args = array(
-				'ajaxurl'       => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
-				'show_meta_box' => ! empty( $post->ID ) && '' !== static::get_webmention_meta( $post )
-					? '1'
-					: '0',
-			);
-
-			if ( ! empty( $post->ID ) ) {
-				$args['nonce'] = wp_create_nonce( 'indieblocks:resend-webmention:' . $post->ID );
+			if ( ! empty( $post->post_type ) && in_array( $post->post_type, Webmention::get_supported_post_types(), true ) ) {
+				$include = true;
 			}
+		}
 
+		if ( ! empty( $include ) || 'comment.php' === $hook_suffix ) {
+			// Enqueue JS.
+			wp_enqueue_script( 'indieblocks-webmention-legacy', plugins_url( '/assets/webmention-legacy.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
 			wp_localize_script(
-				'indieblocks-webmention',
-				'indieblocks_webmention_obj',
-				$args
+				'indieblocks-webmention-legacy',
+				'indieblocks_webmention_legacy_obj',
+				array(
+					'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
+				)
 			);
 		}
 	}

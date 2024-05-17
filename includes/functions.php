@@ -392,6 +392,11 @@ function get_facepile_comments( $post_id ) {
 	// behavior.
 	remove_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 
+	if ( class_exists( '\\Webmention\\Comment_Walker' ) && method_exists( \Webmention\Comment_Walker::class, 'comment_query' ) ) {
+		// The Webmention plugin, as of v5.3.0, also modifies the comment query.
+		remove_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
+	}
+
 	// Placeholder.
 	$facepile_comments           = new \stdClass();
 	$facepile_comments->comments = array();
@@ -449,6 +454,11 @@ function get_facepile_comments( $post_id ) {
 	if ( ! empty( $options['webmention_facepile'] ) ) {
 		// Restore the filter disabled above, but only if it was active before!
 		add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
+	}
+
+	if ( class_exists( '\\Webmention\\Comment_Walker' ) && method_exists( \Webmention\Comment_Walker::class, 'comment_query' ) ) {
+		// Restore also the Webmention plugin's callback.
+		add_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
 	}
 
 	// Allow filtering the resulting comments.

@@ -90,37 +90,6 @@ class Webmention {
 	}
 
 	/**
-	 * Adds admin scripts and styles.
-	 *
-	 * @param string $hook_suffix Current admin page.
-	 */
-	public static function enqueue_scripts( $hook_suffix ) {
-		$include = false;
-
-		if ( 'post-new.php' === $hook_suffix || 'post.php' === $hook_suffix ) {
-			global $post;
-
-			if ( ! empty( $post->post_type ) && in_array( $post->post_type, static::get_supported_post_types(), true ) ) {
-				$include = true;
-			}
-		}
-
-		if ( ! $include && 'comment.php' !== $hook_suffix ) {
-			return;
-		}
-
-		// Enqueue JS.
-		wp_enqueue_script( 'indieblocks-webmention-legacy', plugins_url( '/assets/webmention-legacy.js', dirname( __DIR__ ) ), array( 'jquery' ), \IndieBlocks\Plugin::PLUGIN_VERSION, false );
-		wp_localize_script(
-			'indieblocks-webmention-legacy',
-			'indieblocks_webmention_legacy_obj',
-			array(
-				'message' => esc_attr__( 'Webmention scheduled.', 'indieblocks' ),
-			)
-		);
-	}
-
-	/**
 	 * Returns post types that support Webmention.
 	 *
 	 * @return array Supported post types.

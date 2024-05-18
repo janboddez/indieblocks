@@ -490,24 +490,7 @@ function get_meta( $obj, $meta_key ) {
 }
 
 /**
- * Update post or comment meta.
- *
- * @param  \WP_Post|\WP_Comment $obj        Post or comment.
- * @param  string               $meta_key   The meta key.
- * @param  mixed                $meta_value The value.
- */
-function add_meta( $obj, $meta_key, $meta_value ) {
-	if ( $obj instanceof \WP_Post ) {
-		add_post_meta( $obj->ID, $meta_key, $meta_value );
-	}
-
-	if ( $obj instanceof \WP_Comment ) {
-		add_comment_meta( $obj->comment_ID, $meta_key, $meta_value );
-	}
-}
-
-/**
- * Update post or comment meta.
+ * Update (or add) post or comment meta.
  *
  * @param  \WP_Post|\WP_Comment $obj        Post or comment.
  * @param  string               $meta_key   The meta key.

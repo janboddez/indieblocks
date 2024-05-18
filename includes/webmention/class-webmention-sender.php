@@ -59,8 +59,8 @@ class Webmention_Sender {
 			return;
 		}
 
-		if ( in_array( current_filter(), array( 'comment_post', 'comment_approved_comment' ), true ) ) {
-			$obj = get_comment( $obj_id );
+		if ( 'comment_post' === current_filter() ) {
+			$obj = get_comment( $obj_id ); // For the other hooks, we also pass an object, but not here.
 		}
 
 		if ( $obj instanceof \WP_Post ) {
@@ -173,6 +173,8 @@ class Webmention_Sender {
 				\IndieBlocks\update_meta( $obj, '_indieblocks_webmention_status', 'scheduled' );
 				wp_schedule_single_event( time() + $delay, 'indieblocks_webmention_send', array( $obj ) );
 			} else {
+				\IndieBlocks\update_meta( $obj, '_indieblocks_webmention_status', 'scheduled' );
+
 				// Send inline (although retries will be scheduled as always).
 				static::send_webmention( $obj );
 			}

@@ -217,4 +217,49 @@ class Commands {
 			\WP_CLI::error( 'Something went wrong.' );
 		}
 	}
+
+	/**
+	 * Deletes a link preview card.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <id>
+	 * : The post ID.
+	 *
+	 * @subcommand delete-link-preview
+	 *
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args "Associated" arguments.
+	 */
+	public function delete_link_preview( $args, $assoc_args ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		$id = trim( $args[0] );
+		if ( ! ctype_digit( (string) $id ) ) {
+			\WP_CLI::error( 'Invalid ID.' );
+			return;
+		}
+
+		$post = get_post( $id );
+		if ( empty( $post ) ) {
+			\WP_CLI::error( 'Invalid ID.' );
+			return;
+		}
+
+		$card = get_post_meta( $post->ID, '_indieblocks_link_preview', true );
+		if ( ! empty( $card['thumbnail'] ) ) {
+			$upload_dir = wp_upload_dir();
+			$file_path  = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $card['thumbnail'] );
+
+			\WP_CLI::log( 'Deleting link preview thumbnail.' );
+
+			wp_delete_file( $file_path );
+		}
+
+		$result = delete_post_meta( $post->ID, '_indieblocks_link_preview' );
+
+		if ( $result ) {
+			\WP_CLI::success( 'All done!' );
+		} else {
+			\WP_CLI::error( 'Something went wrong.' );
+		}
+	}
 }

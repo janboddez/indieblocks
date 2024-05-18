@@ -93,8 +93,12 @@ class Plugin {
 		add_action( 'plugins_loaded', array( Post_Types::class, 'register' ) );
 
 		// Everything Site Editor/theme microformats.
-		if ( ! empty( $options['add_mf2'] ) && $this->theme_supports_blocks() ) {
-			add_action( 'plugins_loaded', array( Theme_Mf2::class, 'register' ) );
+		if ( $this->theme_supports_blocks() ) {
+			add_filter( 'pre_get_avatar', array( Theme_Mf2::class, 'get_avatar_html' ), 10, 3 );
+
+			if ( ! empty( $options['add_mf2'] ) ) {
+				add_action( 'plugins_loaded', array( Theme_Mf2::class, 'register' ) );
+			}
 		}
 
 		// Micropub hook callbacks.

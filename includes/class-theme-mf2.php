@@ -23,7 +23,7 @@ class Theme_Mf2 {
 		add_filter( 'comment_class', array( __CLASS__, 'add_comment_class' ), 99 );
 		add_filter( 'post_thumbnail_html', array( __CLASS__, 'add_thumbnail_class' ) );
 		add_filter( 'get_comment_link', array( __CLASS__, 'get_comment_link' ), 10, 2 );
-		add_filter( 'get_avatar_url', array( __CLASS__, 'get_avatar_url' ), 10, 2 );
+		// add_filter( 'get_avatar_url', array( __CLASS__, 'get_avatar_url' ), 10, 2 );
 	}
 
 	/**
@@ -456,9 +456,11 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Filters avatar HTML. No longer in use.
+	 * Quick 'n' dirty way to display webmention avatars.
 	 *
-	 * We never really used this to add microformats.
+	 * Note that the core blocks used by block themes call author and avatar
+	 * blocks separately, which is why these typically _don't_ sit inside the
+	 * author `h-card`.
 	 *
 	 * @param  string|null $avatar  Default HTML.
 	 * @param  mixed       $comment Avatar to retrieve.
@@ -466,16 +468,35 @@ class Theme_Mf2 {
 	 * @return string|null          Avatar HTML.
 	 */
 	public static function get_avatar_html( $avatar, $comment, $args ) {
-		_deprecated_function( __METHOD__, '0.13.0' );
-
 		if ( ! $comment instanceof \WP_Comment ) {
 			return null;
 		}
 
-		$url = get_avatar_url( $comment );
+		$url = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
+
+		if ( in_array( $comment->comment_type, array( 'bookmark', 'like', 'repost' ), true ) ) {
+			// Mention created by the Webmention plugin.
+			$url = get_comment_meta( $comment->comment_ID, 'avatar', true ); // This may be an external URL.
+		}
 
 		if ( empty( $url ) ) {
-			return null;
+			$url = get_comment_meta( $comment->comment_ID, 'avatar_url', true ); // Created by the ActivityPub plugin.
+		}
+
+		if ( empty( $url ) ) {
+			// Created by core. Note: Why do we need this? Doesn't core ... do
+			// exactly this when we end up returning `null`? A: Yes, but it
+			// won't be proxied!
+			$url = get_avatar_url( $comment );
+		}
+
+		if ( empty( $url ) ) {
+			return null; // Let core do its thing.
+		}
+
+		$options = get_options();
+		if ( ! empty( $options['image_proxy'] ) && 0 !== strpos( $url, home_url() ) ) {
+			$url = proxy_image( $url );
 		}
 
 		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );
@@ -497,13 +518,17 @@ class Theme_Mf2 {
 	}
 
 	/**
-	 * Quick 'n' dirty way to display webmention avatars.
+	 * Filter (only) avatar URLs.
+	 *
+	 * Currently unused.
 	 *
 	 * @param  string $url         Avatar URL.
-	 * @param  mixed  $id_or_email The avatar to retrieve. Can be a user ID, Gravatar MD5 hash, user email, WP_User object, WP_Post object, or WP_Comment object.
+	 * @param  mixed  $id_or_email User ID, Gravatar MD5 hash, user email, WP_User object, WP_Post object, or WP_Comment object.
 	 * @return string              Avatar URL.
 	 */
 	public static function get_avatar_url( $url, $id_or_email ) {
+		_deprecated_function( __METHOD__, '0.13.1' );
+
 		if ( ! $id_or_email instanceof \WP_Comment ) {
 			return $url;
 		}
@@ -516,8 +541,7 @@ class Theme_Mf2 {
 		}
 
 		if ( empty( $avatar_url ) ) {
-			// (Likely) created by the ActivityPub plugin.
-			$avatar_url = get_comment_meta( $id_or_email->comment_ID, 'avatar_url', true );
+			$avatar_url = get_comment_meta( $id_or_email->comment_ID, 'avatar_url', true ); // (Likely) created by the ActivityPub plugin.
 		}
 
 		if ( ! empty( $avatar_url ) ) {

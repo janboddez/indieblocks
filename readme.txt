@@ -35,8 +35,8 @@ While IndieBlocks does not depend on _any_ other plugin, it is compatible with, 
 IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
 
 == Changelog ==
-= 0.12.0 =
-Improve Gutenberg compatibility of Location and Webmention "meta boxes." Add Syndication block prefix and suffix attributes. Support "update" and "delete" webmentions after mentions are closed. Add avatar proxy option.
+= 0.13.0 =
+Improve Gutenberg compatibility of Location and Webmention "meta boxes." Add Syndication block prefix and suffix attributes. Support "update" and "delete" webmentions even after mentions are closed. Add avatar proxy option.
 
 = 0.12.0 =
 Improve comment mentions, remove margin "below" hidden note and like titles.

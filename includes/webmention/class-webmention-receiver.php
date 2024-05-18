@@ -165,7 +165,7 @@ class Webmention_Receiver {
 
 			if ( is_wp_error( $response ) ) {
 				// Something went wrong.
-				\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Something went wrong fetching the page at {$webmention->source}:" . $response->get_error_message() . '.' );
+				\IndieBlocks\debug_log( "[IndieBlocks/Webmention] Something went wrong fetching the page at {$webmention->source}: " . $response->get_error_message() . '.' );
 				continue;
 			}
 
@@ -195,7 +195,7 @@ class Webmention_Receiver {
 
 					continue;
 				}
-			} elseif ( ! webmentions_open( $webmention->post_id ) ) {
+			} elseif ( ! \IndieBlocks\webmentions_open( $webmention->post_id ) ) {
 				// New mention, while comments are closed.
 				debug_log( "[IndieBlocks/Webmention] Webmentions closed for the post with ID {$webmention->post_id}." );
 				return;

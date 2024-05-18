@@ -59,7 +59,7 @@ class Webmention_Sender {
 			return;
 		}
 
-		if ( 'comment_post' === current_filter() ) {
+		if ( in_array( current_filter(), array( 'comment_post', 'comment_approved_comment' ), true ) ) {
 			$obj = get_comment( $obj_id );
 		}
 
@@ -107,7 +107,6 @@ class Webmention_Sender {
 		// Parse in targets that may have been there previously, but don't
 		// delete them, yet.
 		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
-
 		if ( ! empty( $history ) && is_array( $history ) ) {
 			$urls = array_merge( $urls, array_column( $history, 'target' ) );
 		}

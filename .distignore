@@ -8,6 +8,7 @@
 .distignore
 .gitignore
 .phpunit.result.cache
+.prettierrc
 README.md
 bootstrap.php
 composer.json

@@ -467,7 +467,7 @@ class Webmention_Sender {
 			return;
 		}
 
-		if ( 'enqueue_block_editor_assets' === current_action() ) {
+		if ( 'enqueue_block_editor_assets' === current_action() && ! apply_filters( 'indieblocks_webmention_meta_box', false )) {
 			$current_screen = get_current_screen();
 			if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
 				wp_enqueue_script(

@@ -200,6 +200,19 @@ class Webmention {
 	}
 
 	/**
+	 * Fixes the display of comments added by the Webmention plugin, even after
+	 * it is deactivated.
+	 *
+	 * @link https://github.com/pfefferle/wordpress-webmention/pull/457
+	 */
+	public static function enqueue_styles() {
+		$current_screen = get_current_screen();
+		if ( isset( $current_screen->base ) && 'dashboard' === $current_screen->base ) {
+			wp_enqueue_style( 'indieblocks-webmention-admin', plugins_url( '/assets/admin.css', dirname( __DIR__ ) ), array(), \IndieBlocks\Plugin::PLUGIN_VERSION );
+		}
+	}
+
+	/**
 	 * Automatically inserts a Facepile block in front of `core/comments`.
 	 *
 	 * @param  array                             $hooked_blocks Hooked block types.

@@ -549,7 +549,7 @@ class Theme_Mf2 {
 		}
 
 		$options = get_options();
-		if ( ! empty( $options['image_proxy'] ) && 0 !== strpos( $avatar_url, home_url() ) ) {
+		if ( ! empty( $options['image_proxy'] ) && wp_http_validate_url( $url ) && 0 !== strpos( $url, home_url() ) ) {
 			return proxy_image( $url );
 		}
 

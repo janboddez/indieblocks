@@ -4,6 +4,7 @@
 /node_modules
 /tests
 /vendor
+/svn
 
 .distignore
 .gitignore
@@ -17,3 +18,5 @@ phpcs.xml
 phpunit.xml
 *.code-workspace
 scoper.*
+*.bak.*
+*.cache

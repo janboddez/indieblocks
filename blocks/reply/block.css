@@ -1,3 +1,8 @@
 .wp-block-indieblocks-reply > .h-cite:first-child > p {
 	margin-block: 0;
 }
+
+.wp-block-indieblocks-reply > .block-editor-inner-blocks {
+	margin-block: 1em;
+	min-height: 35px;
+}

@@ -1,3 +1,8 @@
 .wp-block-indieblocks-bookmark > .h-cite:first-child > p {
 	margin-block: 0;
 }
+
+.wp-block-indieblocks-bookmark > .block-editor-inner-blocks {
+	margin-block: 1em;
+	min-height: 35px;
+}

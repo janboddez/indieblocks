@@ -1,0 +1,41 @@
+{
+	"apiVersion": 2,
+	"title": "On This Day",
+	"description": "Display posts created on the same date (as the current post), but in past years.",
+	"name": "indieblocks/on-this-day",
+	"category": "theme",
+	"icon": "calendar",
+	"editorScript": "file:./block.js",
+	"render": "file:./render.php",
+	"usesContext": [ "postId", "postType" ],
+	"textdomain": "indieblocks",
+	"supports": {
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": ["top", "bottom"],
+			"padding": false,
+			"blockGap": false
+		}
+	}
+}

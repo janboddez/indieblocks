@@ -178,7 +178,7 @@
 					: IndieBlocks.hCite( 'u-repost-of', props.attributes ),
 				el(
 					'blockquote',
-					{ className: 'wp-block-quote e-content' },
+					{ className: 'wp-block-quote is-layout-flow wp-block-quote-is-layout-flow e-content' },
 					el( InnerBlocks, {
 						template: [ [ 'core/paragraph' ] ],
 						templateLock: false,

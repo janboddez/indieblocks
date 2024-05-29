@@ -2,9 +2,9 @@
 	const { registerBlockType } = blocks;
 	const { createElement: el, RawHTML, useState } = element;
 	const { BlockControls, InspectorControls, useBlockProps } = blockEditor;
-	const { PanelBody, Placeholder, ToggleControl, TextControl } = components;
+	const { PanelBody, TextControl } = components;
 	const { useEntityRecord } = coreData;
-	const { __, sprintf } = i18n;
+	const { __ } = i18n;
 
 	const render = ( urls ) => {
 		let output = '';

@@ -39,6 +39,7 @@
 				"text": true,
 				"link": true
 			}
-		}
+		},
+		"inserter": false
 	}
 }

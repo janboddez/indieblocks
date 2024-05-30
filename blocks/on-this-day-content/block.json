@@ -31,6 +31,7 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"inserter": false
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"apiVersion": 2,
-	"title": "On This Day",
+	"title": "On This Day Content",
 	"description": "Outputs the actual “On This Day” posts.",
 	"name": "indieblocks/on-this-day-content",
 	"category": "theme",

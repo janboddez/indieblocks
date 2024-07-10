@@ -62,7 +62,7 @@ class Theme_Mf2 {
 			if ( ! empty( $post->post_content ) ) {
 				if ( preg_match( '~class=("|\')([^"\']*?)p-ingredient([^"\']*?)("|\')~', $post->post_content ) ) {
 					// Decent chance this is a recipe.
-					$class = 'h-review';
+					$class = 'h-recipe';
 				} elseif ( preg_match( '~class=("|\')([^"\']*?)p-rating([^"\']*?)("|\')~', $post->post_content ) ) {
 					// Decent chance this is a review.
 					$class = 'h-review';

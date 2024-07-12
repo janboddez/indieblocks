@@ -20,8 +20,11 @@ class Commands {
 	 * [--dir=<dir>]
 	 * : The destination folder, relative to, typically, `wp-content/uploads`.
 	 *
+	 * [--author=<author>]
+	 * : Author URL.
+	 *
 	 * [--type=<type>]
-	 * : The destination folder, relative to, typically, `wp-content/uploads`.
+	 * : `ap` for ActivityPub.
 	 *
 	 * @subcommand cache-avatar
 	 *
@@ -66,7 +69,14 @@ class Commands {
 			return;
 		}
 
-		$hash     = hash( 'sha256', esc_url_raw( $url ) );
+		if ( isset( $assoc_args['author'] ) && filter_var( $assoc_args['author'], FILTER_VALIDATE_URL ) ) {
+			$hash = hash( 'sha256', esc_url_raw( $assoc_args['author'] ) );
+		} else {
+			$hash = hash( 'sha256', esc_url_raw( $url ) );
+		}
+
+		$dir .= '/' . substr( $hash, 0, 2 );
+
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
@@ -115,6 +125,9 @@ class Commands {
 	 * [--dir=<dir>]
 	 * : The destination folder, relative to, typically, `wp-content/uploads`.
 	 *
+	 * [--author=<author>]
+	 * : Author URL.
+	 *
 	 * @subcommand cache-image
 	 *
 	 * @param array $args       Arguments.
@@ -142,7 +155,14 @@ class Commands {
 			: 'indieblocks-avatars';
 		$dir = sanitize_title( $dir );
 
-		$hash     = hash( 'sha256', esc_url_raw( $url ) );
+		if ( isset( $assoc_args['author'] ) && filter_var( $assoc_args['author'], FILTER_VALIDATE_URL ) ) {
+			$hash = hash( 'sha256', esc_url_raw( $assoc_args['author'] ) );
+		} else {
+			$hash = hash( 'sha256', esc_url_raw( $url ) );
+		}
+
+		$dir .= '/' . substr( $hash, 0, 2 );
+
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 

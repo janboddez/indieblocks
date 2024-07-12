@@ -377,11 +377,12 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 /**
  * Queries for a post's "facepile" comments.
  *
- * @param  int $post_id Post ID.
- * @return array        Facepile comments.
+ * @param  int      $post_id Post ID.
+ * @param  string[] $types   Comment types to include.
+ * @return array             Facepile comments.
  */
-function get_facepile_comments( $post_id ) {
-	$facepile_comments = wp_cache_get( "indieblocks:facepile-comments:$post_id" );
+function get_facepile_comments( $post_id, $types ) {
+	$facepile_comments = wp_cache_get( md5( "indieblocks:facepile-comments:{$post_id}:" . wp_json_encode( $types ) ) );
 
 	if ( false !== $facepile_comments ) {
 		return $facepile_comments;
@@ -415,7 +416,7 @@ function get_facepile_comments( $post_id ) {
 			array(
 				'key'     => 'indieblocks_webmention_kind',
 				'compare' => 'IN',
-				'value'   => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
+				'value'   => apply_filters( 'indieblocks_facepile_kinds', $types, $post_id ),
 			),
 		),
 	);
@@ -429,7 +430,7 @@ function get_facepile_comments( $post_id ) {
 		'post_id'  => $post_id,
 		'fields'   => 'ids',
 		'status'   => 'approve',
-		'type__in' => apply_filters( 'indieblocks_facepile_kinds', array( 'bookmark', 'like', 'repost' ), $post_id ),
+		'type__in' => apply_filters( 'indieblocks_facepile_kinds', $types, $post_id ),
 	);
 	if ( 0 !== get_current_user_id() ) {
 		$args['include_unapproved'] = array( get_current_user_id() );
@@ -465,7 +466,7 @@ function get_facepile_comments( $post_id ) {
 	$facepile_comments = apply_filters( 'indieblocks_facepile_comments', $facepile_comments->comments, $post_id );
 
 	// Cache for the duration of the request (and then some)?
-	wp_cache_set( "indieblocks:facepile-comments:$post_id", $facepile_comments, '', 10 );
+	wp_cache_set( md5( "indieblocks:facepile-comments:{$post_id}:" . wp_json_encode( $types ) ), $facepile_comments, '', 10 );
 
 	return $facepile_comments;
 }

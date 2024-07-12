@@ -15,7 +15,7 @@ if ( empty( $post_id ) ) {
 
 $types = array( 'bookmark', 'like', 'repost' );
 
-if ( ! empty( $attributes['type'] ) && is_array( $attributes['type'] ) ) {
+if ( isset( $attributes['type'] ) && is_array( $attributes['type'] ) ) {
 	$types = $attributes['type'];
 }
 

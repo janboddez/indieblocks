@@ -14,18 +14,21 @@ if ( empty( $post_id ) ) {
 }
 
 $types = array( 'bookmark', 'like', 'repost' );
-foreach ( $block->innerBlocks as $inner_block ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-	if ( 'indieblocks/facepile-content' !== $inner_block->blockName ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		continue;
+
+if ( ! empty( $block->parsed_block['innerBlocks'] ) ) {
+	foreach ( $block->parsed_block['innerBlocks'] as $inner_block ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		if ( 'indieblocks/facepile-content' !== $inner_block['blockName'] ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			continue;
+		}
+
+		if ( isset( $inner_block['attrs']['type'] ) && is_array( $inner_block['attrs']['type'] ) ) {
+			$types = $inner_block['attrs']['type'];
+		}
 	}
 
-	if ( ! empty( $inner_block->attrs['type'] ) && is_array( $inner_block->attrs['type'] ) ) {
-		$types = $inner_block->attrs['type'];
+	if ( empty( $types ) ) {
+		return;
 	}
-}
-
-if ( empty( $types ) ) {
-	return;
 }
 
 $facepile_comments = \IndieBlocks\get_facepile_comments( $post_id, $types );

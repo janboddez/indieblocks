@@ -462,14 +462,14 @@ class Theme_Mf2 {
 	 * blocks separately, which is why these typically _don't_ sit inside the
 	 * author `h-card`.
 	 *
-	 * @param  string|null $avatar  Default HTML.
+	 * @param  string|null $avatar  Default `null`, or another plugin's HTML.
 	 * @param  mixed       $comment Avatar to retrieve.
 	 * @param  array       $args    Additional arguments.
 	 * @return string|null          Avatar HTML.
 	 */
 	public static function get_avatar_html( $avatar, $comment, $args ) {
 		if ( ! $comment instanceof \WP_Comment ) {
-			return null;
+			return $avatar;
 		}
 
 		$url = get_comment_meta( $comment->comment_ID, 'indieblocks_webmention_avatar', true );
@@ -491,7 +491,7 @@ class Theme_Mf2 {
 		}
 
 		if ( empty( $url ) ) {
-			return null; // Let core do its thing.
+			return $avatar; // Let core (or another plugin) do its thing.
 		}
 
 		$options = get_options();

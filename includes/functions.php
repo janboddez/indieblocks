@@ -564,3 +564,31 @@ function proxy_image( $url ) {
 
 	return get_rest_url( null, '/indieblocks/v1/imageproxy' ) . "?$query_string";
 }
+
+/**
+ * Recursively search `innerBlocks`.
+ *
+ * @link https://gist.github.com/bjorn2404/9b2b98b18c2fe47570895a63c62b8a93
+ *
+ * @param  array  $blocks     Blocks to search through.
+ * @param  string $block_name The type of block to search for.
+ * @return array              Matching blocks.
+ */
+function parse_inner_blocks( $blocks, $block_name ) {
+	$block_data = array();
+
+	if ( ! is_array( $blocks ) ) {
+		return $block_data;
+	}
+
+	foreach ( $blocks as $block ) {
+		if ( ! empty( $block['innerBlocks'] ) && $block_name !== $block['blockName'] ) {
+			$inner_data = parse_inner_blocks( $block['innerBlocks'], $block_name );
+			$block_data = array_merge( $block_data, $inner_data );
+		} elseif ( $block_name === $block['blockName'] ) {
+			$block_data[] = $block;
+		}
+	}
+
+	return $block_data;
+}

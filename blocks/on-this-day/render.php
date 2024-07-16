@@ -28,6 +28,7 @@ if ( false === $posts ) {
 				'compare' => '!=',
 			),
 		),
+		// 'post__not_in'        => array( $post_id ),
 	);
 
 	$posts = get_posts( $args ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited

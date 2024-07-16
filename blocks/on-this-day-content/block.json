@@ -6,6 +6,7 @@
 	"category": "theme",
 	"icon": "calendar",
 	"editorScript": "file:./block.js",
+	"style": "file:./block.css",
 	"render": "file:./render.php",
 	"usesContext": [ "postId", "postType" ],
 	"textdomain": "indieblocks",

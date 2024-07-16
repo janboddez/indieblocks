@@ -28,6 +28,8 @@ if ( false === $posts ) {
 				'compare' => '!=',
 			),
 		),
+		'orderby'             => 'date',
+		'order'               => 'DESC',
 	);
 
 	$posts = get_posts( $args ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -39,18 +41,38 @@ if ( empty( $posts ) ) {
 	return;
 }
 
+$count  = count( $posts );
 $output = "<ul style='list-style: none;'>\n";
 
-foreach ( $posts as $post ) { // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+foreach ( $posts as $i => $post ) { // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	$post_year = get_the_date( 'Y', $post );
+
+	if ( 0 === $i ) {
+		$current_year = $post_year;
+
+		/* translators: %d: year */
+		$output .= '<li><strong>' . sprintf( esc_html__( '&hellip; in %d', 'indieblocks' ), (int) $post_year ) . "</strong>\n";
+		$output .= "<ul style='list-style: none;'>\n";
+	} elseif ( $post_year !== $current_year ) {
+		$current_year = $post_year;
+
+		$output .= "</ul>\n</li>\n";
+		/* translators: %d: year */
+		$output .= '<li><strong>' . sprintf( esc_html__( '&hellip; in %d', 'indieblocks' ), (int) $post_year ) . "</strong>\n";
+		$output .= "<ul style='list-style: none;'>\n";
+	}
+
 	$output .= "<li>\n";
-	$output .= '<p style="margin-bottom: 0;">' . get_the_excerpt( $post ) . "</p>\n";
-	$output .= '<span class="has-small-font-size"><a href="' . esc_url( get_permalink( $post ) ) . '">' . get_the_title( $post ) . '</a>';
-	$output .= '<span class="sep" aria-hidden="true"> • </span>';
-	$output .= '<a href="' . esc_url( get_permalink( $post ) ) . '">' . get_the_date( get_option( 'date_format' ), $post ) . '</a></span>';
+	$output .= '<p class="entry-excerpt">' . get_the_excerpt( $post ) . "</p>\n";
+	$output .= '<span class="has-small-font-size"><a href="' . esc_url( get_permalink( $post ) ) . '">' . get_the_title( $post ) . '</a></span>';
 	$output .= "</li>\n";
+
+	if ( $i === $count - 1 ) {
+		$output .= "\n</ul>\n</li>\n";
+	}
 }
 
-$output .= "\n</ul>";
+$output .= "</ul>\n";
 
 $wrapper_attributes = get_block_wrapper_attributes();
 ?>

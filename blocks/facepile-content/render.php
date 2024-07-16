@@ -13,7 +13,17 @@ if ( empty( $post_id ) ) {
 	return;
 }
 
-$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id );
+$types = array( 'bookmark', 'like', 'repost' );
+
+if ( isset( $attributes['type'] ) && is_array( $attributes['type'] ) ) {
+	$types = $attributes['type'];
+}
+
+if ( empty( $types ) ) {
+	return;
+}
+
+$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id, $types );
 
 if ( empty( $facepile_comments ) ) {
 	return;

@@ -13,9 +13,26 @@ if ( empty( $post_id ) ) {
 	return;
 }
 
-$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id );
+$render = false;
+$types  = array( 'bookmark', 'like', 'repost' );
 
-if ( empty( $facepile_comments ) ) {
+$facepile_content_blocks = \IndieBlocks\parse_inner_blocks( $block->parsed_block['innerBlocks'], 'indieblocks/facepile-content' );
+foreach ( $facepile_content_blocks as $inner_block ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+	if ( isset( $inner_block['attrs']['type'] ) && is_array( $inner_block['attrs']['type'] ) ) {
+		// If the `$type` attribute is set, use that.
+		$types = $inner_block['attrs']['type'];
+	}
+
+	$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id, $types );
+	if ( ! empty( $facepile_comments ) ) {
+		// As soon as we've found some "facepile comments," we're good. No need to process any other inner blocks.
+		// @todo: Stop searching after the first result, too.
+		$render = true;
+		break;
+	}
+}
+
+if ( ! $render ) {
 	return;
 }
 

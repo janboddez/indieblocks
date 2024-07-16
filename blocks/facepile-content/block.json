@@ -26,6 +26,10 @@
 		"iconBackgroundColor": {
 			"type": "string",
 			"default": "#fff"
+		},
+		"type": {
+			"type": "array",
+			"default": [ "bookmark", "like", "repost" ]
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
@@ -39,6 +43,7 @@
 				"text": true,
 				"link": true
 			}
-		}
+		},
+		"inserter": false
 	}
 }

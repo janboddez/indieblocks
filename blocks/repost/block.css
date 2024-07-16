@@ -7,10 +7,10 @@
 	min-height: 35px;
 }
 
-.wp-block-indieblocks-repost > blockquote.is-layout-flow .block-editor-block-list__layout > :first-child {
+.wp-block-indieblocks-repost > blockquote.is-layout-flow > .block-editor-inner-blocks > .block-editor-block-list__layout > :first-child {
 	margin-block-start: 0;
 }
 
-.wp-block-indieblocks-repost > blockquote.is-layout-flow .block-editor-block-list__layout > :last-child {
+.wp-block-indieblocks-repost > blockquote.is-layout-flow > .block-editor-inner-blocks > .block-editor-block-list__layout > :last-child {
 	margin-block-end: 0;
 }

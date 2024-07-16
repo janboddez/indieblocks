@@ -87,7 +87,7 @@ class Webmention_Parser {
 
 		$avatar_url = $parser->get_avatar();
 		if ( ! empty( $avatar_url ) ) {
-			$avatar = static::store_avatar( $avatar_url );
+			$avatar = static::store_avatar( $avatar_url, $author_url );
 			if ( ! empty( $avatar ) ) {
 				$commentdata['comment_meta']['indieblocks_webmention_avatar'] = $avatar;
 			}
@@ -222,21 +222,28 @@ class Webmention_Parser {
 	/**
 	 * Caches avatars locally.
 	 *
-	 * @param  string $url Avatar URL.
-	 * @return string|null Local avatar path, or nothing on failure.
+	 * @param  string $avatar_url Avatar URL.
+	 * @param  string $author_url Avatar URL.
+	 * @return string|null        Local avatar path, or nothing on failure.
 	 */
-	protected static function store_avatar( $url ) {
+	protected static function store_avatar( $avatar_url, $author_url = '' ) {
 		$options = \IndieBlocks\get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			return null;
 		}
 
-		$dir = 'indieblocks-avatars';
+		if ( ! empty( $author_url ) ) {
+			$hash = hash( 'sha256', esc_url_raw( $author_url ) );
+		} else {
+			$hash = hash( 'sha256', esc_url_raw( $avatar_url ) );
+		}
 
-		$hash     = hash( 'sha256', esc_url_raw( $url ) );
-		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
+		$dir  = 'indieblocks-avatars/';
+		$dir .= substr( $hash, 0, 2 );
+
+		$ext      = pathinfo( $avatar_url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
-		return \IndieBlocks\store_image( $url, $filename, $dir );
+		return \IndieBlocks\store_image( $avatar_url, $filename, $dir );
 	}
 }

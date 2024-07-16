@@ -2,7 +2,7 @@
 	const { registerBlockType } = blocks;
 	const { createElement: el, RawHTML } = element;
 	const { BlockControls, InspectorControls, useBlockProps, useSetting } = blockEditor;
-	const { BaseControl, ColorPalette, PanelBody, RangeControl, ToggleControl } = components;
+	const { BaseControl, CheckboxControl, ColorPalette, PanelBody, RangeControl, ToggleControl } = components;
 	const { __ } = i18n;
 
 	registerBlockType( 'indieblocks/facepile-content', {
@@ -22,6 +22,9 @@
 			const icons = props.attributes.icons;
 			const color = props.attributes.color || '#000';
 			const iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+
+			let type = props.attributes.type;
+
 			const colors = useSetting( 'color.palette' );
 
 			const imgProps = {
@@ -55,6 +58,52 @@
 				el(
 					InspectorControls,
 					{ key: 'inspector' },
+					el(
+						PanelBody,
+						{
+							title: __( 'Comment Types', 'indieblocks' ),
+							initialOpen: true,
+						},
+						el( CheckboxControl, {
+							label: __( 'Bookmark', 'indieblocks' ),
+							checked: type.includes( 'bookmark' ),
+							onChange: ( checked ) => {
+								type = type.filter( value => value !== 'bookmark' );
+
+								if ( checked ) {
+									type.push( 'bookmark' );
+								}
+
+								props.setAttributes( { type } );
+							},
+						} ),
+						el( CheckboxControl, {
+							label: __( 'Like', 'indieblocks' ),
+							checked: type.includes( 'like' ),
+							onChange: ( checked ) => {
+								type = type.filter( value => value !== 'like' );
+
+								if ( checked ) {
+									type.push( 'like' );
+								}
+
+								props.setAttributes( { type } );
+							},
+						} ),
+						el( CheckboxControl, {
+							label: __( 'Repost', 'indieblocks' ),
+							checked: type.includes( 'repost' ),
+							onChange: ( checked ) => {
+								type = type.filter( value => value !== 'repost' );
+
+								if ( checked ) {
+									type.push( 'repost' );
+								}
+
+								props.setAttributes( { type } );
+							},
+						} ),
+					),
 					el(
 						PanelBody,
 						{
@@ -121,87 +170,93 @@
 				el(
 					'ul',
 					{ className: 'indieblocks-avatar-size-' + avatarSize },
-					el(
-						'li',
-						{},
-						el(
-							'span',
+					type.includes( 'repost' )
+						? el(
+							'li',
 							{},
-							el( 'img', imgProps ),
-							icons
-								? el(
-										'svg',
-										{
-											className: 'icon indieblocks-icon-repost',
-											width: avatarSize,
-											height: avatarSize,
-											style: {
-												backgroundColor: iconBgColor,
-												color: color,
+							el(
+								'span',
+								{},
+								el( 'img', imgProps ),
+								icons
+									? el(
+											'svg',
+											{
+												className: 'icon indieblocks-icon-repost',
+												width: avatarSize,
+												height: avatarSize,
+												style: {
+													backgroundColor: iconBgColor,
+													color: color,
+												},
 											},
-										},
-										el( 'use', {
-											href: '#indieblocks-icon-repost',
-											xlinkHref: '#indieblocks-icon-repost',
-										} )
-								  )
-								: null
+											el( 'use', {
+												href: '#indieblocks-icon-repost',
+												xlinkHref: '#indieblocks-icon-repost',
+											} )
+									)
+									: null
+							)
 						)
-					),
-					el(
-						'li',
-						{},
-						el(
-							'span',
+						: null,
+					type.includes( 'bookmark' )
+						? el(
+							'li',
 							{},
-							el( 'img', imgProps ),
-							icons
-								? el(
-										'svg',
-										{
-											className: 'icon indieblocks-icon-bookmark',
-											width: avatarSize,
-											height: avatarSize,
-											style: {
-												backgroundColor: iconBgColor,
-												color: color,
+							el(
+								'span',
+								{},
+								el( 'img', imgProps ),
+								icons
+									? el(
+											'svg',
+											{
+												className: 'icon indieblocks-icon-bookmark',
+												width: avatarSize,
+												height: avatarSize,
+												style: {
+													backgroundColor: iconBgColor,
+													color: color,
+												},
 											},
-										},
-										el( 'use', {
-											href: '#indieblocks-icon-bookmark',
-											xlinkHref: '#indieblocks-icon-bookmark',
-										} )
-								  )
-								: null
+											el( 'use', {
+												href: '#indieblocks-icon-bookmark',
+												xlinkHref: '#indieblocks-icon-bookmark',
+											} )
+									)
+									: null
+							)
 						)
-					),
-					el(
-						'li',
-						{},
-						el(
-							'span',
+						: null,
+					type.includes( 'like' )
+						? el(
+							'li',
 							{},
-							el( 'img', imgProps ),
-							icons
-								? el(
-										'svg',
-										{
-											className: 'icon indieblocks-icon-like',
-											width: avatarSize,
-											height: avatarSize,
-											style: {
-												backgroundColor: iconBgColor,
-												color: color,
+							el(
+								'span',
+								{},
+								el( 'img', imgProps ),
+								icons
+									? el(
+											'svg',
+											{
+												className: 'icon indieblocks-icon-like',
+												width: avatarSize,
+												height: avatarSize,
+												style: {
+													backgroundColor: iconBgColor,
+													color: color,
+												},
 											},
-										},
-										el( 'use', {
-											href: '#indieblocks-icon-like',
-											xlinkHref: '#indieblocks-icon-like',
-										} )
-								  )
-								: null
+											el( 'use', {
+												href: '#indieblocks-icon-like',
+												xlinkHref: '#indieblocks-icon-like',
+											} )
+									)
+									: null
+							)
 						)
-					)
+						: null,
 				),
 				RawHTML( {
 					children: html,

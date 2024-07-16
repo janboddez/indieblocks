@@ -79,7 +79,7 @@ class Image_Proxy {
 		// Newly received headers.
 		list( $code, $headers ) = static::get_headers( $handle );
 
-		if ( ! in_array( $code, array( 200, 201, 202, 206, 301, 302, 307 ), true ) ) {
+		if ( ! in_array( $code, array( 200, 201, 202, 203, 206, 301, 302, 304, 307, 308 ), true ) ) {
 			// Return an empty response.
 			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
@@ -122,7 +122,7 @@ class Image_Proxy {
 		$metadata = stream_get_meta_data( $stream );
 
 		foreach ( $metadata['wrapper_data'] as $line ) {
-			if ( preg_match( '~^http/.+? (\d+) .+?$~i', $line, $match ) ) {
+			if ( preg_match( '~^http/.+? (\d+) .*?$~i', $line, $match ) ) {
 				// Keeps only the most recent status code. E.g., after a redirect.
 				$status = (int) $match[1];
 				continue;

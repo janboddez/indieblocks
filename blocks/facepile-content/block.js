@@ -22,6 +22,7 @@
 			const icons = props.attributes.icons;
 			const color = props.attributes.color || '#000';
 			const iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+			const countOnly = props.attributes.countOnly;
 
 			let type = props.attributes.type;
 
@@ -68,12 +69,15 @@
 							label: __( 'Bookmark', 'indieblocks' ),
 							checked: type.includes( 'bookmark' ),
 							onChange: ( checked ) => {
+								// Remove `bookmark`.
 								type = type.filter( value => value !== 'bookmark' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'bookmark' );
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
 							},
 						} ),
@@ -81,12 +85,15 @@
 							label: __( 'Like', 'indieblocks' ),
 							checked: type.includes( 'like' ),
 							onChange: ( checked ) => {
+								// Remove `like`.
 								type = type.filter( value => value !== 'like' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'like' );
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
 							},
 						} ),
@@ -94,13 +101,31 @@
 							label: __( 'Repost', 'indieblocks' ),
 							checked: type.includes( 'repost' ),
 							onChange: ( checked ) => {
+								// Remove `repost`.
 								type = type.filter( value => value !== 'repost' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'repost' );
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
+							},
+						} ),
+					),
+					el(
+						PanelBody,
+						{
+							title: __( 'Count Only', 'indieblocks' ),
+							initialOpen: true,
+							description: __( 'Replace the “facepile” with a simple reaction count.', 'indieblocks' ),
+						},
+						el( ToggleControl, {
+							label: __( 'Show count only', 'indieblocks' ),
+							checked: countOnly,
+							onChange: ( value ) => {
+								props.setAttributes( { countOnly: value } );
 							},
 						} ),
 					),
@@ -167,97 +192,103 @@
 						)
 					)
 				),
-				el(
-					'ul',
-					{ className: 'indieblocks-avatar-size-' + avatarSize },
-					type.includes( 'repost' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+				countOnly
+					? el(
+						'div',
+						{ className: 'indieblocks-facepile-count' },
+						type.length
+					 )
+					: el(
+						'ul',
+						{ className: 'indieblocks-avatar-size-' + avatarSize },
+						type.includes( 'repost' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-repost',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-repost',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-repost',
-												xlinkHref: '#indieblocks-icon-repost',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-repost',
+													xlinkHref: '#indieblocks-icon-repost',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-					type.includes( 'bookmark' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+							: null,
+						type.includes( 'bookmark' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-bookmark',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-bookmark',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-bookmark',
-												xlinkHref: '#indieblocks-icon-bookmark',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-bookmark',
+													xlinkHref: '#indieblocks-icon-bookmark',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-					type.includes( 'like' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+							: null,
+						type.includes( 'like' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-like',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-like',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-like',
-												xlinkHref: '#indieblocks-icon-like',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-like',
+													xlinkHref: '#indieblocks-icon-like',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-				),
+							: null,
+					),
 				RawHTML( {
 					children: html,
 				} )

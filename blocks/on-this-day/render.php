@@ -21,7 +21,7 @@ if ( false === $posts ) {
 	$args = array(
 		'day'                 => get_the_date( 'd', $post_id ),
 		'monthnum'            => get_the_date( 'm', $post_id ),
-		'numberposts'         => 3,
+		'numberposts'         => 4,
 		'ignore_sticky_posts' => true,
 		'date_query'          => array(
 			array(
@@ -31,6 +31,7 @@ if ( false === $posts ) {
 		),
 		'orderby'             => 'date',
 		'order'               => 'DESC',
+		'post_type'           => array( 'post', 'indieblocks_note' ),
 	);
 
 	$posts = get_posts( $args ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited

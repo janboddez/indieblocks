@@ -21,7 +21,7 @@ if ( false === $posts ) {
 	$args = array(
 		'day'                 => get_the_date( 'd', $post_id ),
 		'monthnum'            => get_the_date( 'm', $post_id ),
-		'numberposts'         => 3,
+		'numberposts'         => 4,
 		'ignore_sticky_posts' => true,
 		'date_query'          => array(
 			array(
@@ -31,6 +31,7 @@ if ( false === $posts ) {
 		),
 		'orderby'             => 'date',
 		'order'               => 'DESC',
+		'post_type'           => array( 'post', 'indieblocks_note' ),
 	);
 
 	$posts = get_posts( $args ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -43,6 +44,7 @@ if ( empty( $posts ) ) {
 	// Nothing to show. Don't output anything.
 	return;
 }
+
 
 $count  = count( $posts );
 $output = "<ul style='list-style: none;'>\n";
@@ -67,7 +69,7 @@ foreach ( $posts as $i => $post ) { // phpcs:ignore WordPress.WP.GlobalVariables
 
 	$output .= "<li>\n";
 	$output .= '<p class="entry-excerpt">' . get_the_excerpt( $post ) . "</p>\n";
-	$output .= '<span class="has-small-font-size"><a href="' . esc_url( get_permalink( $post ) ) . '">' . get_the_title( $post ) . '</a></span>';
+	$output .= '<span class="has-small-font-size"><a href="' . esc_url( get_permalink( $post ) ) . '">' . ( 'post' === get_post_type( $post ) ? get_the_title( $post ) : wp_date( get_option( 'date_format' ), get_post_timestamp( $post ) ) ) . '</a></span>';
 	$output .= "</li>\n";
 
 	if ( $i === $count - 1 ) {

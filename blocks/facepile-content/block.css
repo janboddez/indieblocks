@@ -33,7 +33,7 @@
 	position: relative;
 }
 
-.wp-block-indieblocks-facepile-content li:hover {
+.wp-block-indieblocks-facepile-content li:not(:last-child):hover {
 	margin-inline-end: calc(-0.05 * var(--indieblocks-avatar-size));
 }
 

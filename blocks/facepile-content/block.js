@@ -23,6 +23,7 @@
 			const color = props.attributes.color || '#000';
 			const iconBgColor = props.attributes.iconBackgroundColor || '#fff';
 			const countOnly = props.attributes.countOnly;
+			const forceShow = props.attributes.forceShow;
 
 			let type = props.attributes.type;
 
@@ -75,6 +76,7 @@
 								if ( checked ) {
 									// Re-add only if checked.
 									type.push( 'bookmark' );
+									type = type.reverse();
 								}
 
 								// Save array.
@@ -91,6 +93,7 @@
 								if ( checked ) {
 									// Re-add only if checked.
 									type.push( 'like' );
+									type = type.reverse();
 								}
 
 								// Save array.
@@ -107,6 +110,7 @@
 								if ( checked ) {
 									// Re-add only if checked.
 									type.push( 'repost' );
+									type = type.reverse();
 								}
 
 								// Save array.
@@ -119,13 +123,19 @@
 						{
 							title: __( 'Count Only', 'indieblocks' ),
 							initialOpen: true,
-							description: __( 'Replace the “facepile” with a simple reaction count.', 'indieblocks' ),
 						},
 						el( ToggleControl, {
 							label: __( 'Show count only', 'indieblocks' ),
 							checked: countOnly,
 							onChange: ( value ) => {
 								props.setAttributes( { countOnly: value } );
+							},
+						} ),
+						el( ToggleControl, {
+							label: __( 'Always show count', 'indieblocks' ),
+							checked: forceShow,
+							onChange: ( value ) => {
+								props.setAttributes( { forceShow: value } );
 							},
 						} ),
 					),
@@ -195,8 +205,26 @@
 				countOnly
 					? el(
 						'div',
-						{ className: 'indieblocks-facepile-count' },
-						type.length
+						{ className: 'indieblocks-count' },
+						icons
+							? el(
+									'svg',
+									{
+										className: 'icon indieblocks-icon-' + type.find( Boolean ),
+										width: avatarSize,
+										height: avatarSize,
+										style: {
+											backgroundColor: iconBgColor,
+											color: color,
+										},
+									},
+									el( 'use', {
+										href: '#indieblocks-icon-' + type.find( Boolean ),
+										xlinkHref: '#indieblocks-icon-repost' + type.find( Boolean ),
+									} )
+							)
+							: null,
+							type.length
 					 )
 					: el(
 						'ul',

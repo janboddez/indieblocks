@@ -25,7 +25,7 @@ if ( empty( $types ) ) {
 
 $facepile_comments = \IndieBlocks\get_facepile_comments( $post_id, $types );
 
-if ( empty( $facepile_comments ) ) {
+if ( empty( $facepile_comments ) && empty( $attributes['forceShow'] ) ) {
 	return;
 }
 

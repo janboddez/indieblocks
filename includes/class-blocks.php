@@ -240,6 +240,50 @@ class Blocks {
 	 */
 	public static function register_block_patterns() {
 		register_block_pattern(
+			'indieblocks/reaction-count-pattern',
+			array(
+				'title'      => __( '3-column reaction counts', 'indieblocks' ),
+				'categories' => array( 'text' ),
+				'content'    => '<!-- wp:indieblocks/facepile {"style":{"spacing":{"margin":{"bottom":"var:preset|spacing|50"}}}} -->
+					<div class="wp-block-indieblocks-facepile" style="margin-bottom:var(--wp--preset--spacing--50)">
+						<!-- wp:columns -->
+						<div class="wp-block-columns">
+							<!-- wp:column {"className":"aligncenter","style":{"spacing":{"blockGap":"0"}}} -->
+							<div class="wp-block-column aligncenter">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Likes', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["like"],"countOnly":true,"forceShow":true} /-->
+							</div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"className":"aligncenter","style":{"spacing":{"blockGap":"0"}}} -->
+							<div class="wp-block-column aligncenter">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Bookmarks', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["bookmark"],"countOnly":true,"forceShow":true} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"className":"aligncenter","style":{"spacing":{"blockGap":"0"}}} -->
+							<div class="wp-block-column aligncenter">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Reposts', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["repost"],"countOnly":true,"forceShow":true} /-->
+							</div>
+							<!-- /wp:column -->
+						</div>
+						<!-- /wp:columns -->
+					</div>
+					<!-- /wp:indieblocks/facepile -->',
+			)
+		);
+
+		register_block_pattern(
 			'indieblocks/note-starter-pattern',
 			array(
 				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),

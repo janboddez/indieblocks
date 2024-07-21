@@ -35,6 +35,10 @@
 		"countOnly": {
 			"type": "boolean",
 			"default": false
+		},
+		"forceShow": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

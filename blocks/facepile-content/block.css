@@ -58,3 +58,13 @@
 	bottom: -3px;
 	border-radius: 50%;
 }
+
+.wp-block-indieblocks-facepile-content .indieblocks-count .icon {
+	display: inline;
+	width: 1.1em;
+	height: 1.1em;
+	position: relative;
+	top: 0.2em;
+	right: initial;
+	bottom: initial;
+}

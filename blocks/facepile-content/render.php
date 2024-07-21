@@ -31,15 +31,20 @@ if ( empty( $facepile_comments ) ) {
 
 add_action( 'wp_footer', '\\IndieBlocks\\print_facepile_icons', 999 );
 
-// Limit comments. Might provide a proper option later.
-$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $post_id );
-$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num );
-
 $output = '';
 
 if ( ! empty( $attributes['countOnly'] ) ) {
-	$output = '<div class="indieblocks-facepile-count">' . count( $facepile_comments ) . '</div>';
+	if ( ! empty( $attributes['icons'] ) && ! empty( $attributes['type'] ) ) {
+		$kind    = ( (array) $attributes['type'] )[0];
+		$output .= '<div class="indieblocks-count"><svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg> ' . count( $facepile_comments ) . '</div>';
+	} else {
+		$output .= '<div class="indieblocks-count">' . count( $facepile_comments ) . '</div>';
+	}
 } else {
+	// Limit number of avatars shown. Might provide a proper option later.
+	$facepile_num      = apply_filters( 'indieblocks_facepile_num', 25, $post_id );
+	$facepile_comments = array_slice( $facepile_comments, 0, $facepile_num );
+
 	foreach ( $facepile_comments as $facepile_comment ) {
 		$avatar = get_avatar( $facepile_comment, 40 );
 

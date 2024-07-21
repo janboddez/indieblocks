@@ -24,6 +24,7 @@ foreach ( $facepile_content_blocks as $inner_block ) { // phpcs:ignore WordPress
 	}
 
 	$facepile_comments = \IndieBlocks\get_facepile_comments( $post_id, $types );
+
 	if ( ! empty( $facepile_comments ) ) {
 		// As soon as we've found some "facepile comments," we're good. No need to process any other inner blocks.
 		// @todo: Stop searching after the first result, too.

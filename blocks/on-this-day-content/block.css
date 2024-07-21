@@ -1,3 +1,8 @@
+.wp-block-indieblocks-on-this-day-content > ul,
+.wp-block-indieblocks-on-this-day-content > ul > li > ul {
+	list-style: none;
+}
+
 .wp-block-indieblocks-on-this-day-content .entry-excerpt {
 	margin-block: 0;
 }

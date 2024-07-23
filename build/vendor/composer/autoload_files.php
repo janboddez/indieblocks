@@ -6,6 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    '757772e28a0943a9afe83def8db95bdf' => $vendorDir . '/mf2/mf2/Mf2/Parser.php',
-    'a01125dfebcda7ec3333dcd2d57ad8f2' => $baseDir . '/../includes/functions.php',
+    'IndieBlocks_757772e28a0943a9afe83def8db95bdf' => $vendorDir . '/mf2/mf2/Mf2/Parser.php',
+    'IndieBlocks_a01125dfebcda7ec3333dcd2d57ad8f2' => $baseDir . '/../includes/functions.php',
 );

@@ -7,12 +7,12 @@ namespace Composer\Autoload;
 class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
 {
     public static $files = array (
-        '757772e28a0943a9afe83def8db95bdf' => __DIR__ . '/..' . '/mf2/mf2/Mf2/Parser.php',
-        'a01125dfebcda7ec3333dcd2d57ad8f2' => __DIR__ . '/../..' . '/../includes/functions.php',
+        'IndieBlocks_757772e28a0943a9afe83def8db95bdf' => __DIR__ . '/..' . '/mf2/mf2/Mf2/Parser.php',
+        'IndieBlocks_a01125dfebcda7ec3333dcd2d57ad8f2' => __DIR__ . '/../..' . '/../includes/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'I' => 
+        'I' =>
         array (
             'IndieBlocks\\Mimey\\' => 18,
             'IndieBlocks\\Michelf\\' => 20,
@@ -21,15 +21,15 @@ class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
     );
 
     public static $prefixDirsPsr4 = array (
-        'IndieBlocks\\Mimey\\' => 
+        'IndieBlocks\\Mimey\\' =>
         array (
             0 => __DIR__ . '/..' . '/ralouphie/mimey/src',
         ),
-        'IndieBlocks\\Michelf\\' => 
+        'IndieBlocks\\Michelf\\' =>
         array (
             0 => __DIR__ . '/..' . '/michelf/php-markdown/Michelf',
         ),
-        'IndieBlocks\\Masterminds\\' => 
+        'IndieBlocks\\Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),

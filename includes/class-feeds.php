@@ -71,7 +71,7 @@ class Feeds {
 
 		// Target only the main feed.
 		if ( isset( $query_vars['feed'] ) && ! isset( $query_vars['post_type'] ) ) {
-			// @link https://github.com/pfefferle/wordpress-rss-club/issues/1
+			/* @link https://github.com/pfefferle/wordpress-rss-club/issues/1 */
 			$query_vars['post_type'] = array( 'post', 'rssclub' );
 
 			if ( ! empty( $options['notes_in_feed'] ) ) {
@@ -98,11 +98,14 @@ class Feeds {
 			return;
 		}
 
-		add_rewrite_rule( "^{$front}/feed/?$", 'index.php?post_type=post&feed=rss2', 'top' );
-		add_rewrite_rule( "^{$front}/feed/atom/?$", 'index.php?post_type=post&feed=atom', 'top' );
+		add_rewrite_rule( "^$front/feed/?$", 'index.php?post_type=post&feed=rss2', 'top' );
+		add_rewrite_rule( "^$front/feed/atom/?$", 'index.php?post_type=post&feed=atom', 'top' );
 
 		// Set the new feed's title.
 		add_filter( 'wp_title_rss', array( __CLASS__, 'set_post_feed_title' ) );
+
+		// Set the new feed's title.
+		add_action( 'wp_head', array( __CLASS__, 'add_post_feed_link' ), 9 );
 	}
 
 	/**
@@ -128,6 +131,32 @@ class Feeds {
 		}
 
 		return $title;
+	}
+
+	/**
+	 * Adds a `link`, in `head`, to the newly created post feed.
+	 */
+	public static function add_post_feed_link() {
+		$front = static::get_front();
+
+		if ( empty( $front ) ) {
+			// Do nothing.
+			return;
+		}
+
+		/* translators: %s: site title */
+		$title = sprintf( __( 'Posts &#8211; %s', 'indieblocks' ), get_bloginfo( 'title' ) );
+		$title = apply_filters( 'indieblocks_post_feed_title', $title );
+
+		$feed_url = home_url( "$front/feed/" );
+
+		$permalink_structure = get_option( 'permalink_structure' );
+		if ( is_string( $permalink_structure ) && '/' !== substr( $permalink_structure, -1 ) ) {
+			// If permalinks were set up without trailing slash, hide it.
+			$feed_url = substr( $feed_url, 0, -1 );
+		}
+
+		echo '<link rel="alternate" type="application/rss+xml" title="' . esc_attr( $title ) . '" href="' . esc_url( $feed_url ) . '" />'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

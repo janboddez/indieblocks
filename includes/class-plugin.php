@@ -26,14 +26,14 @@ class Plugin {
 	/**
 	 * This class's single instance.
 	 *
-	 * @var IndieBlocks $instance Plugin instance.
+	 * @var Plugin $instance Plugin instance.
 	 */
 	private static $instance;
 
 	/**
 	 * Returns the single instance of this class.
 	 *
-	 * @return IndieBlocks This class's single instance.
+	 * @return Plugin This class's single instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {

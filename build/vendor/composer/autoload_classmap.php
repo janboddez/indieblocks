@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'IndieBlocks\\ActivityPub_Compat' => $baseDir . '/../includes/class-activitypub-compat.php',
     'IndieBlocks\\Blocks' => $baseDir . '/../includes/class-blocks.php',
     'IndieBlocks\\Commands\\Commands' => $baseDir . '/../includes/commands/class-commands.php',
     'IndieBlocks\\Feeds' => $baseDir . '/../includes/class-feeds.php',

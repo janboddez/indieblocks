@@ -37,50 +37,51 @@ class ActivityPub_Compat {
 
 		$reply_to_url = '';
 
-		$blocks = parse_blocks( $post_or_comment->post_content );
-		foreach ( $blocks as $block ) {
-			if ( 'indieblocks/reply' !== $block['blockName'] ) {
-				continue;
-			}
+		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
+		$processor = new \WP_HTML_Tag_Processor( $post_or_comment->post_content );
 
-			$reply_to_url = $block['attrs']['url'];
-			break;
+		if ( $processor->next_tag( array( 'class_name' => 'u-in-reply-to' ) ) ) {
+			// Assuming a Reply block, which has its `.u-url` inside (and thus following) `.u-in-reply-to`.
+			$processor->next_tag( array( 'class_name' => 'u-url' ) );
+			$reply_to_url = $processor->get_attribute( 'href' );
 		}
 
-		if ( ! empty( $reply_to_url ) ) {
-			// Add `inReplyTo` property.
+		if ( empty( $reply_to_url ) ) {
+			return $array;
+		}
+
+		// Add `inReplyTo` property.
+		if ( 'activity' === $class ) {
+			$array['object']['inReplyTo'] = $reply_to_url;
+		} elseif ( 'base_object' === $class ) {
+			$array['inReplyTo'] = $reply_to_url;
+		}
+
+		// Trim any reply context off the post content. Because important bits of said content may actually be
+		// inside the Reply block, we can't just not render it. But we could render its inner blocks, and any other
+		// blocks. Eventually. For now, a regex will have to do.
+		$content = apply_filters( 'the_content', $post_or_comment->post_content ); // Wish we didn't have to do this *again*.
+
+		if ( preg_match( '~<div class="e-content">.+?</div>~s', $content, $match ) ) {
+			$copy               = clone $post_or_comment;
+			$copy->post_content = $match[0]; // The `e-content` only, without reply context (if any).
+
+			// Regenerate "ActivityPub content" using the "slimmed down" post content. We ourselves use the
+			// "original" post, hence the need to pass a copy with modified content.
+			// Caveat: Any blocks outside (the Reply block's) `e-content` get ignored!
+			$content = apply_filters( 'activitypub_the_content', $match[0], $copy );
+
 			if ( 'activity' === $class ) {
-				$array['object']['inReplyTo'] = $reply_to_url;
+				$array['object']['content'] = $content;
+
+				foreach ( $array['object']['contentMap'] as $locale => $value ) {
+					$array['object']['contentMap'][ $locale ] = $content;
+				}
 			} elseif ( 'base_object' === $class ) {
-				$array['inReplyTo'] = $reply_to_url;
-			}
+				$array['content'] = $content;
 
-			// Trim any reply context off the post content. Because important bits of said content may actually be
-			// inside the Reply block, we can't just not render it. But we could render its inner blocks, and any other
-			// blocks. Eventually. For now, a regex will have to do.
-			$content = apply_filters( 'the_content', $post_or_comment->post_content ); // Wish we didn't have to do this *again*.
-
-			if ( preg_match( '~<div class="e-content">.+?</div>~s', $content, $match ) ) {
-				$copy               = clone $post_or_comment;
-				$copy->post_content = $match[0]; // The `e-content` only, without reply context (if any).
-
-				// Regenerate "ActivityPub content" using the "slimmed down" post content. We ourselves use the
-				// "original" post, hence the need to pass a copy with modified content.
-				// Caveat: Any blocks outside (the Reply block's) `e-content` get ignored!
-				$content = apply_filters( 'activitypub_the_content', $match[0], $copy );
-
-				if ( 'activity' === $class ) {
-					$array['object']['content'] = $content;
-
-					foreach ( $array['object']['contentMap'] as $locale => $value ) {
-						$array['object']['contentMap'][ $locale ] = $content;
-					}
-				} elseif ( 'base_object' === $class ) {
-					$array['content'] = $content;
-
-					foreach ( $array['contentMap'] as $locale => $value ) {
-						$array['contentMap'][ $locale ] = $content;
-					}
+				foreach ( $array['contentMap'] as $locale => $value ) {
+					$array['contentMap'][ $locale ] = $content;
 				}
 			}
 		}

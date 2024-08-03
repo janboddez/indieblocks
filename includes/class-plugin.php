@@ -104,6 +104,8 @@ class Plugin {
 
 		// Micropub hook callbacks.
 		add_action( 'plugins_loaded', array( Micropub_Compat::class, 'register' ) );
+		// ActivityPub integration.
+		add_action( 'plugins_loaded', array( ActivityPub_Compat::class, 'register' ) );
 
 		// Link preview cards.
 		if ( ! empty( $options['preview_cards'] ) ) {

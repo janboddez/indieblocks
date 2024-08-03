@@ -37,6 +37,7 @@ class ComposerStaticInita41f68a5b79b4678cf41c80073cd864a
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'IndieBlocks\\ActivityPub_Compat' => __DIR__ . '/../..' . '/../includes/class-activitypub-compat.php',
         'IndieBlocks\\Blocks' => __DIR__ . '/../..' . '/../includes/class-blocks.php',
         'IndieBlocks\\Commands\\Commands' => __DIR__ . '/../..' . '/../includes/commands/class-commands.php',
         'IndieBlocks\\Feeds' => __DIR__ . '/../..' . '/../includes/class-feeds.php',

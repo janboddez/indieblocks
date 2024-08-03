@@ -81,8 +81,6 @@ class Blocks {
 			'like',
 			'link-preview',
 			'location',
-			'on-this-day',
-			'on-this-day-content',
 			'reply',
 			'repost',
 			'syndication',

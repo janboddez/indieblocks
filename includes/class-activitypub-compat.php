@@ -14,6 +14,7 @@ class ActivityPub_Compat {
 	 */
 	public static function register() {
 		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'add_in_reply_to_url' ), 99, 4 );
+		add_filter( 'activitypub_extract_mentions', array( __CLASS__, 'add_mentions' ), 99, 3 );
 	}
 
 	/**
@@ -26,6 +27,18 @@ class ActivityPub_Compat {
 	 * @return array                                     The updated array.
 	 */
 	public static function add_in_reply_to_url( $array, $class, $id, $object ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound,Universal.NamingConventions.NoReservedKeywordParameterNames.objectFound,Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
+			return $array;
+		}
+
+		if ( ! method_exists( \Activitypub\Http::class, 'get_remote_object' ) ) {
+			return $array;
+		}
+
+		if ( ! function_exists( '\\Activitypub\\object_to_uri' ) ) {
+			return $array;
+		}
+
 		$post_or_comment = static::get_object( $array, $class ); // Could probably also use `$id` or even `$object`, but this works.
 		if ( ! $post_or_comment ) {
 			return $array;
@@ -47,6 +60,17 @@ class ActivityPub_Compat {
 		}
 
 		if ( empty( $reply_to_url ) ) {
+			return $array;
+		}
+
+		$object = \Activitypub\Http::get_remote_object( $reply_to_url );
+		if ( ! is_array( $object ) || empty( $object['attributedTo'] ) ) {
+			return $array;
+		}
+
+		$actor_url = \Activitypub\object_to_uri( $object['attributedTo'] );
+
+		if ( empty( $actor_url ) ) {
 			return $array;
 		}
 
@@ -87,6 +111,98 @@ class ActivityPub_Compat {
 		}
 
 		return $array;
+	}
+
+	/**
+	 * Adds a mention to posts we think are replies, reposts, or likes.
+	 *
+	 * We want the remote post's author to know about our reply. This ensures a
+	 * `Mention` tag gets added, and that they get added to the `cc` field.
+	 *
+	 * @param  array    $mentions     Associative array of accounts to mention.
+	 * @param  string   $post_content Post content.
+	 * @param  \WP_Post $wp_object    Post (or comment?) object.
+	 * @return array                  Filtered array.
+	 */
+	public static function add_mentions( $mentions, $post_content, $wp_object ) {
+		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
+			return $mentions;
+		}
+
+		if ( ! method_exists( \Activitypub\Http::class, 'get_remote_object' ) ) {
+			return $mentions;
+		}
+
+		if ( ! function_exists( '\\Activitypub\\object_to_uri' ) ) {
+			return $mentions;
+		}
+
+		if ( ! function_exists( '\\Activitypub\\get_remote_metadata_by_actor' ) ) {
+			return $mentions;
+		}
+
+		if ( ! $wp_object instanceof \WP_Post ) {
+			return $mentions;
+		}
+
+		/** @todo: Move to a function and cache the result. */
+		$reply_to_url = '';
+
+		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
+		$processor = new \WP_HTML_Tag_Processor( $wp_object->post_content );
+
+		if ( $processor->next_tag( array( 'class_name' => 'u-in-reply-to' ) ) ) {
+			// Assuming a Reply block, which has its `.u-url` inside (and thus following) `.u-in-reply-to`.
+			$processor->next_tag( array( 'class_name' => 'u-url' ) );
+			$reply_to_url = $processor->get_attribute( 'href' );
+		}
+
+		if ( empty( $reply_to_url ) ) {
+			return $mentions;
+		}
+
+		$object = \Activitypub\Http::get_remote_object( $reply_to_url );
+		if ( ! is_array( $object ) || empty( $object['attributedTo'] ) ) {
+			return $mentions;
+		}
+
+		$actor_url = \Activitypub\object_to_uri( $object['attributedTo'] );
+
+		if ( empty( $actor_url ) ) {
+			return $mentions;
+		}
+
+		$meta = \Activitypub\get_remote_metadata_by_actor( $actor_url );
+
+		if ( is_array( $meta ) && ( ! empty( $meta['id'] ) || ! empty( $meta['url'] ) ) ) {
+			if ( ! empty( $meta['preferredUsername'] ) ) {
+				$handle = $meta['preferredUsername'];
+			} elseif ( ! empty( $meta['name'] ) ) {
+				$handle = $meta['name'];
+			} else {
+				$handle = $actor_url;
+			}
+
+			// $actor_url = isset( $meta['url'] )
+			// 	? \Activitypub\object_to_uri( $meta['url'] )
+			// 	: $actor_url;
+
+			if ( false === strpos( $handle, '@' ) && ! preg_match( '~\s~', $handle ) && ! preg_match( '~^https?://~', $handle ) ) {
+				$host = wp_parse_url( $actor_url, PHP_URL_HOST );
+				if ( ! empty( $host ) ) {
+					// Add domain name.
+					$handle .= '@' . $host;
+				}
+			}
+
+			if ( ! preg_match( '~^https?://~', $handle ) ) {
+				$handle = '@' . $handle;
+			}
+
+			$mentions[ $handle ] = $actor_url;
+		}
+
+		return array_unique( $mentions );
 	}
 
 	/**

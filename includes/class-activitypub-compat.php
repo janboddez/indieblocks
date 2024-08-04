@@ -110,7 +110,7 @@ class ActivityPub_Compat {
 	}
 
 	/**
-	 * Adds a mention to posts we think are replies, reposts, or likes.
+	 * Adds a "mention" to reply posts.
 	 *
 	 * We want the remote post's author to know about our reply. This ensures a
 	 * `Mention` tag gets added, and that they get added to the `cc` field.

@@ -13,18 +13,30 @@ class ActivityPub_Compat {
 	 * Hooks and such.
 	 */
 	public static function register() {
+		if ( ! defined( 'INDIEBLOCKS_ACTIVITYPUB_INTEGRATION' ) || ! INDIEBLOCKS_ACTIVITYPUB_INTEGRATION ) {
+			return;
+		}
+
+		/** @todo: If we were to run this at `plugins_loaded` or so, we can maybe check for dependencies _here_ rather than in the various callbacks. */
 		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'add_in_reply_to_url' ), 99, 2 );
+
+		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'transform_to_announce' ), 99, 2 );
+		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'transform_to_undo_announce' ), 99, 2 );
+
+		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'transform_to_like' ), 99, 2 );
+		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'transform_to_undo_like' ), 99, 2 );
+
 		add_filter( 'activitypub_extract_mentions', array( __CLASS__, 'add_mentions' ), 99, 3 );
 	}
 
 	/**
 	 * Adds the `inReplyTo` property to reply posts.
 	 *
-	 * @param  array  $array  Activity or object (array).
-	 * @param  string $class  Class name.
-	 * @return array          The updated array.
+	 * @param  array  $array Activity or object (array).
+	 * @param  string $class Class name.
+	 * @return array         The updated array.
 	 */
-	public static function add_in_reply_to_url( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound,Universal.NamingConventions.NoReservedKeywordParameterNames.objectFound,Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	public static function add_in_reply_to_url( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
 		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
 			return $array;
 		}
@@ -110,6 +122,260 @@ class ActivityPub_Compat {
 	}
 
 	/**
+	 * Turns a "repost" into an ActivityPub Announce activity.
+	 *
+	 * @param  array  $array Activity or object (array).
+	 * @param  string $class Class name.
+	 * @return array         The updated array.
+	 */
+	public static function transform_to_announce( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
+		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
+			return $array;
+		}
+
+		if ( ! method_exists( \Activitypub\Http::class, 'get_remote_object' ) ) {
+			return $array;
+		}
+
+		if ( ! function_exists( '\\Activitypub\\object_to_uri' ) ) {
+			return $array;
+		}
+
+		if ( 'activity' === $class && ! empty( $array['object']['inReplyTo'] ) ) {
+			// As per "the IndieWeb's 'post type discovery' algorithm," a reply is, first and foremost, a reply.
+			return $array;
+		}
+
+		if ( 'base_object' === $class && ! empty( $array['inReplyTo'] ) ) {
+			return $array;
+		}
+
+		// Retrieve the original WP object.
+		$post_or_comment = static::get_wp_object( $array, $class );
+		if ( ! $post_or_comment || ! $post_or_comment instanceof \WP_Post ) {
+			// We only support posts (and not comments). Comments already support replying to Fediverse statuses.
+			return $array;
+		}
+
+		$post_content = apply_filters( 'the_content', $post_or_comment->post_content );
+
+		$repost_of_url = static::get_repost_of_url( $post_content );
+		if ( empty( $repost_of_url ) ) {
+			// Could not find a `repost-of` URL.
+			return $array;
+		}
+
+		$remote_object = \Activitypub\Http::get_remote_object( $repost_of_url );
+		if ( ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
+			return $array;
+		}
+
+		$actor_url = \Activitypub\object_to_uri( $remote_object['attributedTo'] );
+		if ( empty( $actor_url ) ) {
+			return $array;
+		}
+
+		// Found a `repost-of` and an actor URL. Turn `Create` (and `Update`) activities into Announces.
+		if (
+			'base_object' === $class ||
+			( 'activity' === $class && isset( $array['type'] ) && in_array( $array['type'], array( 'Create', 'Update' ), true ) )
+		) {
+			/**
+			 * Mastodon example:
+			 *
+			 * ```
+			 * array(
+			 *     '@context'  => 'https://www.w3.org/ns/activitystreams',
+			 *     'id'        => 'https://indieweb.social/users/janboddez/statuses/112475177142233425/activity', // The Announce activity JSON is actually served at this URL.
+			 *     'type'      => 'Announce',
+			 *     'actor'     => 'https://indieweb.social/users/janboddez',
+			 *     'published' => '2024-05-20T19:56:42Z',
+			 *     'to'        => array( 'https://www.w3.org/ns/activitystreams#Public' ),
+			 *     'cc'        => array(
+			 *         'https://jan.boddez.net/author/jan',
+			 *         'https://indieweb.social/users/janboddez/followers',
+			 *     ),
+			 *     'object'    => 'https://jan.boddez.net/notes/39ed3b1cfb',
+			 * )
+			 * ```
+			 */
+			$array = array_intersect_key(
+				$array,
+				array_flip( array( '@context', 'id', 'type', 'actor', 'published', 'to', 'cc', 'object' ) )
+			);
+
+			// Rework the top-line ID a bit.
+			$array['id'] = strtok( $array['id'], '#' ) . '#activity';
+			strtok( '', '' );
+
+			$array['type']   = 'Announce';
+			$array['object'] = esc_url_raw( $repost_of_url );
+
+			if ( 'activity' === $class ) {
+				// We want to get this right when we `Undo` reposts.
+				add_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_announce', $array, true );
+			}
+		}
+
+		return $array;
+	}
+
+	/**
+	 * Turns deletion of a "repost" into an ActivityPub Undo (Announce) activity.
+	 *
+	 * @param  array  $array Activity or object (array).
+	 * @param  string $class Class name.
+	 * @return array         The updated array.
+	 */
+	public static function transform_to_undo_announce( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
+		if ( 'activity' !== $class ) {
+			return $array;
+		}
+
+		if ( ! isset( $array['type'] ) || 'Delete' !== $array['type'] ) {
+			return $array;
+		}
+
+		// Retrieve the original WP object.
+		$post_or_comment = static::get_wp_object( $array, $class );
+		if ( ! $post_or_comment || ! $post_or_comment instanceof \WP_Post ) {
+			return $array;
+		}
+
+		$announce = get_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_announce', true );
+		if ( empty( $announce ) ) {
+			return $array;
+		}
+
+		$array['type']   = 'Undo'; // Rather than Delete.
+		$array['object'] = $announce;
+
+		update_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_undo_announce', $array );
+		delete_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_announce' );
+
+		return $array;
+	}
+
+	/**
+	 * Turns a "like" into an ActivityPub Like activity.
+	 *
+	 * @param  array  $array Activity or object (array).
+	 * @param  string $class Class name.
+	 * @return array         The updated array.
+	 */
+	public static function transform_to_like( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
+		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
+			return $array;
+		}
+
+		if ( ! method_exists( \Activitypub\Http::class, 'get_remote_object' ) ) {
+			return $array;
+		}
+
+		if ( ! function_exists( '\\Activitypub\\object_to_uri' ) ) {
+			return $array;
+		}
+
+		if (
+			'activity' === $class &&
+			( ! empty( $array['object']['inReplyTo'] ) || isset( $array['type'] ) && 'Announce' === $array['type'] )
+		) {
+			// As per the "IndieWeb's" 'post type discovery' algorithm.
+			return $array;
+		}
+
+		if ( 'base_object' === $class && ! empty( $array['inReplyTo'] ) ) {
+			return $array;
+		}
+
+		// Retrieve the original WP object.
+		$post_or_comment = static::get_wp_object( $array, $class );
+		if ( ! $post_or_comment || ! $post_or_comment instanceof \WP_Post ) {
+			// We only support posts (and not comments). Comments already support replying to Fediverse statuses.
+			return $array;
+		}
+
+		$post_content = apply_filters( 'the_content', $post_or_comment->post_content );
+
+		$like_of_url = static::get_like_of_url( $post_content );
+		if ( empty( $like_of_url ) ) {
+			// Could not find a `like-of` URL.
+			return $array;
+		}
+
+		$remote_object = \Activitypub\Http::get_remote_object( $like_of_url );
+		if ( ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
+			return $array;
+		}
+
+		$actor_url = \Activitypub\object_to_uri( $remote_object['attributedTo'] );
+		if ( empty( $actor_url ) ) {
+			return $array;
+		}
+
+		// Found a `like-of` and an actor URL. Turn `Create` (and `Update`) activities into Announces.
+		if (
+			'base_object' === $class ||
+			( 'activity' === $class && isset( $array['type'] ) && in_array( $array['type'], array( 'Create', 'Update' ), true ) )
+		) {
+			$array = array_intersect_key(
+				$array,
+				array_flip( array( '@context', 'id', 'type', 'actor', 'published', 'to', 'cc', 'object' ) )
+			);
+
+			// Rework the top-line ID a bit.
+			$array['id'] = strtok( $array['id'], '#' ) . '#activity';
+			strtok( '', '' );
+
+			$array['type']   = 'Like';
+			$array['object'] = esc_url_raw( $like_of_url );
+
+			if ( 'activity' === $class ) {
+				// We want to get this right when we `Undo` reposts.
+				add_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_like', $array, true );
+			}
+		}
+
+		return $array;
+	}
+
+	/**
+	 * Turns deletion of a "like" into an ActivityPub Undo (Like) activity.
+	 *
+	 * @param  array  $array Activity or object (array).
+	 * @param  string $class Class name.
+	 * @return array         The updated array.
+	 */
+	public static function transform_to_undo_like( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
+		if ( 'activity' !== $class ) {
+			return $array;
+		}
+
+		if ( ! isset( $array['type'] ) || 'Delete' !== $array['type'] ) {
+			return $array;
+		}
+
+		// Retrieve the original WP object.
+		$post_or_comment = static::get_wp_object( $array, $class );
+		if ( ! $post_or_comment || ! $post_or_comment instanceof \WP_Post ) {
+			return $array;
+		}
+
+		$like = get_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_like', true );
+		if ( empty( $like ) ) {
+			return $array;
+		}
+
+		$array['type']   = 'Undo'; // Rather than Delete.
+		$array['object'] = $like;
+
+		update_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_undo_like', $array );
+		delete_post_meta( $post_or_comment->ID, '_indieblocks_activitypub_like' );
+
+		return $array;
+	}
+
+	/**
 	 * Adds a "mention" to reply posts.
 	 *
 	 * We want the remote post's author to know about our reply. This ensures a
@@ -142,13 +408,21 @@ class ActivityPub_Compat {
 		}
 
 		$in_reply_to_url = static::get_in_reply_to_url( $post_content );
-		if ( empty( $in_reply_to_url ) ) {
-			// Could not find an `in-reply-to` URL.
-			return $mentions;
+		if ( ! empty( $in_reply_to_url ) ) {
+			$remote_object = \Activitypub\Http::get_remote_object( $in_reply_to_url );
+		} else {
+			$repost_of_url = static::get_repost_of_url( $post_content );
+			if ( ! empty( $repost_of_url ) ) {
+				$remote_object = \Activitypub\Http::get_remote_object( $repost_of_url );
+			} else {
+				$like_of_url = static::get_like_of_url( $post_content );
+				if ( ! empty( $like_of_url ) ) {
+					$remote_object = \Activitypub\Http::get_remote_object( $like_of_url );
+				}
+			}
 		}
 
-		$remote_object = \Activitypub\Http::get_remote_object( $in_reply_to_url );
-		if ( ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
+		if ( empty( $remote_object ) || ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
 			return $mentions;
 		}
 
@@ -250,5 +524,51 @@ class ActivityPub_Compat {
 		}
 
 		return $in_reply_to_url;
+	}
+
+	/**
+	 * Parses an HTML string and returns either a repost-of URL or `null`.
+	 *
+	 * @param  string $post_content Post content.
+	 * @return string|null          Repost-of URL.
+	 */
+	protected static function get_repost_of_url( $post_content ) {
+		$repost_of_url = null;
+		$processor     = new \WP_HTML_Tag_Processor( $post_content );
+
+		if ( $processor->next_tag( array( 'class_name' => 'u-repost-of' ) ) ) {
+			$repost_of_url = $processor->get_attribute( 'href' );
+
+			if ( null === $repost_of_url ) {
+				// Might be a `.u-url` be nested inside, e.g, `.h-cite.u-repost-of`.
+				$processor->next_tag( array( 'class_name' => 'u-url' ) );
+				$repost_of_url = $processor->get_attribute( 'href' );
+			}
+		}
+
+		return $repost_of_url;
+	}
+
+	/**
+	 * Parses an HTML string and returns either a like-of URL or `null`.
+	 *
+	 * @param  string $post_content Post content.
+	 * @return string|null          Like-of URL.
+	 */
+	protected static function get_like_of_url( $post_content ) {
+		$like_of_url = null;
+		$processor   = new \WP_HTML_Tag_Processor( $post_content );
+
+		if ( $processor->next_tag( array( 'class_name' => 'u-like-of' ) ) ) {
+			$like_of_url = $processor->get_attribute( 'href' );
+
+			if ( null === $like_of_url ) {
+				// Might be a `.u-url` be nested inside, e.g, `.h-cite.u-like-of`.
+				$processor->next_tag( array( 'class_name' => 'u-url' ) );
+				$like_of_url = $processor->get_attribute( 'href' );
+			}
+		}
+
+		return $like_of_url;
 	}
 }

@@ -228,13 +228,13 @@ class ActivityPub_Compat {
 	}
 
 	/**
-	 * Parses an HTML string and returns either an in-reply-to URL or an empty string.
+	 * Parses an HTML string and returns either an in-reply-to URL or `null`.
 	 *
 	 * @param  string $post_content Post content.
-	 * @return string               In-reply-to URL.
+	 * @return string|null          In-reply-to URL.
 	 */
 	protected static function get_in_reply_to_url( $post_content ) {
-		$in_reply_to_url = '';
+		$in_reply_to_url = null;
 
 		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
 		$processor = new \WP_HTML_Tag_Processor( $post_content );

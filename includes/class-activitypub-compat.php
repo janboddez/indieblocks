@@ -13,20 +13,18 @@ class ActivityPub_Compat {
 	 * Hooks and such.
 	 */
 	public static function register() {
-		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'add_in_reply_to_url' ), 99, 4 );
+		add_filter( 'activitypub_activity_object_array', array( __CLASS__, 'add_in_reply_to_url' ), 99, 2 );
 		add_filter( 'activitypub_extract_mentions', array( __CLASS__, 'add_mentions' ), 99, 3 );
 	}
 
 	/**
 	 * Adds the `inReplyTo` property to reply posts.
 	 *
-	 * @param  array                             $array  Activity or object (array).
-	 * @param  string                            $class  Class name.
-	 * @param  string                            $id     Activity or object ID.
-	 * @param  \Activitypub\Activity\Base_Object $object Activity or object (object).
-	 * @return array                                     The updated array.
+	 * @param  array  $array  Activity or object (array).
+	 * @param  string $class  Class name.
+	 * @return array          The updated array.
 	 */
-	public static function add_in_reply_to_url( $array, $class, $id, $object ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound,Universal.NamingConventions.NoReservedKeywordParameterNames.objectFound,Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	public static function add_in_reply_to_url( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound,Universal.NamingConventions.NoReservedKeywordParameterNames.objectFound,Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( ! class_exists( '\\Activitypub\\Http' ) ) {
 			return $array;
 		}
@@ -39,54 +37,52 @@ class ActivityPub_Compat {
 			return $array;
 		}
 
-		$post_or_comment = static::get_object( $array, $class ); // Could probably also use `$id` or even `$object`, but this works.
-		if ( ! $post_or_comment ) {
+		if ( 'activity' === $class && ! empty( $array['object']['inReplyTo'] ) ) {
+			// An `inReplyTo` property already exists.
 			return $array;
 		}
 
-		if ( ! $post_or_comment instanceof \WP_Post ) {
+		if ( 'base_object' === $class && ! empty( $array['inReplyTo'] ) ) {
+			// An `inReplyTo` property already exists.
 			return $array;
 		}
 
-		$reply_to_url = '';
-
-		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
-		$processor = new \WP_HTML_Tag_Processor( $post_or_comment->post_content );
-
-		if ( $processor->next_tag( array( 'class_name' => 'u-in-reply-to' ) ) ) {
-			// Assuming a Reply block, which has its `.u-url` inside (and thus following) `.u-in-reply-to`.
-			$processor->next_tag( array( 'class_name' => 'u-url' ) );
-			$reply_to_url = $processor->get_attribute( 'href' );
-		}
-
-		if ( empty( $reply_to_url ) ) {
+		// Retrieve the original WP object.
+		$post_or_comment = static::get_wp_object( $array, $class );
+		if ( ! $post_or_comment || ! $post_or_comment instanceof \WP_Post ) {
+			// We only support posts (and not comments). Comments already support replying to Fediverse statuses.
 			return $array;
 		}
 
-		$object = \Activitypub\Http::get_remote_object( $reply_to_url );
-		if ( ! is_array( $object ) || empty( $object['attributedTo'] ) ) {
+		$post_content = apply_filters( 'the_content', $post_or_comment->post_content );
+
+		$in_reply_to_url = static::get_in_reply_to_url( $post_content );
+		if ( empty( $in_reply_to_url ) ) {
+			// Could not find an `in-reply-to` URL.
 			return $array;
 		}
 
-		$actor_url = \Activitypub\object_to_uri( $object['attributedTo'] );
+		$remote_object = \Activitypub\Http::get_remote_object( $in_reply_to_url );
+		if ( ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
+			return $array;
+		}
 
+		$actor_url = \Activitypub\object_to_uri( $remote_object['attributedTo'] );
 		if ( empty( $actor_url ) ) {
 			return $array;
 		}
 
-		// Add `inReplyTo` property.
+		// Found an `in-reply-to` and an actor URL. Add `inReplyTo` property.
 		if ( 'activity' === $class ) {
-			$array['object']['inReplyTo'] = $reply_to_url;
+			$array['object']['inReplyTo'] = $in_reply_to_url;
 		} elseif ( 'base_object' === $class ) {
-			$array['inReplyTo'] = $reply_to_url;
+			$array['inReplyTo'] = $in_reply_to_url;
 		}
 
-		// Trim any reply context off the post content. Because important bits of said content may actually be
-		// inside the Reply block, we can't just not render it. But we could render its inner blocks, and any other
-		// blocks. Eventually. For now, a regex will have to do.
-		$content = apply_filters( 'the_content', $post_or_comment->post_content ); // Wish we didn't have to do this *again*.
-
-		if ( preg_match( '~<div class="e-content">.+?</div>~s', $content, $match ) ) {
+		// Trim any reply context off the post content. Because important bits of said content may actually be inside
+		// Reply block, we can't just not render it. But we could render its inner blocks, and any other blocks.
+		// Eventually. For now, a regex will have to do.
+		if ( preg_match( '~<div class="e-content">.+?</div>~s', $post_content, $match ) ) {
 			$copy               = clone $post_or_comment;
 			$copy->post_content = $match[0]; // The `e-content` only, without reply context (if any).
 
@@ -145,49 +141,37 @@ class ActivityPub_Compat {
 			return $mentions;
 		}
 
-		/** @todo: Move to a function and cache the result. */
-		$reply_to_url = '';
-
-		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
-		$processor = new \WP_HTML_Tag_Processor( $wp_object->post_content );
-
-		if ( $processor->next_tag( array( 'class_name' => 'u-in-reply-to' ) ) ) {
-			// Assuming a Reply block, which has its `.u-url` inside (and thus following) `.u-in-reply-to`.
-			$processor->next_tag( array( 'class_name' => 'u-url' ) );
-			$reply_to_url = $processor->get_attribute( 'href' );
-		}
-
-		if ( empty( $reply_to_url ) ) {
+		$in_reply_to_url = static::get_in_reply_to_url( $post_content );
+		if ( empty( $in_reply_to_url ) ) {
+			// Could not find an `in-reply-to` URL.
 			return $mentions;
 		}
 
-		$object = \Activitypub\Http::get_remote_object( $reply_to_url );
-		if ( ! is_array( $object ) || empty( $object['attributedTo'] ) ) {
+		$remote_object = \Activitypub\Http::get_remote_object( $in_reply_to_url );
+		if ( ! is_array( $remote_object ) || empty( $remote_object['attributedTo'] ) ) {
 			return $mentions;
 		}
 
-		$actor_url = \Activitypub\object_to_uri( $object['attributedTo'] );
-
+		$actor_url = \Activitypub\object_to_uri( $remote_object['attributedTo'] );
 		if ( empty( $actor_url ) ) {
 			return $mentions;
 		}
 
 		$meta = \Activitypub\get_remote_metadata_by_actor( $actor_url );
+		if ( ! is_array( $meta ) || ( empty( $meta['id'] ) && empty( $meta['url'] ) ) ) {
+			return $mentions;
+		}
 
-		if ( is_array( $meta ) && ( ! empty( $meta['id'] ) || ! empty( $meta['url'] ) ) ) {
-			if ( ! empty( $meta['preferredUsername'] ) ) {
-				$handle = $meta['preferredUsername'];
-			} elseif ( ! empty( $meta['name'] ) ) {
-				$handle = $meta['name'];
-			} else {
-				$handle = $actor_url;
-			}
+		if ( ! empty( $meta['preferredUsername'] ) ) {
+			$handle = $meta['preferredUsername'];
+		} elseif ( ! empty( $meta['name'] ) ) {
+			$handle = $meta['name']; // Looks like for Mastodon this is the user's chosen display name.
+		} else {
+			$handle = esc_url_raw( $actor_url );
+		}
 
-			// $actor_url = isset( $meta['url'] )
-			// 	? \Activitypub\object_to_uri( $meta['url'] )
-			// 	: $actor_url;
-
-			if ( false === strpos( $handle, '@' ) && ! preg_match( '~\s~', $handle ) && ! preg_match( '~^https?://~', $handle ) ) {
+		if ( ! preg_match( '~^https?://~', $handle ) ) {
+			if ( false === strpos( $handle, '@' ) && ! preg_match( '~\s~', $handle ) ) {
 				$host = wp_parse_url( $actor_url, PHP_URL_HOST );
 				if ( ! empty( $host ) ) {
 					// Add domain name.
@@ -195,12 +179,10 @@ class ActivityPub_Compat {
 				}
 			}
 
-			if ( ! preg_match( '~^https?://~', $handle ) ) {
-				$handle = '@' . $handle;
-			}
-
-			$mentions[ $handle ] = $actor_url;
+			$handle = '@' . $handle;
 		}
+
+		$mentions[ $handle ] = esc_url_raw( $actor_url );
 
 		return array_unique( $mentions );
 	}
@@ -212,7 +194,7 @@ class ActivityPub_Compat {
 	 * @param  string $class             The ActivityPub "class" name.
 	 * @return \WP_Post|\WP_Comment|null Post or comment object, or null.
 	 */
-	protected static function get_object( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
+	protected static function get_wp_object( $array, $class ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound,Universal.NamingConventions.NoReservedKeywordParameterNames.classFound
 		if ( 'activity' === $class && isset( $array['object']['id'] ) ) {
 			// Activity.
 			$object_id = $array['object']['id'];
@@ -243,5 +225,30 @@ class ActivityPub_Compat {
 		}
 
 		return $post_or_comment;
+	}
+
+	/**
+	 * Parses an HTML string and returns either an in-reply-to URL or an empty string.
+	 *
+	 * @param  string $post_content Post content.
+	 * @return string               In-reply-to URL.
+	 */
+	protected static function get_in_reply_to_url( $post_content ) {
+		$in_reply_to_url = '';
+
+		/** Link https://github.com/WordPress/gutenberg/issues/46029#issuecomment-1326330988 */
+		$processor = new \WP_HTML_Tag_Processor( $post_content );
+
+		if ( $processor->next_tag( array( 'class_name' => 'u-in-reply-to' ) ) ) {
+			$in_reply_to_url = $processor->get_attribute( 'href' );
+
+			if ( null === $in_reply_to_url ) {
+				// Might be a `.u-url` be nested inside, e.g, `.h-cite.u-in-reply-to`.
+				$processor->next_tag( array( 'class_name' => 'u-url' ) );
+				$in_reply_to_url = $processor->get_attribute( 'href' );
+			}
+		}
+
+		return $in_reply_to_url;
 	}
 }

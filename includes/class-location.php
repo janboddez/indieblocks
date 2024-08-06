@@ -70,7 +70,7 @@ class Location {
 					'wp-core-data',
 					'wp-api-fetch',
 					'wp-plugins',
-					'wp-edit-post',
+					'wp-editor',
 				),
 				\IndieBlocks\Plugin::PLUGIN_VERSION,
 				false

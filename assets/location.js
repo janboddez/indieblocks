@@ -1,11 +1,11 @@
-( ( element, components, i18n, data, coreData, apiFetch, plugins, editPost ) => {
+( ( element, components, i18n, data, coreData, apiFetch, plugins, editor ) => {
 	const { createElement: el, useEffect, useState, useRef } = element;
 	const { Button, Flex, FlexBlock, FlexItem, TextControl, PanelRow } = components;
 	const { __ } = i18n;
 	const { useSelect } = data;
 	const { useEntityProp } = coreData;
 	const { registerPlugin } = plugins;
-	const { PluginDocumentSettingPanel } = editPost;
+	const { PluginDocumentSettingPanel } = editor;
 
 	// @link https://wordpress.stackexchange.com/questions/362975/admin-notification-after-save-post-when-ajax-saving-in-gutenberg
 	const doneSaving = () => {
@@ -223,5 +223,5 @@
 	window.wp.coreData,
 	window.wp.apiFetch,
 	window.wp.plugins,
-	window.wp.editPost
+	window.wp.editor
 );

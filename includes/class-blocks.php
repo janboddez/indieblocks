@@ -67,6 +67,14 @@ class Blocks {
 				'assets_url' => plugins_url( '/assets/', __DIR__ ),
 			)
 		);
+
+		wp_enqueue_script(
+			'indieblocks-bookmarklets',
+			plugins_url( '/assets/bookmarklets.js', __DIR__ ),
+			array( 'wp-blocks', 'wp-element', 'wp-data', 'wp-plugins', 'wp-dom-ready' ),
+			Plugin::PLUGIN_VERSION,
+			true
+		);
 	}
 
 	/**

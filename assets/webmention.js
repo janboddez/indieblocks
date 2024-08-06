@@ -47,16 +47,6 @@
 	if ( '1' === indieblocks_webmention_obj.show_meta_box ) {
 		// Gutenberg sidebar.
 		registerPlugin( 'indieblocks-webmention-sidebar', {
-			icon: el(
-				'svg',
-				{
-					xmlns: 'http://www.w3.org/2000/svg',
-					viewBox: '0 0 24 24',
-				},
-				el( 'path', {
-					d: 'm13.91 18.089-1.894-5.792h-.032l-1.863 5.792H7.633L4.674 6.905h2.458L8.9 14.518h.032l1.94-5.793h2.302l1.91 5.886h.031L16.48 8.73l-1.778-.004L18.387 5.3l2.287 3.43-1.81-.001-2.513 9.36z',
-				} )
-			),
 			render: () => {
 				const { postId, postType } = useSelect( ( select ) => {
 					return {

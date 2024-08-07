@@ -71,7 +71,7 @@ class Blocks {
 		wp_enqueue_script(
 			'indieblocks-bookmarklets',
 			plugins_url( '/assets/bookmarklets.js', __DIR__ ),
-			array( 'wp-blocks', 'wp-element', 'wp-data', 'wp-plugins', 'wp-dom-ready' ),
+			array( 'wp-blocks', 'wp-block-editor', 'wp-notices', 'wp-element', 'wp-data', 'wp-plugins' ),
 			Plugin::PLUGIN_VERSION,
 			true
 		);

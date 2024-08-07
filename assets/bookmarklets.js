@@ -1,7 +1,9 @@
-( ( blocks, element, data, plugins, domReady ) => {
+( ( blocks, blockEditor, notices, element, data, plugins ) => {
 	const { createBlock } = blocks;
+	const { store: blockEditorStore } = blockEditor;
+	const { store: noticesStore } = notices;
 	const { useEffect } = element;
-	const { dispatch } = data;
+	const { useDispatch, useSelect } = data;
 	const { registerPlugin } = plugins;
 
 	/**
@@ -13,43 +15,48 @@
 		'indieblocks-bookmarklets',
 		{
 			render: () => {
-				domReady( () => { // May not be needed, but I mean, I don't know.
-					useEffect( () => {
-						const urlParams = new URLSearchParams( window.location.search );
+				const { getBlocks } = useSelect( blockEditorStore );
+				const { removeAllNotices } = useDispatch( noticesStore );
+				const { insertBlock, removeBlocks } = useDispatch( blockEditorStore );
 
-						const bookmarkOf = urlParams?.get( 'indieblocks_bookmark_of' );
-						const inReplyTo  = urlParams?.get( 'indieblocks_in_reply_to' );
-						const likeOf     = urlParams?.get( 'indieblocks_like_of' );
-						const repostOf   = urlParams?.get( 'indieblocks_repost_of' );
+				useEffect( () => {
+					const urlParams = new URLSearchParams( window.location.search );
 
-						let block = null;
+					const bookmarkOf = urlParams?.get( 'indieblocks_bookmark_of' );
+					const inReplyTo = urlParams?.get( 'indieblocks_in_reply_to' );
+					const likeOf = urlParams?.get( 'indieblocks_like_of' );
+					const repostOf = urlParams?.get( 'indieblocks_repost_of' );
 
-						if ( bookmarkOf ) {
-							block = createBlock( 'indieblocks/bookmark', { url: bookmarkOf } );
-						} else if ( inReplyTo ) {
-							block = createBlock( 'indieblocks/reply', { url: inReplyTo } );
-						} else if ( likeOf ) {
-							// By default, a new "like" already contains a Like block, so this would lead to a second
-							// such block being inserted. Unless one were to override the like block template.
-							block = createBlock( 'indieblocks/like', { url: likeOf } );
-						} else if ( repostOf ) {
-							block = createBlock( 'indieblocks/repost', { url: repostOf } );
-						}
+					let block = null;
 
-						if ( block ) {
-							setTimeout( () => {
-								dispatch( 'core/block-editor' ).insertBlock( block );
-							}, 250 ); // I thought maybe `domReady` would remove the need for this, but ... guess it doesn't?
-						}
-					}, [] );
-				} );
+					if ( bookmarkOf ) {
+						block = createBlock( 'indieblocks/bookmark', { url: bookmarkOf } );
+					} else if ( inReplyTo ) {
+						block = createBlock( 'indieblocks/reply', { url: inReplyTo } );
+					} else if ( likeOf ) {
+						block = createBlock( 'indieblocks/like', { url: likeOf } );
+					} else if ( repostOf ) {
+						block = createBlock( 'indieblocks/repost', { url: repostOf } );
+					}
+
+					if ( block ) {
+						removeAllNotices(); // Remove all notices.
+
+						setTimeout( () => {
+							const blockIds = getBlocks()?.map( block => block.clientId );
+							insertBlock( block );
+							removeBlocks( blockIds ); // Clear any earlier blocks.
+						} ); // We don't actually need a delay, but we need to wait till render is done.
+					}
+				}, [] );
 			}
 		}
 	);
 } )(
 	window.wp.blocks,
+	window.wp.blockEditor,
+	window.wp.notices,
 	window.wp.element,
 	window.wp.data,
-	window.wp.plugins,
-	window.wp.domReady
+	window.wp.plugins
 );

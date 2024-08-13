@@ -41,11 +41,9 @@ class Blocks {
 	/**
 	 * Registers common JS.
 	 *
-	 * `common.js` (to avoid too much code duplication) is required by the
-	 * Bookmark, Like, Reply, and Repost blocks, and itself requires the
-	 * `wp-element`, `wp-i18n`, `wp-api-fetch` assets.
+	 * @param string $hook_suffix Current admin page.
 	 */
-	public static function register_scripts() {
+	public static function register_scripts( $hook_suffix ) {
 		wp_register_script(
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
@@ -68,13 +66,16 @@ class Blocks {
 			)
 		);
 
-		wp_enqueue_script(
-			'indieblocks-bookmarklets',
-			plugins_url( '/assets/bookmarklets.js', __DIR__ ),
-			array( 'wp-blocks', 'wp-block-editor', 'wp-notices', 'wp-element', 'wp-data', 'wp-plugins', 'wp-escape-html' ),
-			Plugin::PLUGIN_VERSION,
-			true
-		);
+		$options = get_options();
+		if ( ! empty( $options['bookmarklets'] ) && in_array( $hook_suffix, array( 'post-new.php', 'post.php' ), true ) ) {
+			wp_enqueue_script(
+				'indieblocks-bookmarklets',
+				plugins_url( '/assets/bookmarklets.js', __DIR__ ),
+				array( 'wp-blocks', 'wp-block-editor', 'wp-notices', 'wp-element', 'wp-data', 'wp-plugins', 'wp-escape-html' ),
+				Plugin::PLUGIN_VERSION,
+				true
+			);
+		}
 	}
 
 	/**

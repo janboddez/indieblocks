@@ -8,8 +8,8 @@
 namespace IndieBlocks;
 
 /**
- * If applicable, converts Micropub posts to blocks and sets a post type.
- * Optionally, adds improved Micropub config query support.
+ * If applicable, converts Micropub posts to blocks and sets a post type. Optionally, adds improved Micropub config
+ * query support.
  */
 class Micropub_Compat {
 	/**
@@ -19,35 +19,29 @@ class Micropub_Compat {
 		$options = get_options();
 
 		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) || ! empty( $options['enable_likes'] ) ) {
-			// Assuming anyone who has our post types enabled would also want
-			// their Micropub posts to use them.
+			// Assuming anyone who has our post types enabled would also want their Micropub posts to use them.
 			add_filter( 'micropub_post_type', array( __CLASS__, 'set_post_type' ), 10, 2 );
 		}
 
 		if ( ! empty( $options['micropub'] ) ) {
-			// Behind an extra option so folks that want to support more post
-			// types or somehow not hook into config queries can more easily
-			// disable these.
+			// Behind an extra option so folks who want to support more post types or somehow not hook into config
+			// queries can more easily disable these.
 			if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_notes'] ) || ! empty( $options['enable_likes'] ) ) {
-				// Micropub users can often choose to limit possible post types
-				// to those supported by their CMS. Filterable.
+				// Micropub users can often choose to limit possible post types to those supported by their CMS.
 				add_filter( 'micropub_query', array( __CLASS__, 'query_post_types' ), 20, 2 );
 			}
 
 			if ( ! empty( $options['note_taxonomies'] ) || ! empty( $options['default_taxonomies'] ) || ! empty( $options['like_taxonomies'] ) ) {
-				// Certain Micropub clients support existing category or tag
-				// lookups. Filterable.
+				// Certain Micropub clients support existing category or tag lookups.
 				add_filter( 'micropub_query', array( __CLASS__, 'query_categories' ), 20, 2 );
 			}
 
 			if ( ! empty( $options['enable_blocks'] ) ) {
-				// Rather than assume anyone who has our block(s) enabled would
-				// want to use them also in (supported) Micropub posts, let's
-				// stick this, too, behind the `micropub` setting.
+				// Rather than assume anyone who has our block(s) enabled would want to use them also in (supported)
+				// Micropub posts, let's stick this, too, behind the `micropub` setting.
 				add_filter( 'micropub_post_content', array( __CLASS__, 'set_post_content' ), 10, 2 );
 
-				// Prevent the Micropub plugin from altering post content
-				// dynamically.
+				// Prevent the Micropub plugin from altering post content dynamically.
 				add_filter( 'micropub_dynamic_render', '__return_false', 99 );
 			}
 		}
@@ -106,7 +100,7 @@ class Micropub_Compat {
 					),
 				)
 			);
-		} elseif ( ! empty( $options['enable_notes'] ) ) {
+		} elseif ( ! empty( $options['enable_likes'] ) ) {
 			// Add _only_ likes.
 			$post_types[] = array(
 				'type' => 'like',
@@ -224,7 +218,7 @@ class Micropub_Compat {
 	 * Render `e-content` for certain post types.
 	 *
 	 * @param  string $post_type (IndieWeb) post type.
-	 * @param  array  $url       The URL being interacted with, if applicable.
+	 * @param  string $url       The URL being interacted with, if applicable.
 	 * @param  array  $input     Micropub input arguments.
 	 * @return string            Rendered content.
 	 */
@@ -247,8 +241,7 @@ class Micropub_Compat {
 		if ( ! empty( $url ) ) {
 			// Could be we're looking at a bookmark, reply, repost or like.
 			if ( preg_match( '~https?://.+?(?:$|\s)~', $url, $matches ) ) {
-				// Depending on the scenario, Micropub clients may add a page
-				// title in front of the URL.
+				// Depending on the scenario, Micropub clients may add a page title in front of the URL.
 				$url = trim( $matches[0] ); // Keep only the URL.
 			}
 
@@ -265,7 +258,7 @@ class Micropub_Compat {
 			switch ( $post_type ) {
 				case 'like':
 					if ( '' !== $author ) {
-						// We're given an author name; use newer Like block.
+						// We're given an author name; use the newer Like block.
 						if ( empty( $content ) ) {
 							$post_content .= '<!-- wp:indieblocks/like -->' . PHP_EOL;
 						} else {
@@ -328,7 +321,7 @@ class Micropub_Compat {
 
 				case 'bookmark':
 					if ( '' !== $author ) {
-						// We're given an author name; use newer Bookmark block.
+						// We're given an author name; use the newer Bookmark block.
 						if ( empty( $content ) ) {
 							$post_content .= '<!-- wp:indieblocks/bookmark -->' . PHP_EOL;
 						} else {
@@ -391,7 +384,7 @@ class Micropub_Compat {
 
 				case 'reply':
 					if ( '' !== $author ) {
-						// We're given an author name; use newer Reply block.
+						// We're given an author name; use the newer Reply block.
 						if ( empty( $content ) ) {
 							$post_content .= '<!-- wp:indieblocks/reply -->' . PHP_EOL;
 						} else {
@@ -454,7 +447,7 @@ class Micropub_Compat {
 
 				case 'repost':
 					if ( '' !== $author ) {
-						// We're given an author name; use newer Repost block.
+						// We're given an author name; use the newer Repost block.
 						if ( empty( $content ) ) {
 							$post_content .= '<!-- wp:indieblocks/repost -->' . PHP_EOL;
 						} else {

@@ -22,6 +22,8 @@
 			const icons = props.attributes.icons;
 			const color = props.attributes.color || '#000';
 			const iconBgColor = props.attributes.iconBackgroundColor || '#fff';
+			const countOnly = props.attributes.countOnly;
+			const forceShow = props.attributes.forceShow;
 
 			let type = props.attributes.type;
 
@@ -68,12 +70,16 @@
 							label: __( 'Bookmark', 'indieblocks' ),
 							checked: type.includes( 'bookmark' ),
 							onChange: ( checked ) => {
+								// Remove `bookmark`.
 								type = type.filter( value => value !== 'bookmark' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'bookmark' );
+									type = type.reverse();
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
 							},
 						} ),
@@ -81,12 +87,16 @@
 							label: __( 'Like', 'indieblocks' ),
 							checked: type.includes( 'like' ),
 							onChange: ( checked ) => {
+								// Remove `like`.
 								type = type.filter( value => value !== 'like' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'like' );
+									type = type.reverse();
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
 							},
 						} ),
@@ -94,13 +104,38 @@
 							label: __( 'Repost', 'indieblocks' ),
 							checked: type.includes( 'repost' ),
 							onChange: ( checked ) => {
+								// Remove `repost`.
 								type = type.filter( value => value !== 'repost' );
 
 								if ( checked ) {
+									// Re-add only if checked.
 									type.push( 'repost' );
+									type = type.reverse();
 								}
 
+								// Save array.
 								props.setAttributes( { type } );
+							},
+						} ),
+					),
+					el(
+						PanelBody,
+						{
+							title: __( 'Count Only', 'indieblocks' ),
+							initialOpen: true,
+						},
+						el( ToggleControl, {
+							label: __( 'Show count only', 'indieblocks' ),
+							checked: countOnly,
+							onChange: ( value ) => {
+								props.setAttributes( { countOnly: value } );
+							},
+						} ),
+						el( ToggleControl, {
+							label: __( 'Always show count', 'indieblocks' ),
+							checked: forceShow,
+							onChange: ( value ) => {
+								props.setAttributes( { forceShow: value } );
 							},
 						} ),
 					),
@@ -167,97 +202,119 @@
 						)
 					)
 				),
-				el(
-					'ul',
-					{ className: 'indieblocks-avatar-size-' + avatarSize },
-					type.includes( 'repost' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+				countOnly
+					? el(
+						'div',
+						{ className: 'indieblocks-count' },
+						el(
+								'svg',
+								{
+									className: 'icon indieblocks-icon-' + type.find( Boolean ),
+									width: avatarSize,
+									height: avatarSize,
+									style: {
+										backgroundColor: iconBgColor,
+										color: color,
+									},
+								},
+								el( 'use', {
+									href: '#indieblocks-icon-' + type.find( Boolean ),
+									xlinkHref: '#indieblocks-icon-repost' + type.find( Boolean ),
+								} )
+						),
+						type.length
+					)
+					: el(
+						'ul',
+						{ className: 'indieblocks-avatar-size-' + avatarSize },
+						type.includes( 'repost' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-repost',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-repost',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-repost',
-												xlinkHref: '#indieblocks-icon-repost',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-repost',
+													xlinkHref: '#indieblocks-icon-repost',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-					type.includes( 'bookmark' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+							: null,
+						type.includes( 'bookmark' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-bookmark',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-bookmark',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-bookmark',
-												xlinkHref: '#indieblocks-icon-bookmark',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-bookmark',
+													xlinkHref: '#indieblocks-icon-bookmark',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-					type.includes( 'like' )
-						? el(
-							'li',
-							{},
-							el(
-								'span',
+							: null,
+						type.includes( 'like' )
+							? el(
+								'li',
 								{},
-								el( 'img', imgProps ),
-								icons
-									? el(
-											'svg',
-											{
-												className: 'icon indieblocks-icon-like',
-												width: avatarSize,
-												height: avatarSize,
-												style: {
-													backgroundColor: iconBgColor,
-													color: color,
+								el(
+									'span',
+									{},
+									el( 'img', imgProps ),
+									icons
+										? el(
+												'svg',
+												{
+													className: 'icon indieblocks-icon-like',
+													width: avatarSize,
+													height: avatarSize,
+													style: {
+														backgroundColor: iconBgColor,
+														color: color,
+													},
 												},
-											},
-											el( 'use', {
-												href: '#indieblocks-icon-like',
-												xlinkHref: '#indieblocks-icon-like',
-											} )
-									)
-									: null
+												el( 'use', {
+													href: '#indieblocks-icon-like',
+													xlinkHref: '#indieblocks-icon-like',
+												} )
+										)
+										: null
+								)
 							)
-						)
-						: null,
-				),
+							: null,
+					),
 				RawHTML( {
 					children: html,
 				} )

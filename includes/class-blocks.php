@@ -247,22 +247,43 @@ class Blocks {
 	 */
 	public static function register_block_patterns() {
 		register_block_pattern(
-			'indieblocks/reaction-counters',
+			'indieblocks/reaction-counts',
 			array(
-				'title'       => __( 'Reaction Counters', 'indieblocks' ),
-				'description' => __( 'A row of bookmark, like, and repost counters.', 'indieblocks' ),
-				'categories'  => array( 'theme' ),
-				'content'     => '<!-- wp:indieblocks/facepile -->
+				'title'      => __( 'Reaction counts', 'indieblocks' ),
+				'categories' => array( 'text' ),
+				'content'    => '<!-- wp:indieblocks/facepile -->
 					<div class="wp-block-indieblocks-facepile">
-						<!-- wp:heading {"className":"screen-reader-text"} -->
-						<h2 class="wp-block-heading screen-reader-text">' . esc_html__( 'Likes, Bookmarks, and Reposts', 'indieblocks' ) . '</h2>
-						<!-- /wp:heading -->
-
 						<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 						<div class="wp-block-group">
-							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["like"],"countOnly":true,"forceShow":true} /-->
-							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["bookmark"],"countOnly":true,"forceShow":true} /-->
-							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["repost"],"countOnly":true,"forceShow":true} /-->
+							<!-- wp:group {"style":{"spacing":{"blockGap":"0"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+							<div class="wp-block-group">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Likes', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["like"],"countOnly":true,"forceShow":true} /-->
+							</div>
+							<!-- /wp:group -->
+
+							<!-- wp:group {"style":{"spacing":{"blockGap":"0"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+							<div class="wp-block-group">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Bookmarks', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["bookmark"],"countOnly":true,"forceShow":true} /-->
+							</div>
+							<!-- /wp:group -->
+
+							<!-- wp:group {"style":{"spacing":{"blockGap":"0"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+							<div class="wp-block-group">
+								<!-- wp:paragraph {"className":"screen-reader-text"} -->
+								<p class="screen-reader-text">' . esc_html__( 'Reposts', 'indieblocks' ) . '</p>
+								<!-- /wp:paragraph -->
+
+								<!-- wp:indieblocks/facepile-content {"type":["repost"],"countOnly":true,"forceShow":true} /-->
+							</div>
+							<!-- /wp:group -->
 						</div>
 						<!-- /wp:group -->
 					</div>

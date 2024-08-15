@@ -247,6 +247,30 @@ class Blocks {
 	 */
 	public static function register_block_patterns() {
 		register_block_pattern(
+			'indieblocks/reaction-counters',
+			array(
+				'title'       => __( 'Reaction Counters', 'indieblocks' ),
+				'description' => __( 'A row of bookmark, like, and repost counters.', 'indieblocks' ),
+				'categories'  => array( 'theme' ),
+				'content'     => '<!-- wp:indieblocks/facepile -->
+					<div class="wp-block-indieblocks-facepile">
+						<!-- wp:heading {"className":"screen-reader-text"} -->
+						<h2 class="wp-block-heading screen-reader-text">' . esc_html__( 'Likes, Bookmarks, and Reposts', 'indieblocks' ) . '</h2>
+						<!-- /wp:heading -->
+
+						<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+						<div class="wp-block-group">
+							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["like"],"countOnly":true,"forceShow":true} /-->
+							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["bookmark"],"countOnly":true,"forceShow":true} /-->
+							<!-- wp:indieblocks/facepile-content {"icons":true,"type":["repost"],"countOnly":true,"forceShow":true} /-->
+						</div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:indieblocks/facepile -->',
+			)
+		);
+
+		register_block_pattern(
 			'indieblocks/note-starter-pattern',
 			array(
 				'title'       => __( 'Note Starter Pattern', 'indieblocks' ),

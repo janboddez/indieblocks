@@ -164,10 +164,6 @@ class Options_Handler {
 			'type'    => 'string',
 			'default' => '',
 		),
-		'bookmarklets'           => array(
-			'type'    => 'boolean',
-			'default' => false,
-		),
 	);
 
 	/**
@@ -383,7 +379,6 @@ class Options_Handler {
 					'micropub'            => isset( $settings['micropub'] ) ? true : false,
 					'parse_markdown'      => isset( $settings['parse_markdown'] ) ? true : false,
 					'preview_cards'       => isset( $settings['preview_cards'] ) ? true : false,
-					'bookmarklets'        => isset( $settings['bookmarklets'] ) ? true : false,
 				);
 
 				$this->options = array_merge( $this->options, $options );
@@ -589,22 +584,6 @@ class Options_Handler {
 							<td><label><input type="checkbox" name="indieblocks_settings[preview_cards]" value="1" <?php checked( ! empty( $this->options['preview_cards'] ) ); ?>/> <?php esc_html_e( 'Generate preview cards', 'indieblocks' ); ?></label>
 							<p class="description"><?php esc_html_e( '(Experimental) Fetch link metadata in order to generate &ldquo;link preview cards.&rdquo;', 'indieblocks' ); ?></p></td>
 						</tr>
-
-							<tr valign="top">
-								<th scope="row"><?php esc_html_e( 'Bookmarklets', 'indieblocks' ); ?></th>
-								<td>
-									<label><input type="checkbox" name="indieblocks_settings[bookmarklets]" value="1" <?php checked( ! empty( $this->options['bookmarklets'] ) ); ?>/> <?php esc_html_e( 'Enable bookmarklets', 'indieblocks' ); ?></label>
-									<p class="description"><?php esc_html_e( '(Experimental) Use bookmarklets to quickly post bookmarks, likes, replies and reposts.', 'indieblocks' ); ?></p>
-									<div style="margin-block-start: 1em;">
-										<a class="button" href="javascript:( () => { window.open( '<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>?post_type=indieblocks_note&indieblocks_bookmark_of=' + encodeURIComponent( window.location.href ) + '&indieblocks_selected_text=' + encodeURIComponent( window.getSelection()?.toString().replace( /(?:\r\n|\r|\n)/g, '<br />' ) ) ); } )();"><?php esc_html_e( 'Bookmark', 'indieblocks' ); ?></a>
-
-										<a class="button" href="javascript:( () => { window.open( '<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>?post_type=indieblocks_like&indieblocks_like_of=' + encodeURIComponent( window.location.href ) + '&indieblocks_selected_text=' + encodeURIComponent( window.getSelection()?.toString().replace( /(?:\r\n|\r|\n)/g, '<br />' ) ) ); } )();"><?php esc_html_e( 'Like', 'indieblocks' ); ?></a>
-
-										<a class="button" href="javascript:( () => { window.open( '<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>?post_type=indieblocks_note&indieblocks_in_reply_to=' + encodeURIComponent( window.location.href ) + '&indieblocks_selected_text=' + encodeURIComponent( window.getSelection()?.toString().replace( /(?:\r\n|\r|\n)/g, '<br />' ) ) ); } )();"><?php esc_html_e( 'Reply', 'indieblocks' ); ?></a>
-										<a class="button" href="javascript:( () => { window.open( '<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>?post_type=indieblocks_note&indieblocks_repost_of=' + encodeURIComponent( window.location.href ) + '&indieblocks_selected_text=' + encodeURIComponent( window.getSelection()?.toString().replace( /(?:\r\n|\r|\n)/g, '<br />' ) ) ); } )();"><?php esc_html_e( 'Repost', 'indieblocks' ); ?></a>
-									</div>
-								</td>
-							</tr>
 					</table>
 				<?php endif; ?>
 

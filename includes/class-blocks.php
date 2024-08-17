@@ -246,6 +246,11 @@ class Blocks {
 	 * These are mostly outdated now.
 	 */
 	public static function register_block_patterns() {
+		// Did previously implement this as a block variation (with different default inner blocks), and while that may
+		// have worked even "better," the `isActive` part was kind of hard to figure out, and thus the variation would
+		// "look" as "just another" Facepile block. Plus, it's kind of a lot of attributes; maybe this should be a
+		// different block (or perhaps "inner block") altogether?
+		/** @todo: Add screen reader text to the SVG icon rather than in yet another Paragraph block. */
 		register_block_pattern(
 			'indieblocks/reaction-counts',
 			array(

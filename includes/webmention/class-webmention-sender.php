@@ -15,11 +15,17 @@ class Webmention_Sender {
 			add_action( "publish_{$post_type}", array( __CLASS__, 'schedule_webmention' ), 10, 2 );
 		}
 
+		// And when a post was just trashed.
+		add_action( 'trashed_post', array( __CLASS__, 'schedule_webmention' ) );
+
 		// And when a comment is first inserted into the database ...
-		add_action( 'comment_post', array( __CLASS__, 'schedule_webmention' ) ); // Pass only one argument (the comment ID) to `Webmention_Sender::schedule_webmention()`!
+		add_action( 'comment_post', array( __CLASS__, 'schedule_webmention' ) );
 
 		// And when a comment is approved. Or a previously approved comment updated.
 		add_action( 'comment_approved_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
+
+		// And when a comment was just deleted.
+		add_action( 'trashed_comment', array( __CLASS__, 'schedule_webmention' ) );
 
 		// Send previously scheduled mentions.
 		add_action( 'indieblocks_webmention_send', array( __CLASS__, 'send_webmention' ) );
@@ -45,9 +51,9 @@ class Webmention_Sender {
 	 * Scans for outgoing links, but leaves fetching Webmention endpoints to the
 	 * callback function queued in the background.
 	 *
-	 * @param int                  $obj_id     Post or comment ID.
-	 * @param \WP_Post|\WP_Comment $obj        Post or comment object.
-	 * @param mixed                $deprecated Used to be the post object, now deprecated.
+	 * @param int                         $obj_id     Post or comment ID.
+	 * @param \WP_Post|\WP_Comment|string $obj        Post or comment object, or previous post status.
+	 * @param mixed                       $deprecated Used to be the post object, now deprecated.
 	 */
 	public static function schedule_webmention( $obj_id, $obj = null, $deprecated = null ) {
 		if ( null !== $deprecated ) {
@@ -59,13 +65,16 @@ class Webmention_Sender {
 			return;
 		}
 
+		// For the other hooks, we also pass an object, but not for these two.
 		if ( 'comment_post' === current_filter() ) {
-			$obj = get_comment( $obj_id ); // For the other hooks, we also pass an object, but not here.
+			$obj = get_comment( $obj_id );
+		} elseif ( 'trashed_post' === current_filter() ) {
+			$obj = get_post( $obj_id );
 		}
 
 		if ( $obj instanceof \WP_Post ) {
-			if ( 'publish' !== $obj->post_status ) {
-				// Do not send webmention on delete/unpublish, for now.
+			if ( ! in_array( $obj->post_status, array( 'publish', 'trash' ), true ) ) {
+				// Only send on publish/trash.
 				return;
 			}
 
@@ -83,29 +92,26 @@ class Webmention_Sender {
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				return;
 			}
-		} elseif ( '1' !== $obj->comment_approved ) {
-			// Do not send webmention on delete/unpublish, for now.
-			return;
+		} elseif ( in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
+				// Only send on publish/trash.
+				return;
 		}
 
 		$urls = array();
 
-		if ( $obj instanceof \WP_Post ) {
-			// Fetch our post's HTML.
+		if ( $obj instanceof \WP_Post && 'trash' !== $obj->post_status ) {
+			// We scan posts' HTML for outgoing links.
 			$html = apply_filters( 'the_content', $obj->post_content );
-
-			// Scan it for outgoing links.
 			$urls = static::find_outgoing_links( $html );
 		} elseif ( ! empty( $obj->comment_parent ) ) {
-			// Add in the parent's, if any, Webmention source.
+			// Add the parent's, if any, Webmention source.
 			$source = get_comment_meta( $obj->comment_parent, 'indieblocks_webmention_source', true );
 			if ( ! empty( $source ) ) {
 				$urls[] = $source;
 			}
 		}
 
-		// Parse in targets that may have been there previously, but don't
-		// delete them, yet.
+		// Parse in targets that may have been there previously, but don't delete them, yet.
 		$history = \IndieBlocks\get_meta( $obj, '_indieblocks_webmention_history' );
 		if ( ! empty( $history ) && is_array( $history ) ) {
 			$urls = array_merge( $urls, array_column( $history, 'target' ) );
@@ -189,9 +195,9 @@ class Webmention_Sender {
 	 */
 	public static function send_webmention( $obj ) {
 		if ( $obj instanceof \WP_Post ) {
-			if ( 'publish' !== $obj->post_status ) {
-				// Do not send webmention on delete/unpublish, for now.
-				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is not published.' );
+			if ( ! in_array( $obj->post_status, array( 'publish', 'trash' ), true ) ) {
+				// Only send on publish/trash.
+				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is not published (or trashed).' );
 				return;
 			}
 
@@ -200,18 +206,17 @@ class Webmention_Sender {
 				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
-		} elseif ( '1' !== $obj->comment_approved ) {
-			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved." );
+		} elseif ( in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
+			// Only send on publish/trash.
+			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved (or trashed)." );
 			return;
 		}
 
 		$urls = array();
 
-		if ( $obj instanceof \WP_Post ) {
-			// Fetch our post's HTML.
+		if ( $obj instanceof \WP_Post && 'trash' !== $obj->post_status ) {
+			// We scan posts' HTML for outgoing links.
 			$html = apply_filters( 'the_content', $obj->post_content );
-
-			// Scan it for outgoing links.
 			$urls = static::find_outgoing_links( $html );
 		} elseif ( ! empty( $obj->comment_parent ) ) {
 			// Add in the parent's, if any, Webmention source.

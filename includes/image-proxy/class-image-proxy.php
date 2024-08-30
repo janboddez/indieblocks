@@ -76,6 +76,10 @@ class Image_Proxy {
 		$stream = stream_context_create( $args );
 		$handle = fopen( $url, 'rb', false, $stream ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
+		if ( false === $handle ) {
+			return new \WP_Error( 'unkown_error', esc_html__( 'Could not open URL.', 'indieblocks' ), array( 'status' => 0 ) );
+		}
+
 		// Newly received headers.
 		list( $code, $headers ) = static::get_headers( $handle );
 

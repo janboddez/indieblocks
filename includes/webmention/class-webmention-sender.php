@@ -65,11 +65,13 @@ class Webmention_Sender {
 			return;
 		}
 
-		// For the other hooks, we also pass an object, but not for these two.
-		if ( 'comment_post' === current_filter() ) {
-			$obj = get_comment( $obj_id );
-		} elseif ( 'trashed_post' === current_filter() ) {
-			$obj = get_post( $obj_id );
+		if ( null === $obj ) {
+			// For the other hooks, we also pass an object, but not for these two.
+			if ( 'comment_post' === current_filter() ) {
+				$obj = get_comment( $obj_id );
+			} elseif ( 'trashed_post' === current_filter() ) {
+				$obj = get_post( $obj_id );
+			}
 		}
 
 		if ( $obj instanceof \WP_Post ) {
@@ -92,9 +94,9 @@ class Webmention_Sender {
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				return;
 			}
-		} elseif ( in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
-				// Only send on publish/trash.
-				return;
+		} elseif ( $obj instanceof \WP_Comment && ! in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
+			// Only send on publish/trash.
+			return;
 		}
 
 		$urls = array();
@@ -206,7 +208,7 @@ class Webmention_Sender {
 				\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
-		} elseif ( in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
+		} elseif ( ! in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
 			// Only send on publish/trash.
 			\IndieBlocks\debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved (or trashed)." );
 			return;

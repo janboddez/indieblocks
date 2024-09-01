@@ -25,7 +25,7 @@ class Webmention_Sender {
 		add_action( 'comment_approved_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
 
 		// And when a comment was just deleted.
-		add_action( 'trashed_comment', array( __CLASS__, 'schedule_webmention' ) );
+		add_action( 'trashed_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
 
 		// Send previously scheduled mentions.
 		add_action( 'indieblocks_webmention_send', array( __CLASS__, 'send_webmention' ) );
@@ -74,6 +74,11 @@ class Webmention_Sender {
 			}
 		}
 
+		if ( null === $obj ) {
+			\IndieBlocks\debug_log( '[IndieBlocks\Webmention] Unable to fetch object for ID ' . $obj_id . ' (filter: `' . current_filter() . '`).' );
+			return;
+		}
+
 		if ( $obj instanceof \WP_Post ) {
 			if ( ! in_array( $obj->post_status, array( 'publish', 'trash' ), true ) ) {
 				// Only send on publish/trash.
@@ -95,6 +100,8 @@ class Webmention_Sender {
 				return;
 			}
 		} elseif ( $obj instanceof \WP_Comment && ! in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
+			\IndieBlocks\debug_log( '[IndieBlocks\Webmention] Unsupported comment status.' );
+			\IndieBlocks\debug_log( $obj );
 			// Only send on publish/trash.
 			return;
 		}

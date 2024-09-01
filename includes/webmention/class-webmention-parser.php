@@ -4,6 +4,9 @@ namespace IndieBlocks\Webmention;
 
 use IndieBlocks\Parser;
 
+use function IndieBlocks\get_options;
+use function IndieBlocks\store_image;
+
 /**
  * Parses a webmention's source page for microformats.
  */
@@ -69,10 +72,10 @@ class Webmention_Parser {
 	/**
 	 * Updates comment (meta)data using h-entry properties.
 	 *
-	 * @param array               $commentdata Comment (meta)data.
-	 * @param \IndieBlocks\Parser $parser      Parser instance.
-	 * @param string              $source      Source URL.
-	 * @param string              $target      Target URL.
+	 * @param array  $commentdata Comment (meta)data.
+	 * @param Parser $parser      Parser instance.
+	 * @param string $source      Source URL.
+	 * @param string $target      Target URL.
 	 */
 	public static function parse_hentry( &$commentdata, $parser, $source, $target ) {
 		$author = $parser->get_author();
@@ -227,7 +230,7 @@ class Webmention_Parser {
 	 * @return string|null        Local avatar path, or nothing on failure.
 	 */
 	protected static function store_avatar( $avatar_url, $author_url = '' ) {
-		$options = \IndieBlocks\get_options();
+		$options = get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			return null;
 		}
@@ -244,6 +247,6 @@ class Webmention_Parser {
 		$ext      = pathinfo( $avatar_url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
 
-		return \IndieBlocks\store_image( $avatar_url, $filename, $dir );
+		return store_image( $avatar_url, $filename, $dir );
 	}
 }

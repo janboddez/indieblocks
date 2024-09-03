@@ -2,6 +2,11 @@
 
 namespace IndieBlocks\Commands;
 
+use function IndieBlocks\get_meta;
+use function IndieBlocks\get_options;
+use function IndieBlocks\store_image;
+use function IndieBlocks\update_meta;
+
 class Commands {
 	/**
 	 * Replaces a webmention avatar by a "local" copy of the same file.
@@ -32,7 +37,7 @@ class Commands {
 	 * @param array $assoc_args "Associated" arguments.
 	 */
 	public function cache_avatar( $args, $assoc_args ) {
-		$options = \IndieBlocks\get_options();
+		$options = get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			\WP_CLI::error( 'Avatar cache disabled.' );
 			return;
@@ -49,15 +54,15 @@ class Commands {
 		if ( isset( $assoc_args['type'] ) && 'ap' === $assoc_args['type'] ) {
 			// This is a special case, to locally save avatars stored by the
 			// ActivityPub plugin.
-			$url = \IndieBlocks\get_meta( $comment, 'avatar_url' );
+			$url = get_meta( $comment, 'avatar_url' );
 			$dir = 'activitypub-avatars';
 		} elseif ( isset( $assoc_args['type'] ) && 'wm' === $assoc_args['type'] ) {
 			// This is a special case, to locally save avatars stored by the
 			// ActivityPub plugin.
-			$url = \IndieBlocks\get_meta( $comment, 'avatar' );
+			$url = get_meta( $comment, 'avatar' );
 			$dir = 'indieblocks-avatars'; // We're okay reusing this folder.
 		} else {
-			$url = \IndieBlocks\get_meta( $comment, 'indieblocks_webmention_avatar' );
+			$url = get_meta( $comment, 'indieblocks_webmention_avatar' );
 			$dir = isset( $assoc_args['dir'] )
 				? $assoc_args['dir']
 				: 'indieblocks-avatars';
@@ -90,16 +95,16 @@ class Commands {
 			? (int) $assoc_args['h']
 			: 150;
 
-		$result = \IndieBlocks\store_image( $url, $filename, $dir, $width, $height );
+		$result = store_image( $url, $filename, $dir, $width, $height );
 
 		if ( $result ) {
 			if ( isset( $assoc_args['type'] ) && 'ap' === $assoc_args['type'] ) {
 				// That special case again.
-				\IndieBlocks\update_meta( $comment, 'avatar_url', $result );
+				update_meta( $comment, 'avatar_url', $result );
 			} elseif ( isset( $assoc_args['type'] ) && 'wm' === $assoc_args['type'] ) {
-				\IndieBlocks\update_meta( $comment, 'avatar', $result );
+				update_meta( $comment, 'avatar', $result );
 			} else {
-				\IndieBlocks\update_meta( $comment, 'indieblocks_webmention_avatar', $result );
+				update_meta( $comment, 'indieblocks_webmention_avatar', $result );
 			}
 
 			\WP_CLI::success( 'All done!' );
@@ -134,7 +139,7 @@ class Commands {
 	 * @param array $assoc_args "Associated" arguments.
 	 */
 	public function cache_image( $args, $assoc_args ) {
-		$options = \IndieBlocks\get_options();
+		$options = get_options();
 		if ( empty( $options['cache_avatars'] ) ) {
 			\WP_CLI::error( 'Avatar cache disabled.' );
 			return;
@@ -176,7 +181,7 @@ class Commands {
 			? (int) $assoc_args['h']
 			: 150;
 
-		$result = \IndieBlocks\store_image( $url, $filename, $dir, $width, $height );
+		$result = store_image( $url, $filename, $dir, $width, $height );
 
 		if ( $result ) {
 			\WP_CLI::success( 'All done!' );

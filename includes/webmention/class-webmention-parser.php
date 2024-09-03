@@ -242,7 +242,7 @@ class Webmention_Parser {
 		}
 
 		$dir  = 'indieblocks-avatars/';
-		$dir .= substr( $hash, 0, 2 );
+		$dir .= substr( $hash, 0, 2 ) . '/' . substr( $hash, 2, 2 );
 
 		$ext      = pathinfo( $avatar_url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );

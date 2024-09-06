@@ -35,9 +35,6 @@ class Webmention_Sender {
 		// And when a comment is approved. Or a previously approved comment updated.
 		add_action( 'comment_approved_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
 
-		// And when a comment was just deleted.
-		add_action( 'trashed_comment', array( __CLASS__, 'schedule_webmention' ), 10, 2 );
-
 		// Send previously scheduled mentions.
 		add_action( 'indieblocks_webmention_send', array( __CLASS__, 'send_webmention' ) );
 
@@ -92,14 +89,12 @@ class Webmention_Sender {
 
 		if ( $obj instanceof \WP_Post ) {
 			if ( ! in_array( $obj->post_status, array( 'publish', 'trash' ), true ) ) {
-				// Only send on publish/trash.
 				return;
 			}
 
 			/* @see https://github.com/WordPress/gutenberg/issues/15094#issuecomment-1021288811. */
 			if ( ! empty( $_REQUEST['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				// Avoid scheduling (or posting, in case of no delay) webmentions
-				// more than once.
+				// Avoid scheduling (or posting, in case of no delay) webmentions more than once.
 				return;
 			}
 
@@ -110,8 +105,7 @@ class Webmention_Sender {
 			if ( ! in_array( $obj->post_type, Webmention::get_supported_post_types(), true ) ) {
 				return;
 			}
-		} elseif ( $obj instanceof \WP_Comment && ! in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
-			// Only send on publish/trash.
+		} elseif ( $obj instanceof \WP_Comment && '1' !== $obj->comment_approved ) {
 			return;
 		}
 
@@ -215,7 +209,6 @@ class Webmention_Sender {
 		if ( $obj instanceof \WP_Post ) {
 			if ( ! in_array( $obj->post_status, array( 'publish', 'trash' ), true ) ) {
 				// Only send on publish/trash.
-				debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is not published (or trashed).' );
 				return;
 			}
 
@@ -224,9 +217,8 @@ class Webmention_Sender {
 				debug_log( '[IndieBlocks/Webmention] Post ' . $obj->ID . ' is of an unsupported type.' );
 				return;
 			}
-		} elseif ( ! in_array( $obj->comment_approved, array( '1', 'trash' ), true ) ) {
-			// Only send on publish/trash.
-			debug_log( '[IndieBlocks/Webmention] Comment ' . $obj->comment_ID . " isn't approved (or trashed)." );
+		} elseif ( '1' !== $obj->comment_approved ) {
+			// Send mentions only for approved comments.
 			return;
 		}
 
@@ -490,7 +482,7 @@ class Webmention_Sender {
 			return;
 		}
 
-		if ( 'enqueue_block_editor_assets' === current_action() && ! apply_filters( 'indieblocks_webmention_meta_box', false )) {
+		if ( 'enqueue_block_editor_assets' === current_action() && ! apply_filters( 'indieblocks_webmention_meta_box', false ) ) {
 			$current_screen = get_current_screen();
 			if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, Webmention::get_supported_post_types(), true ) ) {
 				wp_enqueue_script(

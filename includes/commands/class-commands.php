@@ -80,7 +80,7 @@ class Commands {
 			$hash = hash( 'sha256', esc_url_raw( $url ) );
 		}
 
-		$dir .= '/' . substr( $hash, 0, 2 );
+		$dir .= '/' . substr( $hash, 0, 2 ) . '/' . substr( $hash, 2, 2 );
 
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );
@@ -166,7 +166,7 @@ class Commands {
 			$hash = hash( 'sha256', esc_url_raw( $url ) );
 		}
 
-		$dir .= '/' . substr( $hash, 0, 2 );
+		$dir .= '/' . substr( $hash, 0, 2 ) . '/' . substr( $hash, 2, 2 );
 
 		$ext      = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename = $hash . ( ! empty( $ext ) ? '.' . $ext : '' );

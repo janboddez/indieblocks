@@ -388,14 +388,19 @@ function get_facepile_comments( $post_id, $types ) {
 		return $facepile_comments;
 	}
 
-	// When the "facepile" setting's enabled, we _remove_ the very comments
-	// we now want to fetch, so we have to temporarily disable that
-	// behavior.
+	// When the "facepile" setting's enabled, we remove the very comments we now want to fetch, so we have to
+	// temporarily disable that behavior.
 	remove_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 
+	/* @todo: Check if we could maybe get rid of the `class_exist()` calls. */
 	if ( class_exists( '\\Webmention\\Comment_Walker' ) && method_exists( \Webmention\Comment_Walker::class, 'comment_query' ) ) {
 		// The Webmention plugin, as of v5.3.0, also modifies the comment query.
-		$webmention_removed = remove_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
+		$wm_removed = remove_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
+	}
+
+	if ( class_exists( '\\Activitypub\\Comment' ) && method_exists( \Activitypub\Comment::class, 'comment_query' ) ) {
+		// The ActivityPub plugin, as of v3.2.2, also modifies the comment query.
+		$ap_removed = remove_action( 'pre_get_comments', array( \Activitypub\Comment::class, 'comment_query' ) );
 	}
 
 	// Placeholder.
@@ -457,9 +462,14 @@ function get_facepile_comments( $post_id, $types ) {
 		add_action( 'pre_get_comments', array( Webmention::class, 'comment_query' ) );
 	}
 
-	if ( ! empty( $webmention_removed ) ) {
+	if ( ! empty( $wm_removed ) ) {
 		// Restore also the Webmention plugin's callback.
 		add_action( 'pre_get_comments', array( \Webmention\Comment_Walker::class, 'comment_query' ) );
+	}
+
+	if ( ! empty( $ap_removed ) ) {
+		// Restore also the ActivityPub plugin's callback.
+		add_action( 'pre_get_comments', array( \Activitypub\Comment::class, 'comment_query' ) );
 	}
 
 	// Allow filtering the resulting comments.

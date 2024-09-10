@@ -40,10 +40,8 @@ class Blocks {
 
 	/**
 	 * Registers common JS.
-	 *
-	 * @param string $hook_suffix Current admin page.
 	 */
-	public static function register_scripts( $hook_suffix ) {
+	public static function register_scripts() {
 		wp_register_script(
 			'indieblocks-common',
 			plugins_url( '/assets/common.js', __DIR__ ),
@@ -65,17 +63,6 @@ class Blocks {
 				'assets_url' => plugins_url( '/assets/', __DIR__ ),
 			)
 		);
-
-		$options = get_options();
-		if ( ! empty( $options['bookmarklets'] ) && in_array( $hook_suffix, array( 'post-new.php', 'post.php' ), true ) ) {
-			wp_enqueue_script(
-				'indieblocks-bookmarklets',
-				plugins_url( '/assets/bookmarklets.js', __DIR__ ),
-				array( 'wp-blocks', 'wp-block-editor', 'wp-notices', 'wp-element', 'wp-data', 'wp-plugins', 'wp-escape-html' ),
-				Plugin::PLUGIN_VERSION,
-				true
-			);
-		}
 	}
 
 	/**

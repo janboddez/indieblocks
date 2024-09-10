@@ -35,6 +35,9 @@ While IndieBlocks does not depend on _any_ other plugin, it is compatible with, 
 IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
 
 == Changelog ==
+= 0.13.1 =
+Minor bug fixes. Improved "Facepile" compatibility (with the ActivityPub plugin).
+
 = 0.13.0 =
 Improve Gutenberg compatibility of Location and Webmention "meta boxes." Add Syndication block prefix and suffix attributes. Support "update" and "delete" webmentions even after mentions are closed. Add avatar proxy option.
 
@@ -82,11 +85,9 @@ Fix rescheduling of webmentions from the classic editor.
 
 = 0.3.4 =
 Webmention tweaks.
+
 = 0.3.3 =
 Slight block changes. Bug fixes, and basic Webmention support.
 
 = 0.2.0 =
 Slightly improved "empty" URL handling, and permalink flushing. Additional CPT, feed and Micropub options. Date-based CPT archives, and basic location functions.
-
-= 0.1.0 =
-Very first version.

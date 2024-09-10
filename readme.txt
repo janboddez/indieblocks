@@ -1,6 +1,6 @@
 === IndieBlocks ===
 Contributors: janboddez
-Tags: blocks, gutenberg, indieweb, notes, likes, microblog, microblogging, micropub, fse, site editor, webmention, syndication
+Tags: blocks, indieweb, notes, microblog, webmention
 Tested up to: 6.6
 Stable tag: 0.13.1
 License: GNU General Public License v3.0

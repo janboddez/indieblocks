@@ -50,6 +50,10 @@ if ( ! empty( $attributes['countOnly'] ) ) {
 
 		if ( empty( $avatar ) ) {
 			continue;
+
+			// So, normally, WordPress would return a "Mystery Man" or whatever avatar, if there was none. Still, could
+			// be it doesn't in case there's no author email address.
+			// $avatar = '<img loading="lazy" decoding="async" src="' . plugins_url( '/assets/mm.png', dirname( __DIR__ ) ) . '" width="40" height="40" class="avatar avatar-40 photo">';
 		}
 
 		$processor = new \WP_HTML_Tag_Processor( $avatar );

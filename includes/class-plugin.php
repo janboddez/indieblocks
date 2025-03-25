@@ -7,14 +7,13 @@
 
 namespace IndieBlocks;
 
-use IndieBlocks\Image_Proxy\Image_Proxy;
 use IndieBlocks\Webmention\Webmention;
 
 class Plugin {
 	/**
 	 * Plugin version.
 	 */
-	const PLUGIN_VERSION = '0.13.1';
+	const PLUGIN_VERSION = '0.13.2';
 
 	/**
 	 * Options handler.
@@ -109,8 +108,6 @@ class Plugin {
 		if ( ! empty( $options['preview_cards'] ) ) {
 			add_action( 'plugins_loaded', array( Preview_Cards::class, 'register' ) );
 		}
-
-		add_action( 'rest_api_init', array( Image_Proxy::class, 'register' ) );
 	}
 
 	/**

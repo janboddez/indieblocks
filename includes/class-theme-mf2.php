@@ -494,11 +494,6 @@ class Theme_Mf2 {
 			return $avatar; // Let core (or another plugin) do its thing.
 		}
 
-		$options = get_options();
-		if ( ! empty( $options['image_proxy'] ) && 0 !== strpos( $url, home_url() ) ) {
-			$url = proxy_image( $url );
-		}
-
 		$width  = (int) ( ! empty( $args['width'] ) ? $args['width'] : 96 );
 		$height = (int) ( ! empty( $args['height'] ) ? $args['height'] : 96 );
 
@@ -546,11 +541,6 @@ class Theme_Mf2 {
 
 		if ( ! empty( $avatar_url ) ) {
 			$url = $avatar_url;
-		}
-
-		$options = get_options();
-		if ( ! empty( $options['image_proxy'] ) && wp_http_validate_url( $url ) && 0 !== strpos( $url, home_url() ) ) {
-			return proxy_image( $url );
 		}
 
 		return $url;

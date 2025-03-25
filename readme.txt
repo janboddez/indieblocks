@@ -1,8 +1,8 @@
 === IndieBlocks ===
 Contributors: janboddez
 Tags: blocks, indieweb, notes, microblog, webmention
-Tested up to: 6.6
-Stable tag: 0.13.1
+Tested up to: 6.7
+Stable tag: 0.13.2
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,6 +35,9 @@ While IndieBlocks does not depend on _any_ other plugin, it is compatible with, 
 IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible with, respectively, the Webmention and Syndication Links plugins.
 
 == Changelog ==
+= 0.13.2 =
+Removed "image proxy."
+
 = 0.13.1 =
 Minor bug fixes. Improved "Facepile" compatibility (with the ActivityPub plugin).
 

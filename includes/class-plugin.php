@@ -13,7 +13,7 @@ class Plugin {
 	/**
 	 * Plugin version.
 	 */
-	const PLUGIN_VERSION = '0.13.2';
+	const PLUGIN_VERSION = '0.13.3';
 
 	/**
 	 * Options handler.

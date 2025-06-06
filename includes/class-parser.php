@@ -89,7 +89,10 @@ class Parser {
 		// Load DOM.
 		$content = convert_encoding( $content );
 		libxml_use_internal_errors( true );
-		$this->dom->loadHTML( $content );
+
+		if ( ! $this->dom->loadHTML( $content ) ) {
+			return;
+		}
 
 		// Attempt to also load mf2.
 		$mf2 = get_transient( 'indieblocks:mf2:' . $hash );

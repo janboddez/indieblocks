@@ -1,7 +1,7 @@
 === IndieBlocks ===
 Contributors: janboddez
 Tags: blocks, indieweb, notes, microblog, webmention
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 0.13.3
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -36,7 +36,7 @@ IndieBlocks&rsquo; Facepile and Syndication blocks also aim to be compatible wit
 
 == Changelog ==
 = 0.13.3 =
-Fix RSS feeds.
+Fix RSS feeds. Properly validate and escape the Facepile Content block's type attribute.
 
 = 0.13.2 =
 Removed "image proxy."

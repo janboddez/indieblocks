@@ -36,7 +36,7 @@ $output = '';
 if ( ! empty( $attributes['countOnly'] ) ) {
 	if ( ! empty( $attributes['icons'] ) && ! empty( $attributes['type'] ) ) {
 		$kind    = ( (array) $attributes['type'] )[0];
-		$output .= '<div class="indieblocks-count"><svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg> ' . count( $facepile_comments ) . '</div>';
+		$output .= '<div class="indieblocks-count"><svg class="' . esc_attr( 'icon indieblocks-icon-' . $kind ) . '" aria-hidden="true" role="img"><use href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '" xlink:href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '"></use></svg> ' . count( $facepile_comments ) . '</div>';
 	} else {
 		$output .= '<div class="indieblocks-count">' . count( $facepile_comments ) . '</div>';
 	}
@@ -101,7 +101,7 @@ if ( ! empty( $attributes['countOnly'] ) ) {
 			$el = '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title_attr ) ? ' title="' . $title_attr . '"' : '' ) . '>' .
 			'<a class="u-url" href="' . esc_url( $source ) . '" target="_blank" rel="noopener noreferrer"><span class="h-card p-author">' . $avatar . '</span>' .
 			( ! empty( $attributes['icons'] ) && ! empty( $kind )
-				? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
+				? '<svg class="' . esc_attr( 'icon indieblocks-icon-' . $kind ) . '" aria-hidden="true" role="img"><use href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '" xlink:href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '"></use></svg>'
 				: ''
 			) .
 			"</a></li>\n";
@@ -109,7 +109,7 @@ if ( ! empty( $attributes['countOnly'] ) ) {
 			$el = '<li class="h-cite' . ( ! empty( $class ) ? " $class" : '' ) . '"' . ( ! empty( $title_attr ) ? ' title="' . $title_attr . '"' : '' ) . '>' .
 			'<span class="p-author h-card">' . $avatar . '</span>' .
 			( ! empty( $attributes['icons'] ) && ! empty( $kind )
-				? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="#indieblocks-icon-' . $kind . '" xlink:href="#indieblocks-icon-' . $kind . '"></use></svg>'
+				? '<svg class="icon indieblocks-icon-' . $kind . '" aria-hidden="true" role="img"><use href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '" xlink:href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '"></use></svg>'
 				: ''
 			) .
 			"</li>\n";

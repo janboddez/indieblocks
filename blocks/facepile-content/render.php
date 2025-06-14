@@ -35,7 +35,11 @@ $output = '';
 
 if ( ! empty( $attributes['countOnly'] ) ) {
 	if ( ! empty( $attributes['icons'] ) && ! empty( $attributes['type'] ) ) {
-		$kind    = ( (array) $attributes['type'] )[0];
+		$kind = ( (array) $attributes['type'] )[0];
+		if ( ! in_array( $kind, array( 'bookmark', 'like', 'repost' ), true ) ) {
+			return;
+		}
+
 		$output .= '<div class="indieblocks-count"><svg class="' . esc_attr( 'icon indieblocks-icon-' . $kind ) . '" aria-hidden="true" role="img"><use href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '" xlink:href="' . esc_attr( '#indieblocks-icon-' . $kind ) . '"></use></svg> ' . count( $facepile_comments ) . '</div>';
 	} else {
 		$output .= '<div class="indieblocks-count">' . count( $facepile_comments ) . '</div>';
@@ -88,7 +92,12 @@ if ( ! empty( $attributes['countOnly'] ) ) {
 			'like'     => 'p-like',
 			'repost'   => 'p-repost',
 		);
-		$class   = isset( $classes[ $kind ] ) ? esc_attr( $classes[ $kind ] ) : '';
+
+		if ( ! isset( $classes[ $kind ] ) ) {
+			$kind = '';
+		}
+
+		$class = isset( $classes[ $kind ] ) ? esc_attr( $classes[ $kind ] ) : '';
 
 		$titles     = array(
 			'bookmark' => '&hellip; bookmarked this!',

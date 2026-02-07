@@ -315,8 +315,8 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 				// Successfully renamed the file.
 				$temp_file .= ".$ext";
 			} elseif ( $wp_filesystem->put_contents( "$temp_file.$ext", $wp_filesystem->get_contents( $temp_file ), 0644 ) ) {
-				// This here mainly because, once again,  plugins like S3
-				// Uploads, or rather, the AWS SDK for PHP, doesn't always play
+				// This here mainly because, once again, plugins like S3
+				// Uploads, or rather, the AWS SDK for PHP, don't always play
 				// nice with `WP_Filesystem::move()`.
 				wp_delete_file( $temp_file ); // Delete the original.
 				$temp_file .= ".$ext"; // Our new file path from here on out.
@@ -368,6 +368,7 @@ function store_image( $url, $filename, $dir, $width = 150, $height = 150 ) {
 		}
 	} else {
 		debug_log( "[IndieBlocks] Could not load $file_path into WordPress' image editor: " . $image->get_error_message() . '.' );
+		wp_delete_file( $file_path );
 	}
 
 	// And return the local URL.

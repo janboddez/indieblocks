@@ -434,7 +434,7 @@ class Tokenizer
         // 8.1.2.3
         $this->scanner->whitespace();
         $val = $this->attributeValue();
-        if ($isValidAttribute) {
+        if ($isValidAttribute && !\array_key_exists($name, $attributes)) {
             $attributes[$name] = $val;
         }
         return \true;
@@ -957,7 +957,7 @@ class Tokenizer
                 $this->scanner->unconsume(1);
                 return '&';
             }
-            // Hexidecimal encoding.
+            // Hexadecimal encoding.
             // X[0-9a-fA-F]+;
             // x[0-9a-fA-F]+;
             if ('x' === $tok || 'X' === $tok) {

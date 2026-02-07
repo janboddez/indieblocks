@@ -1,7 +1,7 @@
 === IndieBlocks ===
 Contributors: janboddez
-Tags: blocks, indieweb, notes, microblog, webmention
-Tested up to: 6.8
+Tags: indieweb, notes, microblog, webmention, adopt-me
+Tested up to: 6.9
 Stable tag: 0.13.3
 License: GNU General Public License v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html

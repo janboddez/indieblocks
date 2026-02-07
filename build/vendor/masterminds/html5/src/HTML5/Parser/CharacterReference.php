@@ -39,7 +39,7 @@ class CharacterReference
         return \mb_decode_numericentity($entity, static::$numeric_mask, 'utf-8');
     }
     /**
-     * Given a hexidecimal number, return the UTF-8 character.
+     * Given a hexadecimal number, return the UTF-8 character.
      *
      * @param $hexdec
      *
